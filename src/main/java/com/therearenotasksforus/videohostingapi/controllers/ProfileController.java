@@ -13,9 +13,9 @@ public class ProfileController {
 
     @PostMapping("/profile/add")
     public Profile addProfile(@RequestBody Profile profile) {
-        System.out.println(profile);
+        System.out.println(profile.getFirstName());
         profileRepository.save(profile);
-        return ;
+        return profile;
     }
 
     @GetMapping("/profiles")

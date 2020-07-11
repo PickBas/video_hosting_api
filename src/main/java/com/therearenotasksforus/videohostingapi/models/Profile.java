@@ -37,6 +37,10 @@ public class Profile {
         custom_url = "";
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getUsername() {
         return username;
     }
