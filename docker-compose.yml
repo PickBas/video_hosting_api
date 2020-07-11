@@ -12,4 +12,6 @@ services:
       MYSQL_ROOT_PASSWORD: toor
       MYSQL_DATABASE: video_hosting_db
       MYSQL_USER: administrator
-      MYSQL_PASSWORD: admin
+      MYSQL_PASSWORD:
+    cap_add:
+      - SYS_NICE
