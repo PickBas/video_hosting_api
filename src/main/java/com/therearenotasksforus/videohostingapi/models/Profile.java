@@ -1,6 +1,10 @@
 package com.therearenotasksforus.videohostingapi.models;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Column;
 import java.sql.Timestamp;
 
 @Entity
@@ -9,6 +13,7 @@ public class Profile {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(unique = true)
     private String username;
 
     private String firstName;
@@ -20,10 +25,10 @@ public class Profile {
     private char gender;
     private String country;
 
-    @Column(unique=true)
+    @Column(unique = true)
     private String custom_url;
 
-    private boolean is_private_sublist;
+    private boolean isPrivateSublist;
 
     public Profile() {
         username = "";
@@ -32,7 +37,7 @@ public class Profile {
         dateJoined = new Timestamp(System.currentTimeMillis());
         aboutProfileInfo = "";
         gender = 'M';
-        is_private_sublist = false;
+        isPrivateSublist = false;
         country = "";
         custom_url = "";
     }
@@ -101,11 +106,11 @@ public class Profile {
         this.custom_url = custom_url;
     }
 
-    public boolean isIs_private_sublist() {
-        return is_private_sublist;
+    public boolean getIsPrivateSublist() {
+        return isPrivateSublist;
     }
 
-    public void setIs_private_sublist(boolean is_private_sublist) {
-        this.is_private_sublist = is_private_sublist;
+    public void setIsPrivateSublist(boolean is_private_sublist) {
+        this.isPrivateSublist = is_private_sublist;
     }
 }
