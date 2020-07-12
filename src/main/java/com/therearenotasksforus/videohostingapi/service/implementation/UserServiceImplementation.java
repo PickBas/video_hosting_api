@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,9 +34,15 @@ public class UserServiceImplementation implements UserService {
     public User register(User user) {
         Role roleUser = roleRepository.findByName("ROLE_USER");
         List<Role> userRoles = new ArrayList<>();
+
         userRoles.add(roleUser);
         user.setRoles(userRoles);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setCreated(new Timestamp(System.currentTimeMillis()));
+        user.setUpdated(new Timestamp(System.currentTimeMillis()));
+        user.setFirstName("Undecided");
+        user.setLastName("Undecided");
+
         return userRepository.save(user);
     }
 
