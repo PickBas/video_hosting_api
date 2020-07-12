@@ -2,4 +2,101 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    
+    <changeSet id="1.0.0" author="com.therearenotasksforus">
+        <createTable tableName="usrs">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="username" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="first_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="last_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created" type="TIMESTAMP" defaultValue="CURRENT_TIMESTAMP()">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated" type="TIMESTAMP" defaultValue="CURRENT_TIMESTAMP()">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+
+    <changeSet id="1.0.1" author="com.therearenotasksforus">
+        <createTable tableName="roles_users">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="created" type="TIMESTAMP" defaultValue="CURRENT_TIMESTAMP()">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated" type="TIMESTAMP" defaultValue="CURRENT_TIMESTAMP()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="1.0.2" author="com.therearenotasksforus">
+        <createTable tableName="user_roles_users">
+            <column name="user_id" type="BIGINT">
+            </column>
+
+            <column name="role_id" type="BIGINT">
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="1.0.3" author="com.therearenotasksforus">
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="user_roles_users"
+                                 constraintName="fk_user_roles_users_user"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="usrs"/>
+    </changeSet>
+
+    <changeSet id="1.0.4" author="com.therearenotasksforus">
+        <addForeignKeyConstraint baseColumnNames="role_id"
+                                 baseTableName="user_roles_users"
+                                 constraintName="fk_user_roles_users_roles_users"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="roles_users"/>
+    </changeSet>
+
+    <changeSet id="1.0.5" author="com.therearenotasksforus">
+        <insert tableName="roles_users">
+            <column name="name" value="ROLE_USER"/>
+        </insert>
+
+        <insert tableName="roles_users">
+            <column name="name" value="ROLE_ADMIN"/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>
