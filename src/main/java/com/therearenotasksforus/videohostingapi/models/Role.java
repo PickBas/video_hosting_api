@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import java.util.List;
 
 @Entity
-@Table(name = "roles_users")
+@Table(name = "roles")
 @Data
 public class Role extends BaseEntity {
 

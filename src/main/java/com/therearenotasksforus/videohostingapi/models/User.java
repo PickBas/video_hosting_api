@@ -12,7 +12,7 @@ import javax.persistence.Table;
 import java.util.List;
 
 @Entity
-@Table(name = "usrs")
+@Table(name = "users")
 @Data
 public class User extends BaseEntity {
 

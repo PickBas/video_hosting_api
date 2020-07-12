@@ -4,7 +4,7 @@
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
     
     <changeSet id="1.0.0" author="com.therearenotasksforus">
-        <createTable tableName="usrs">
+        <createTable tableName="users">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -41,7 +41,7 @@
     </changeSet>
 
     <changeSet id="1.0.1" author="com.therearenotasksforus">
-        <createTable tableName="roles_users">
+        <createTable tableName="roles">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -61,7 +61,7 @@
     </changeSet>
 
     <changeSet id="1.0.2" author="com.therearenotasksforus">
-        <createTable tableName="user_roles_users">
+        <createTable tableName="user_roles">
             <column name="user_id" type="BIGINT">
             </column>
 
@@ -72,30 +72,30 @@
 
     <changeSet id="1.0.3" author="com.therearenotasksforus">
         <addForeignKeyConstraint baseColumnNames="user_id"
-                                 baseTableName="user_roles_users"
-                                 constraintName="fk_user_roles_users_user"
+                                 baseTableName="user_roles"
+                                 constraintName="fk_user_roles_user"
                                  onDelete="CASCADE"
                                  onUpdate="RESTRICT"
                                  referencedColumnNames="id"
-                                 referencedTableName="usrs"/>
+                                 referencedTableName="users"/>
     </changeSet>
 
     <changeSet id="1.0.4" author="com.therearenotasksforus">
         <addForeignKeyConstraint baseColumnNames="role_id"
-                                 baseTableName="user_roles_users"
-                                 constraintName="fk_user_roles_users_roles_users"
+                                 baseTableName="user_roles"
+                                 constraintName="fk_user_roles_roles"
                                  onDelete="CASCADE"
                                  onUpdate="RESTRICT"
                                  referencedColumnNames="id"
-                                 referencedTableName="roles_users"/>
+                                 referencedTableName="roles"/>
     </changeSet>
 
     <changeSet id="1.0.5" author="com.therearenotasksforus">
-        <insert tableName="roles_users">
+        <insert tableName="roles">
             <column name="name" value="ROLE_USER"/>
         </insert>
 
-        <insert tableName="roles_users">
+        <insert tableName="roles">
             <column name="name" value="ROLE_ADMIN"/>
         </insert>
     </changeSet>

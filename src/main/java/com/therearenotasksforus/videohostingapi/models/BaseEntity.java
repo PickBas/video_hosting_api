@@ -25,8 +25,4 @@ public class BaseEntity {
     @LastModifiedDate
     @Column(name = "updated")
     private Date updated;
-
-    protected Long getId() {
-        return id;
-    }
 }
