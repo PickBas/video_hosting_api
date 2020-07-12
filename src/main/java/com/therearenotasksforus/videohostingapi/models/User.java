@@ -1,5 +1,6 @@
 package com.therearenotasksforus.videohostingapi.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -31,6 +32,7 @@ public class User extends BaseEntity {
     @Column(name = "password")
     private String password;
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
