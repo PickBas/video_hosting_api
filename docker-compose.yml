@@ -11,7 +11,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: toor
       MYSQL_DATABASE: video_hosting_db
-      MYSQL_USER: administrator
-      MYSQL_PASSWORD:
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 1234
     cap_add:
       - SYS_NICE
