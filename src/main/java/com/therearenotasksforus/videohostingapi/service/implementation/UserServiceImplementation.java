@@ -47,6 +47,12 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    public void updateUserToken(User user, String jwtToken) {
+        user.setJwtToken(jwtToken);
+        userRepository.save(user);
+    }
+
+    @Override
     public List<User> getAll() {
         return userRepository.findAll();
     }
@@ -60,6 +66,7 @@ public class UserServiceImplementation implements UserService {
     public User findById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
+
 
     @Override
     public void delete(Long id) {

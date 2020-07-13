@@ -7,6 +7,8 @@ import java.util.List;
 public interface UserService {
     User register(User user);
 
+    void updateUserToken(User user, String jwtToken);
+
     List<User> getAll();
 
     User findByUsername(String username);
