@@ -1,5 +1,6 @@
 package com.therearenotasksforus.videohostingapi.service.implementation;
 
+import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.repositories.ProfileRepository;
@@ -33,6 +34,12 @@ public class ProfileServiceImplementation implements ProfileService {
     @Override
     public Profile findByUser(User user) {
         return null;
+    }
+
+    @Override
+    public void addOwnedChannel(Profile profile, Channel channel) {
+        profile.addOwnedChannel(channel);
+        profileRepository.save(profile);
     }
 
     @Override

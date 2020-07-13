@@ -24,7 +24,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/api/users/")
+    @GetMapping("/api/users")
     public List<UserDto> getAllUsers() {
         List<User> users = userService.getAll();
         List<UserDto> result = new ArrayList<>();
@@ -37,7 +37,7 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/api/user/get/")
+    @GetMapping("/api/user/get")
     public UserDto getCurrentUser(@RequestHeader(name = "Authorization") String jwtToken) {
         UserDto userDto = UserDto.fromUser(userService.findByJwtToken(jwtToken.substring(6)));
         return userDto;

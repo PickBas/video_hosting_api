@@ -47,7 +47,7 @@ public class UserServiceImplementation implements UserService {
 
         Profile profile = new Profile();
 
-        profile.setcustomUrl(user.getUsername());
+        profile.setCustomUrl(user.getUsername());
         profile.setUser(user);
         profileRepository.save(profile);
 
