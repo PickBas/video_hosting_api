@@ -1,6 +1,16 @@
-version: '3.1'
+version: '3'
 
 services:
+
+  api_backend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - db
 
   db:
     image: mysql
@@ -13,5 +23,9 @@ services:
       MYSQL_DATABASE: video_hosting_db
       MYSQL_USER: user
       MYSQL_PASSWORD: 1234
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
     cap_add:
       - SYS_NICE
