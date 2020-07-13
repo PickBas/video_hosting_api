@@ -33,7 +33,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public void register(User user) {
+    public User register(User user) {
         Role roleUser = roleRepository.findByName("ROLE_USER");
         List<Role> userRoles = new ArrayList<>();
 
@@ -49,11 +49,11 @@ public class UserServiceImplementation implements UserService {
 
         profile.setcustomUrl(user.getUsername());
         profile.setUser(user);
+        profileRepository.save(profile);
 
         user.setProfile(profile);
 
-        profileRepository.save(profile);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Override

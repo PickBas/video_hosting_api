@@ -76,7 +76,7 @@ public class AuthenticationController {
             userService.register(userToRegister);
             return "Success: User with username " + userToRegister.getUsername() + " has been registered!";
         } catch (Exception e) {
-            return "Failure";
+            return "Failure: " + e.getMessage();
         }
     }
 }

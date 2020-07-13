@@ -132,4 +132,37 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="1.0.7" author="com.therearenotasksforus">
+        <createTable tableName="user_profiles">
+            <column name="user_id" type="BIGINT">
+            </column>
+
+            <column name="profiles_id" type="BIGINT">
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="1.0.8" author="com.therearenotasksforus">
+        <addForeignKeyConstraint baseColumnNames="profiles_id"
+                                 baseTableName="user_profiles"
+                                 constraintName="fk_user_profiles_profiles"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="profiles"/>
+    </changeSet>
+
+    <changeSet id="1.0.9" author="com.therearenotasksforus">
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="user_profiles"
+                                 constraintName="fk_user_profiles_user"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="users"/>
+    </changeSet>
+
+
+
 </databaseChangeLog>

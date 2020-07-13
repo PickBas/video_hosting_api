@@ -5,7 +5,7 @@ import com.therearenotasksforus.videohostingapi.models.User;
 import java.util.List;
 
 public interface UserService {
-    void register(User user);
+    User register(User user);
 
     void updateUserToken(User user, String jwtToken);
 

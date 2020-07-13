@@ -1,14 +1,11 @@
 package com.therearenotasksforus.videohostingapi.models;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Column;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "profiles")
 public class Profile  extends BaseEntity {
-    @OneToOne(mappedBy = "profile")
+    @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL)
     private User user;
 
     @Column(name = "about_profile_info")
