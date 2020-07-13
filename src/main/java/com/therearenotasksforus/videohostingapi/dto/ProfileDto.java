@@ -18,7 +18,7 @@ public class ProfileDto {
         profile.setAboutProfileInfo(aboutProfileInfo);
         profile.setGender(gender);
         profile.setCountry(country);
-        profile.setcustomUrl(customUrl);
+        profile.setCustomUrl(customUrl);
         profile.setUser(user);
 
         return profile;
@@ -30,7 +30,7 @@ public class ProfileDto {
         profileDto.setAboutProfileInfo(profile.getAboutProfileInfo());
         profileDto.setGender(profile.getGender());
         profileDto.setCountry(profile.getCountry());
-        profileDto.setCustomUrl(profile.getcustomUrl());
+        profileDto.setCustomUrl(profile.getCustomUrl());
         profileDto.setUser(profile.getUser());
 
         return profileDto;

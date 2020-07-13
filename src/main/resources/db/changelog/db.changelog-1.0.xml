@@ -2,6 +2,8 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+<!--    User-->
     
     <changeSet id="1.0.0" author="com.therearenotasksforus">
         <createTable tableName="users">
@@ -44,6 +46,8 @@
         </createTable>
     </changeSet>
 
+<!--    Roles-->
+
     <changeSet id="1.0.1" author="com.therearenotasksforus">
         <createTable tableName="roles">
             <column name="id" type="BIGINT" autoIncrement="true">
@@ -64,6 +68,8 @@
         </createTable>
     </changeSet>
 
+<!--    User-roles table-->
+
     <changeSet id="1.0.2" author="com.therearenotasksforus">
         <createTable tableName="user_roles">
             <column name="user_id" type="BIGINT">
@@ -73,6 +79,8 @@
             </column>
         </createTable>
     </changeSet>
+
+<!--    User-role relationships-->
 
     <changeSet id="1.0.3" author="com.therearenotasksforus">
         <addForeignKeyConstraint baseColumnNames="user_id"
@@ -84,6 +92,8 @@
                                  referencedTableName="users"/>
     </changeSet>
 
+<!--    Role-user relationships-->
+
     <changeSet id="1.0.4" author="com.therearenotasksforus">
         <addForeignKeyConstraint baseColumnNames="role_id"
                                  baseTableName="user_roles"
@@ -94,6 +104,8 @@
                                  referencedTableName="roles"/>
     </changeSet>
 
+<!--    Inserting data into role-->
+
     <changeSet id="1.0.5" author="com.therearenotasksforus">
         <insert tableName="roles">
             <column name="name" value="ROLE_USER"/>
@@ -103,6 +115,8 @@
             <column name="name" value="ROLE_ADMIN"/>
         </insert>
     </changeSet>
+
+<!--    Profile-->
 
     <changeSet id="1.0.6" author="com.therearenotasksforus">
         <createTable tableName="profiles">
@@ -132,19 +146,22 @@
         </createTable>
     </changeSet>
 
+<!--    User-profile table-->
+
     <changeSet id="1.0.7" author="com.therearenotasksforus">
         <createTable tableName="user_profiles">
             <column name="user_id" type="BIGINT">
             </column>
 
-            <column name="profiles_id" type="BIGINT">
+            <column name="profile_id" type="BIGINT">
             </column>
         </createTable>
     </changeSet>
 
+<!--    Profile-user relationships-->
 
     <changeSet id="1.0.8" author="com.therearenotasksforus">
-        <addForeignKeyConstraint baseColumnNames="profiles_id"
+        <addForeignKeyConstraint baseColumnNames="profile_id"
                                  baseTableName="user_profiles"
                                  constraintName="fk_user_profiles_profiles"
                                  onDelete="CASCADE"
@@ -152,6 +169,8 @@
                                  referencedColumnNames="id"
                                  referencedTableName="profiles"/>
     </changeSet>
+
+<!--    User-profile relationships-->
 
     <changeSet id="1.0.9" author="com.therearenotasksforus">
         <addForeignKeyConstraint baseColumnNames="user_id"
@@ -163,6 +182,58 @@
                                  referencedTableName="users"/>
     </changeSet>
 
+<!--    Channel-->
 
+    <changeSet id="1.0.10" author="com.therearenotasksforus">
+        <createTable tableName="channels">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="true" unique="false"/>
+            </column>
+
+            <column name="info" type="VARCHAR(5000)">
+                <constraints nullable="true" unique="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+<!--    Profile-channel table-->
+
+    <changeSet id="1.0.11" author="com.therearenotasksforus">
+        <createTable tableName="profile_channels">
+            <column name="profile_id" type="BIGINT">
+            </column>
+
+            <column name="channel_id" type="BIGINT">
+            </column>
+        </createTable>
+    </changeSet>
+
+<!--    Channels-profiles relationships-->
+
+    <changeSet id="1.0.12" author="com.therearenotasksforus">
+        <addForeignKeyConstraint baseColumnNames="channel_id"
+                                 baseTableName="profile_channels"
+                                 constraintName="fk_profile_channels_channels"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="channels"/>
+    </changeSet>
+
+<!--    Profile-channels relationships-->
+
+    <changeSet id="1.0.13" author="com.therearenotasksforus">
+        <addForeignKeyConstraint baseColumnNames="profile_id"
+                                 baseTableName="profile_channels"
+                                 constraintName="fk_profile_channels_profile"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="profiles"/>
+    </changeSet>
 
 </databaseChangeLog>
