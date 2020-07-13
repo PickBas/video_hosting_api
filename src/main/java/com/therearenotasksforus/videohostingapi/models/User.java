@@ -8,12 +8,20 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.CascadeType;
 import javax.persistence.Table;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
 public class User extends BaseEntity {
+    @JsonIgnore
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinTable(name = "user_profiles",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "profile_id", referencedColumnName = "id")})
+    private Profile profile;
 
     @Column(name = "username")
     private String username;
@@ -95,5 +103,13 @@ public class User extends BaseEntity {
 
     public void setJwtToken(String jwtToken) {
         this.jwtToken = jwtToken;
+    }
+
+    public Profile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(Profile profile) {
+        this.profile = profile;
     }
 }
