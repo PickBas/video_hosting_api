@@ -1,11 +1,12 @@
 package com.therearenotasksforus.videohostingapi.service.implementation;
 
+import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.Role;
 import com.therearenotasksforus.videohostingapi.models.User;
+import com.therearenotasksforus.videohostingapi.repositories.ProfileRepository;
 import com.therearenotasksforus.videohostingapi.repositories.RoleRepository;
 import com.therearenotasksforus.videohostingapi.repositories.UserRepository;
 import com.therearenotasksforus.videohostingapi.service.UserService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,23 +16,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Slf4j
 public class UserServiceImplementation implements UserService {
 
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final ProfileRepository profileRepository;
 
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImplementation(UserRepository userRepository, RoleRepository repository, BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImplementation(UserRepository userRepository, RoleRepository repository, ProfileRepository profileRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = repository;
+        this.profileRepository = profileRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public User register(User user) {
+    public void register(User user) {
         Role roleUser = roleRepository.findByName("ROLE_USER");
         List<Role> userRoles = new ArrayList<>();
 
@@ -43,7 +45,15 @@ public class UserServiceImplementation implements UserService {
         user.setFirstName("Undecided");
         user.setLastName("Undecided");
 
-        return userRepository.save(user);
+        Profile profile = new Profile();
+
+        profile.setcustomUrl(user.getUsername());
+        profile.setUser(user);
+
+        user.setProfile(profile);
+
+        profileRepository.save(profile);
+        userRepository.save(user);
     }
 
     @Override
@@ -66,7 +76,6 @@ public class UserServiceImplementation implements UserService {
     public User findById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
-
 
     @Override
     public void delete(Long id) {

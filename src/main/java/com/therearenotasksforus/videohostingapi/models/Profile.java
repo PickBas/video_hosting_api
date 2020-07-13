@@ -75,8 +75,8 @@ public class Profile  extends BaseEntity {
         this.isPrivateSublist = is_private_sublist;
     }
 
-    public Long getUser() {
-        return user.getId();
+    public User getUser() {
+        return user;
     }
 
     public void setUser(User user) {
