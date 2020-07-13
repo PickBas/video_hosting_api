@@ -1,5 +1,6 @@
 package com.therearenotasksforus.videohostingapi.service;
 
+import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
 
 import java.util.List;
@@ -11,9 +12,10 @@ public interface UserService {
 
     List<User> getAll();
 
-    User findByUsername(String username);
-
     User findById(Long id);
+    User findByProfile(Profile profile);
+    User findByJwtToken(String jwtToken);
+    User findByUsername(String username);
 
     void delete(Long id);
 }

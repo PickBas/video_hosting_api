@@ -78,6 +78,16 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    public User findByProfile(Profile profile) {
+        return userRepository.findByProfile(profile);
+    }
+
+    @Override
+    public User findByJwtToken(String jwtToken) {
+        return userRepository.findByJwtToken(jwtToken);
+    }
+
+    @Override
     public void delete(Long id) {
         userRepository.deleteById(id);
     }
