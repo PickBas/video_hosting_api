@@ -1,6 +1,7 @@
 package com.therearenotasksforus.videohostingapi.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -10,6 +11,7 @@ public class UserDto {
     private String firstName;
     private String lastName;
     private String email;
+    private Profile profile;
 
     public User toUser(){
         User user = new User();
@@ -18,6 +20,7 @@ public class UserDto {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);
+        user.setProfile(profile);
 
         return user;
     }
@@ -29,6 +32,7 @@ public class UserDto {
         userDto.setFirstName(user.getFirstName());
         userDto.setLastName(user.getLastName());
         userDto.setEmail(user.getEmail());
+        userDto.setProfile(user.getProfile());
 
         return userDto;
     }
@@ -53,6 +57,10 @@ public class UserDto {
         this.email = email;
     }
 
+    public void setProfile(Profile profile) {
+        this.profile = profile;
+    }
+
     public Long getId() {
         return id;
     }
@@ -72,5 +80,10 @@ public class UserDto {
     public String getEmail() {
         return email;
     }
+
+    public Long getProfile() {
+        return profile.getId();
+    }
+
 
 }

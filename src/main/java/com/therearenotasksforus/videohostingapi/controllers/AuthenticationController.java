@@ -2,6 +2,7 @@ package com.therearenotasksforus.videohostingapi.controllers;
 
 import com.therearenotasksforus.videohostingapi.dto.AuthenticationRequestDto;
 import com.therearenotasksforus.videohostingapi.dto.UserRegistrationDto;
+import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.security.jwt.JwtTokenProvider;
 import com.therearenotasksforus.videohostingapi.service.UserService;
@@ -71,11 +72,11 @@ public class AuthenticationController {
             userToRegister.setUsername(requestDto.getUsername());
             userToRegister.setEmail(requestDto.getEmail());
             userToRegister.setPassword(requestDto.getPassword());
-            userService.register(userToRegister);
 
+            userService.register(userToRegister);
             return "Success: User with username " + userToRegister.getUsername() + " has been registered!";
         } catch (Exception e) {
-            return "Failure";
+            return "Failure: " + e.getMessage();
         }
     }
 }

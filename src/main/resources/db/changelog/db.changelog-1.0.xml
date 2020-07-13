@@ -103,4 +103,66 @@
             <column name="name" value="ROLE_ADMIN"/>
         </insert>
     </changeSet>
+
+    <changeSet id="1.0.6" author="com.therearenotasksforus">
+        <createTable tableName="profiles">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="about_profile_info" type="VARCHAR(5000)">
+                <constraints nullable="true" unique="false"/>
+            </column>
+
+            <column name="gender" type="VARCHAR(5)">
+                <constraints nullable="true" unique="false"/>
+            </column>
+
+            <column name="country" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="custom_url" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="is_private_sublist" type="BIT(1)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="1.0.7" author="com.therearenotasksforus">
+        <createTable tableName="user_profiles">
+            <column name="user_id" type="BIGINT">
+            </column>
+
+            <column name="profiles_id" type="BIGINT">
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="1.0.8" author="com.therearenotasksforus">
+        <addForeignKeyConstraint baseColumnNames="profiles_id"
+                                 baseTableName="user_profiles"
+                                 constraintName="fk_user_profiles_profiles"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="profiles"/>
+    </changeSet>
+
+    <changeSet id="1.0.9" author="com.therearenotasksforus">
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="user_profiles"
+                                 constraintName="fk_user_profiles_user"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="users"/>
+    </changeSet>
+
+
+
 </databaseChangeLog>
