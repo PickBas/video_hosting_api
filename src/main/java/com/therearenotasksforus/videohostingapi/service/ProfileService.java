@@ -1,9 +1,11 @@
 package com.therearenotasksforus.videohostingapi.service;
 
+import com.therearenotasksforus.videohostingapi.dto.profile.ProfileUpdateDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
 
+import javax.xml.bind.ValidationException;
 import java.util.List;
 
 public interface ProfileService {
@@ -14,6 +16,8 @@ public interface ProfileService {
     void addOwnedChannel(Profile profile, Channel channel);
 
     List<Profile> getAll();
+
+    void update(Profile profile, ProfileUpdateDto profileUpdateDto) throws ValidationException;
 
     void delete(Long id);
 

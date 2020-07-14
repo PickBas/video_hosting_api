@@ -26,3 +26,6 @@ A token which you get after logging in has to be provided as a request header wi
 ### Profile
     * /api/profiles - Getting all the profiles. GET request.
     * /api/profilee - Getting the current profile. GET request.
+    * /api/profile/id/{id} - Getting a profile with its id. GET request.
+    * /api/profile/update - Updating profiles's data. POST request. JSON Example: {"aboutProfileInfo": "example", "gender": "M/F", "country": "example", "customUrl": "example", "isPrivateSublist": "false/true"}
+

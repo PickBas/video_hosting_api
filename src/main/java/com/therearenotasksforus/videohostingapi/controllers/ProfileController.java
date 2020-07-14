@@ -1,16 +1,16 @@
 package com.therearenotasksforus.videohostingapi.controllers;
 
 import com.therearenotasksforus.videohostingapi.dto.profile.ProfileDto;
+import com.therearenotasksforus.videohostingapi.dto.profile.ProfileUpdateDto;
 import com.therearenotasksforus.videohostingapi.dto.user.UserDto;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +47,25 @@ public class ProfileController {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @GetMapping("/api/profile/id/{id}")
+    public ProfileDto getProfileById(@PathVariable(name = "id") Long id) {
+        return ProfileDto.fromProfile(profileService.findById(id));
+    }
+
+    @PostMapping("/api/profile/update")
+    public String updateProfile(@RequestHeader(name = "Authorization") String jwtToken, @RequestBody ProfileUpdateDto requestDto) {
+        User currentUser = userService.findByJwtToken(jwtToken.substring(6));
+        Profile currentProfile = currentUser.getProfile();
+
+        try {
+            profileService.update(currentProfile, requestDto);
+        } catch (ValidationException e) {
+            return "Failure: wrong data was provided";
+        }
+
+        return "Success: profile " + currentProfile.getUser().getUsername() + " was updated!";
     }
 
 }
