@@ -20,6 +20,7 @@ public class ProfileDto {
 
     public Profile toUser(){
         Profile profile = new Profile();
+
         profile.setId(id);
         profile.setAboutProfileInfo(aboutProfileInfo);
         profile.setGender(gender);
@@ -34,6 +35,7 @@ public class ProfileDto {
 
     public static ProfileDto fromUser(Profile profile) {
         ProfileDto profileDto = new ProfileDto();
+
         profileDto.setId(profile.getId());
         profileDto.setAboutProfileInfo(profile.getAboutProfileInfo());
         profileDto.setGender(profile.getGender());
