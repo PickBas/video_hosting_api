@@ -1,7 +1,11 @@
 package com.therearenotasksforus.videohostingapi.dto.profile;
 
+import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProfileDto {
     private Long id;
@@ -11,6 +15,8 @@ public class ProfileDto {
     private String country;
     private String customUrl;
     private boolean isPrivateSublist;
+    private List<Channel> ownedChannels;
+    private List<Channel> subscriptions;
 
     public Profile toUser(){
         Profile profile = new Profile();
@@ -20,6 +26,8 @@ public class ProfileDto {
         profile.setCountry(country);
         profile.setCustomUrl(customUrl);
         profile.setUser(user);
+        profile.setOwnedChannels(ownedChannels);
+        profile.setSubscriptions(subscriptions);
 
         return profile;
     }
@@ -32,6 +40,8 @@ public class ProfileDto {
         profileDto.setCountry(profile.getCountry());
         profileDto.setCustomUrl(profile.getCustomUrl());
         profileDto.setUser(profile.getUser());
+        profileDto.setOwnedChannels(profile.getOwnedChannels());
+        profileDto.setSubscriptions(profile.getSubscriptions());
 
         return profileDto;
     }
@@ -87,4 +97,33 @@ public class ProfileDto {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public void setOwnedChannels(List<Channel> ownedChannels) {
+        this.ownedChannels = ownedChannels;
+    }
+
+    public void setSubscriptions(List<Channel> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
+
+    public List<Long> getOwnedChannels() {
+        List<Long> ownedChannelsIds = new ArrayList<>();
+
+        for (Channel channel : ownedChannels) {
+            ownedChannelsIds.add(channel.getId());
+        }
+
+        return ownedChannelsIds;
+    }
+
+    public List<Long> getSubscriptions() {
+        List<Long> subscriptionsIds = new ArrayList<>();
+
+        for (Channel channel : subscriptions) {
+            subscriptionsIds.add(channel.getId());
+        }
+
+        return subscriptionsIds;
+    }
+
 }
