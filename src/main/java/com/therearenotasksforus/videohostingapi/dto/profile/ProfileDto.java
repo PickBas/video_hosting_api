@@ -18,7 +18,7 @@ public class ProfileDto {
     private List<Channel> ownedChannels;
     private List<Channel> subscriptions;
 
-    public Profile toUser(){
+    public Profile toProfile(){
         Profile profile = new Profile();
 
         profile.setId(id);
@@ -33,7 +33,7 @@ public class ProfileDto {
         return profile;
     }
 
-    public static ProfileDto fromUser(Profile profile) {
+    public static ProfileDto fromProfile(Profile profile) {
         ProfileDto profileDto = new ProfileDto();
 
         profileDto.setId(profile.getId());

@@ -1,10 +1,13 @@
 package com.therearenotasksforus.videohostingapi.controllers;
 
 import com.therearenotasksforus.videohostingapi.dto.profile.ProfileDto;
+import com.therearenotasksforus.videohostingapi.dto.user.UserDto;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.service.ProfileService;
+import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -14,9 +17,12 @@ import java.util.List;
 public class ProfileController {
     private final ProfileService profileService;
 
+    private final UserService userService;
+
     @Autowired
-    public ProfileController(ProfileService profileService) {
+    public ProfileController(ProfileService profileService, UserService userService) {
         this.profileService = profileService;
+        this.userService = userService;
     }
 
     @GetMapping("/api/profiles")
@@ -25,10 +31,19 @@ public class ProfileController {
         List<ProfileDto> result = new ArrayList<>();
 
         for (Profile profile : profiles) {
-            result.add(ProfileDto.fromUser(profile));
+            result.add(ProfileDto.fromProfile(profile));
         }
 
         return result;
+    }
+
+    @GetMapping("/api/profile")
+    public ProfileDto getCurrentUser(@RequestHeader(name = "Authorization") String jwtToken) {
+        try {
+            return ProfileDto.fromProfile(profileService.findById(UserDto.fromUser(userService.findByJwtToken(jwtToken.substring(6))).getProfile()));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }
