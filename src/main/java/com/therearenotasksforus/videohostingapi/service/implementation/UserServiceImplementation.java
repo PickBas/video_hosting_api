@@ -1,5 +1,6 @@
 package com.therearenotasksforus.videohostingapi.service.implementation;
 
+import com.therearenotasksforus.videohostingapi.dto.user.UpdateUserDto;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.Role;
 import com.therearenotasksforus.videohostingapi.models.User;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.xml.bind.ValidationException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +35,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public User register(User user) {
+    public void register(User user) {
         Role roleUser = roleRepository.findByName("ROLE_USER");
         List<Role> userRoles = new ArrayList<>();
 
@@ -53,7 +55,7 @@ public class UserServiceImplementation implements UserService {
 
         user.setProfile(profile);
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     @Override
@@ -63,9 +65,13 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public void updateNames(User user, String firstName, String lastName) {
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
+    public void updateNames(User user, UpdateUserDto updateUserDto) throws ValidationException {
+        if (updateUserDto.getFirstName() == null && updateUserDto.getLastName() == null) {
+            throw new ValidationException("Failure: wrong data was provided");
+        }
+
+        user.setFirstName(updateUserDto.getFirstName() != null ? updateUserDto.getFirstName() : "");
+        user.setLastName(updateUserDto.getLastName() != null ? updateUserDto.getLastName() : "");
 
         user.setUpdated(new Timestamp(System.currentTimeMillis()));
 

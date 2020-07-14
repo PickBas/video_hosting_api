@@ -7,6 +7,7 @@ import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,14 +58,11 @@ public class UserController {
             return "Failure: cannot find the user!";
         }
 
-        if (requestDto.getFirstName() == null && requestDto.getLastName() == null) {
+        try {
+            userService.updateNames(userToUpdate, requestDto);
+        } catch (ValidationException e) {
             return "Failure: invalid data was provided!";
         }
-
-        String firstName = requestDto.getFirstName() != null ? requestDto.getFirstName() : "";
-        String lastName = requestDto.getLastName() != null ? requestDto.getLastName() : "";
-
-        userService.updateNames(userToUpdate, firstName, lastName);
 
         return "Success: the user has been updated!";
     }
