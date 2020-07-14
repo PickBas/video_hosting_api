@@ -1,15 +1,21 @@
 package com.therearenotasksforus.videohostingapi.service;
 
 import com.therearenotasksforus.videohostingapi.dto.channel.ChannelCreateDto;
+import com.therearenotasksforus.videohostingapi.dto.channel.ChannelUpdateDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 
+import javax.xml.bind.ValidationException;
 import java.util.List;
 
 public interface ChannelService {
     Channel findById(Long id);
 
     Channel create(Profile channelOwner, ChannelCreateDto requestDto);
+
+    void update(Channel channel, ChannelUpdateDto channelUpdateDto) throws ValidationException;
+
+    boolean isProfileOwner(Profile profile, Channel channel);
 
     List<Channel> getAll();
 

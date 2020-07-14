@@ -1,6 +1,7 @@
 package com.therearenotasksforus.videohostingapi.service.implementation;
 
 import com.therearenotasksforus.videohostingapi.dto.channel.ChannelCreateDto;
+import com.therearenotasksforus.videohostingapi.dto.channel.ChannelUpdateDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.repositories.ChannelRepository;
@@ -8,6 +9,7 @@ import com.therearenotasksforus.videohostingapi.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.xml.bind.ValidationException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,24 @@ public class ChannelServiceImplementation implements ChannelService {
         channel.setCreated(new Timestamp(System.currentTimeMillis()));
         channel.setUpdated(new Timestamp(System.currentTimeMillis()));
         return channelRepository.save(channel);
+    }
+
+    @Override
+    public void update(Channel channel, ChannelUpdateDto channelUpdateDto) throws ValidationException {
+        if (channelUpdateDto.getName() == null && channel.getInfo() == null)
+            throw new ValidationException("Wrong data was provided");
+
+        channel.setUpdated(new Timestamp(System.currentTimeMillis()));
+
+        channel.setName(channelUpdateDto.getName() != null ? channelUpdateDto.getName() : "");
+        channel.setInfo(channelUpdateDto.getInfo() != null ? channelUpdateDto.getInfo() : "");
+
+        channelRepository.save(channel);
+    }
+
+    @Override
+    public boolean isProfileOwner(Profile profile, Channel channel) {
+        return profile == channel.getOwner();
     }
 
     @Override
