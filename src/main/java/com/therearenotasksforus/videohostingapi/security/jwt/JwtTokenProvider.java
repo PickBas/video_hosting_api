@@ -1,5 +1,6 @@
 package com.therearenotasksforus.videohostingapi.security.jwt;
 
+import com.therearenotasksforus.videohostingapi.security.jwt.services.InvalidJwtsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -36,6 +37,9 @@ public class JwtTokenProvider {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private InvalidJwtsService invalidJwtsService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -75,7 +79,7 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest req) {
         String authorizationToken = req.getHeader("Authorization");
-        if (authorizationToken != null && authorizationToken.startsWith("TOKEN_")) {
+        if (authorizationToken != null && authorizationToken.startsWith("TOKEN_") && !invalidJwtsService.findByToken(authorizationToken.substring(6))) {
             return authorizationToken.substring(6);
         }
         return null;

@@ -1,22 +1,19 @@
 package com.therearenotasksforus.videohostingapi.controllers;
 
 import com.therearenotasksforus.videohostingapi.dto.AuthenticationRequestDto;
+import com.therearenotasksforus.videohostingapi.dto.LogoutRequestDto;
 import com.therearenotasksforus.videohostingapi.dto.UserRegistrationDto;
-import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.security.jwt.JwtTokenProvider;
+import com.therearenotasksforus.videohostingapi.security.jwt.services.InvalidJwtsService;
+import com.therearenotasksforus.videohostingapi.security.models.InvalidJwts;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,11 +28,14 @@ public class AuthenticationController {
 
     private final UserService userService;
 
+    private final InvalidJwtsService invalidJwtsService;
+
     @Autowired
-    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, UserService userService) {
+    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, UserService userService, InvalidJwtsService invalidJwtsService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
+        this.invalidJwtsService = invalidJwtsService;
     }
 
     @PostMapping("login")
@@ -79,4 +79,13 @@ public class AuthenticationController {
             return "Failure: " + e.getMessage();
         }
     }
+
+    @PostMapping("logout")
+    public String logout(@RequestHeader(name = "Authorization") String jwtToken, @RequestBody LogoutRequestDto requestDto) {
+        if (requestDto.getLogout().equals("true"))
+            invalidJwtsService.addNew(jwtToken.substring(6));
+
+        return "Success: You've logged out";
+    }
+
 }

@@ -1,8 +1,6 @@
 package com.therearenotasksforus.videohostingapi.security;
 
-import com.therearenotasksforus.videohostingapi.security.jwt.JwtUser;
 import com.therearenotasksforus.videohostingapi.security.jwt.JwtUserFactory;
-import lombok.extern.slf4j.Slf4j;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +10,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
 public class JwtUserDetailsService implements UserDetailsService {
 
     private final UserService userService;
@@ -30,8 +27,6 @@ public class JwtUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User with username: " + username + " not found");
         }
 
-        JwtUser jwtUser = JwtUserFactory.create(user);
-        log.info("IN loadUserByUsername - user with username: {} successfully loaded", username);
-        return jwtUser;
+        return JwtUserFactory.create(user);
     }
 }

@@ -236,4 +236,18 @@
                                  referencedTableName="profiles"/>
     </changeSet>
 
+<!--    Invalid tokens-->
+    <changeSet id="1.0.14" author="com.therearenotasksforus">
+        <createTable tableName="invalid_tokens">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="token" type="VARCHAR(1000)">
+                <constraints nullable="true" unique="false"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
