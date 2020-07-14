@@ -3,6 +3,7 @@ package com.therearenotasksforus.videohostingapi.controllers;
 import com.therearenotasksforus.videohostingapi.dto.profile.ProfileDto;
 import com.therearenotasksforus.videohostingapi.dto.user.UserDto;
 import com.therearenotasksforus.videohostingapi.models.Profile;
+import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +39,11 @@ public class ProfileController {
     }
 
     @GetMapping("/api/profile")
-    public ProfileDto getCurrentUser(@RequestHeader(name = "Authorization") String jwtToken) {
+    public ProfileDto getCurrentProfile(@RequestHeader(name = "Authorization") String jwtToken) {
         try {
-            return ProfileDto.fromProfile(profileService.findById(UserDto.fromUser(userService.findByJwtToken(jwtToken.substring(6))).getProfile()));
+            User currentUser = userService.findByJwtToken(jwtToken.substring(6));
+            Profile currentProfile = currentUser.getProfile();
+            return ProfileDto.fromProfile(currentProfile);
         } catch (Exception e) {
             return null;
         }
