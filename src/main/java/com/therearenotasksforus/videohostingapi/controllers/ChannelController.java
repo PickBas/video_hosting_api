@@ -28,6 +28,10 @@ public class ChannelController {
     public String channelCreate(@RequestHeader(name = "Authorization") String jwtToken, @RequestBody ChannelCreateDto requestDto) {
         Profile channelOwner = userService.findByJwtToken(jwtToken.substring(6)).getProfile();
 
+        if (requestDto.getName().isEmpty()) {
+            return "Failure: No channel name was provided!";
+        }
+
         Channel channel = channelService.create(channelOwner, requestDto);
 
         profileService.addOwnedChannel(channelOwner, channel);

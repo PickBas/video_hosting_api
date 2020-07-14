@@ -1,15 +1,11 @@
 package com.therearenotasksforus.videohostingapi.controllers;
 
+import com.therearenotasksforus.videohostingapi.dto.UpdateUserDto;
 import com.therearenotasksforus.videohostingapi.dto.UserDto;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.service.UserService;
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,10 +33,40 @@ public class UserController {
         return result;
     }
 
-    @GetMapping("/api/user/get")
+    @GetMapping("/api/user")
     public UserDto getCurrentUser(@RequestHeader(name = "Authorization") String jwtToken) {
-        UserDto userDto = UserDto.fromUser(userService.findByJwtToken(jwtToken.substring(6)));
-        return userDto;
+        try {
+            return UserDto.fromUser(userService.findByJwtToken(jwtToken.substring(6)));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @GetMapping("/api/user/id/{id}")
+    public UserDto getUserById(@PathVariable(name = "id") Long id) {
+        return UserDto.fromUser(userService.findById(id));
+    }
+
+    @PostMapping("/api/user/update")
+    public String updateUser(@RequestHeader(name = "Authorization") String jwtToken, @RequestBody UpdateUserDto requestDto) {
+        User userToUpdate;
+
+        try {
+             userToUpdate = userService.findByJwtToken(jwtToken.substring(6));
+        } catch (Exception e) {
+            return "Failure: cannot find the user!";
+        }
+
+        if (requestDto.getFirstName() == null && requestDto.getLastName() == null) {
+            return "Failure: invalid data was provided!";
+        }
+
+        String firstName = requestDto.getFirstName() != null ? requestDto.getFirstName() : "";
+        String lastName = requestDto.getLastName() != null ? requestDto.getLastName() : "";
+
+        userService.updateNames(userToUpdate, firstName, lastName);
+
+        return "Success: the user has been updated!";
     }
 
 }

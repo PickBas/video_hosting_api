@@ -47,7 +47,7 @@ public class AuthenticationController {
             User user = userService.findByUsername(username);
 
             if (user == null) {
-                throw new UsernameNotFoundException("User with username: " + username + " not found");
+                throw new UsernameNotFoundException("User with username: " + username + " not found!");
             }
 
             String token = jwtTokenProvider.createToken(username, user.getRoles());
@@ -85,7 +85,7 @@ public class AuthenticationController {
         if (requestDto.getLogout().equals("true"))
             invalidJwtsService.addNew(jwtToken.substring(6));
 
-        return "Success: You've logged out";
+        return "Success: You've logged out!";
     }
 
 }

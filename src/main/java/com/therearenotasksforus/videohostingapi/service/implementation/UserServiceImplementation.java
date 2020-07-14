@@ -63,6 +63,16 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    public void updateNames(User user, String firstName, String lastName) {
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+
+        user.setUpdated(new Timestamp(System.currentTimeMillis()));
+
+        userRepository.save(user);
+    }
+
+    @Override
     public List<User> getAll() {
         return userRepository.findAll();
     }

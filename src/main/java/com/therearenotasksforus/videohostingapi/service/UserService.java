@@ -10,6 +10,8 @@ public interface UserService {
 
     void updateUserToken(User user, String jwtToken);
 
+    void updateNames(User user, String firstName, String lastName);
+
     List<User> getAll();
 
     User findById(Long id);
