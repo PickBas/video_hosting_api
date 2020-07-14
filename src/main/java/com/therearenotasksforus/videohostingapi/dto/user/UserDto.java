@@ -1,4 +1,4 @@
-package com.therearenotasksforus.videohostingapi.dto;
+package com.therearenotasksforus.videohostingapi.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.therearenotasksforus.videohostingapi.models.Profile;

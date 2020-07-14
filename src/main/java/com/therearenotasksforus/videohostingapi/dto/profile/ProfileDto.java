@@ -1,4 +1,4 @@
-package com.therearenotasksforus.videohostingapi.dto;
+package com.therearenotasksforus.videohostingapi.dto.profile;
 
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;

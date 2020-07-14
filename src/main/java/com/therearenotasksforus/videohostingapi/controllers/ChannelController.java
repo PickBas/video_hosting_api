@@ -1,6 +1,7 @@
 package com.therearenotasksforus.videohostingapi.controllers;
 
-import com.therearenotasksforus.videohostingapi.dto.ChannelCreateDto;
+import com.therearenotasksforus.videohostingapi.dto.channel.ChannelCreateDto;
+import com.therearenotasksforus.videohostingapi.dto.channel.ChannelDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.service.ChannelService;
@@ -9,6 +10,7 @@ import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -40,8 +42,15 @@ public class ChannelController {
     }
 
     @GetMapping("/api/channels")
-    public List<Channel> getAllChannels() {
-        return channelService.getAll();
+    public List<ChannelDto> getAllChannels() {
+        List<Channel> channels = channelService.getAll();
+        List<ChannelDto> channelDtos = new ArrayList<>();
+
+        for (Channel channel : channels) {
+            channelDtos.add(ChannelDto.fromChannel(channel));
+        }
+
+        return channelDtos;
     }
 
     @GetMapping("/api/channels/owned")

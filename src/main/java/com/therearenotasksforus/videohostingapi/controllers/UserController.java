@@ -1,7 +1,7 @@
 package com.therearenotasksforus.videohostingapi.controllers;
 
-import com.therearenotasksforus.videohostingapi.dto.UpdateUserDto;
-import com.therearenotasksforus.videohostingapi.dto.UserDto;
+import com.therearenotasksforus.videohostingapi.dto.user.UpdateUserDto;
+import com.therearenotasksforus.videohostingapi.dto.user.UserDto;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.therearenotasksforus.videohostingapi.dto;
+package com.therearenotasksforus.videohostingapi.dto.auth;
 
 public class LogoutRequestDto {
     private String logout;

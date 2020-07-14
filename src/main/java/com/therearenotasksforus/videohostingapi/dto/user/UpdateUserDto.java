@@ -1,4 +1,4 @@
-package com.therearenotasksforus.videohostingapi.dto;
+package com.therearenotasksforus.videohostingapi.dto.user;
 
 public class UpdateUserDto {
     private String firstName;

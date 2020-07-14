@@ -1,6 +1,6 @@
 package com.therearenotasksforus.videohostingapi.service;
 
-import com.therearenotasksforus.videohostingapi.dto.ChannelCreateDto;
+import com.therearenotasksforus.videohostingapi.dto.channel.ChannelCreateDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 

@@ -1,12 +1,11 @@
 package com.therearenotasksforus.videohostingapi.controllers;
 
-import com.therearenotasksforus.videohostingapi.dto.AuthenticationRequestDto;
-import com.therearenotasksforus.videohostingapi.dto.LogoutRequestDto;
-import com.therearenotasksforus.videohostingapi.dto.UserRegistrationDto;
+import com.therearenotasksforus.videohostingapi.dto.auth.AuthenticationRequestDto;
+import com.therearenotasksforus.videohostingapi.dto.auth.LogoutRequestDto;
+import com.therearenotasksforus.videohostingapi.dto.user.UserRegistrationDto;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.security.jwt.JwtTokenProvider;
 import com.therearenotasksforus.videohostingapi.security.jwt.services.InvalidJwtsService;
-import com.therearenotasksforus.videohostingapi.security.models.InvalidJwts;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
