@@ -23,3 +23,6 @@ A token which you get after logging in has to be provided as a request header wi
     * /api/channel/{id} - Getting a channel with its id. GET request.
     * /api/channel/create - Creating a channel. POST request. JSON Example: {"name": "example", "info": "example"}
     * /api/channel/{id}/update - Updating channel's data. POST request. JSON Example: {"name": "example", "info": "example"}
+### Profile
+    * /api/profiles - Getting all the profiles. GET request.
+    * /api/profilee - Getting the current profile. GET request.
