@@ -38,6 +38,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("login")
+    @CrossOrigin
     public ResponseEntity login(@RequestBody AuthenticationRequestDto requestDto) {
         try {
             String username = requestDto.getUsername();
@@ -64,6 +65,7 @@ public class AuthenticationController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("register")
     public String register(@RequestBody UserRegistrationDto requestDto) {
         try {
@@ -79,6 +81,7 @@ public class AuthenticationController {
         }
     }
 
+    @CrossOrigin
     @PostMapping("logout")
     public String logout(@RequestHeader(name = "Authorization") String jwtToken, @RequestBody LogoutRequestDto requestDto) {
         if (requestDto.getLogout().equals("true"))

@@ -22,6 +22,7 @@ public class UserController {
     }
 
     @GetMapping("/api/users")
+    @CrossOrigin
     public List<UserDto> getAllUsers() {
         List<User> users = userService.getAll();
         List<UserDto> result = new ArrayList<>();
@@ -35,6 +36,7 @@ public class UserController {
     }
 
     @GetMapping("/api/user")
+    @CrossOrigin
     public UserDto getCurrentUser(@RequestHeader(name = "Authorization") String jwtToken) {
         try {
             return UserDto.fromUser(userService.findByJwtToken(jwtToken.substring(6)));
@@ -44,11 +46,13 @@ public class UserController {
     }
 
     @GetMapping("/api/user/id/{id}")
+    @CrossOrigin
     public UserDto getUserById(@PathVariable(name = "id") Long id) {
         return UserDto.fromUser(userService.findById(id));
     }
 
     @PostMapping("/api/user/update")
+    @CrossOrigin
     public String updateUser(@RequestHeader(name = "Authorization") String jwtToken, @RequestBody UpdateUserDto requestDto) {
         User userToUpdate;
 

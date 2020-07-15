@@ -27,6 +27,7 @@ public class ProfileController {
     }
 
     @GetMapping("/api/profiles")
+    @CrossOrigin
     public List<ProfileDto> getAllProfiles() {
         List<Profile> profiles = profileService.getAll();
         List<ProfileDto> result = new ArrayList<>();
@@ -39,6 +40,7 @@ public class ProfileController {
     }
 
     @GetMapping("/api/profile")
+    @CrossOrigin
     public ProfileDto getCurrentProfile(@RequestHeader(name = "Authorization") String jwtToken) {
         try {
             User currentUser = userService.findByJwtToken(jwtToken.substring(6));
@@ -50,11 +52,13 @@ public class ProfileController {
     }
 
     @GetMapping("/api/profile/id/{id}")
+    @CrossOrigin
     public ProfileDto getProfileById(@PathVariable(name = "id") Long id) {
         return ProfileDto.fromProfile(profileService.findById(id));
     }
 
     @PostMapping("/api/profile/update")
+    @CrossOrigin
     public String updateProfile(@RequestHeader(name = "Authorization") String jwtToken, @RequestBody ProfileUpdateDto requestDto) {
         User currentUser = userService.findByJwtToken(jwtToken.substring(6));
         Profile currentProfile = currentUser.getProfile();

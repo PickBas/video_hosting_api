@@ -29,6 +29,7 @@ public class ChannelController {
     }
 
     @PostMapping("/api/channel/create")
+    @CrossOrigin
     public String channelCreate(@RequestHeader(name = "Authorization") String jwtToken, @RequestBody ChannelCreateDto requestDto) {
         Profile channelOwner = userService.findByJwtToken(jwtToken.substring(6)).getProfile();
 
@@ -44,6 +45,7 @@ public class ChannelController {
     }
 
     @GetMapping("/api/channels")
+    @CrossOrigin
     public List<ChannelDto> getAllChannels() {
         List<Channel> channels = channelService.getAll();
 
@@ -61,6 +63,7 @@ public class ChannelController {
     }
 
     @GetMapping("/api/channels/owned")
+    @CrossOrigin
     public List<Channel> getAllOwnedChannels(@RequestHeader(name = "Authorization") String jwtToken) {
         Profile channelsOwner;
 
@@ -74,6 +77,7 @@ public class ChannelController {
     }
 
     @GetMapping("/api/channel/{id}")
+    @CrossOrigin
     public ChannelDto getChannelById(@PathVariable(name = "id") Long id) {
         Channel channel = channelService.findById(id);
 
@@ -85,6 +89,7 @@ public class ChannelController {
     }
 
     @PostMapping("/api/channel/{id}/update")
+    @CrossOrigin
     public String updateChannel(@RequestHeader(name = "Authorization") String jwtToken, @PathVariable(name = "id") Long id, @RequestBody ChannelUpdateDto requestDto) {
         Profile ownerProfile = userService.findByJwtToken(jwtToken.substring(6)).getProfile();
         Channel channel = channelService.findById(id);
