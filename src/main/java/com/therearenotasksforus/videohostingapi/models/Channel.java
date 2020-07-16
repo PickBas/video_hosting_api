@@ -70,4 +70,8 @@ public class Channel extends BaseEntity {
     public void setInfo(String info) {
         this.info = info;
     }
+
+    public void addSubscriber(Profile profile) {
+        this.subscribers.add(profile);
+    }
 }

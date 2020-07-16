@@ -112,4 +112,8 @@ public class Profile  extends BaseEntity {
     public void addOwnedChannel(Channel channel) {
         this.ownedChannels.add(channel);
     }
+
+    public void addSubscription(Channel channel) {
+        this.subscriptions.add(channel);
+    }
 }

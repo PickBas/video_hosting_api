@@ -5,6 +5,7 @@ import com.therearenotasksforus.videohostingapi.dto.channel.ChannelUpdateDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.repositories.ChannelRepository;
+import com.therearenotasksforus.videohostingapi.repositories.ProfileRepository;
 import com.therearenotasksforus.videohostingapi.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,12 @@ import java.util.List;
 public class ChannelServiceImplementation implements ChannelService {
 
     private final ChannelRepository channelRepository;
+    private final ProfileRepository profileRepository;
 
     @Autowired
-    public ChannelServiceImplementation(ChannelRepository channelRepository) {
+    public ChannelServiceImplementation(ChannelRepository channelRepository, ProfileRepository profileRepository) {
         this.channelRepository = channelRepository;
+        this.profileRepository = profileRepository;
     }
 
     @Override
@@ -56,6 +59,20 @@ public class ChannelServiceImplementation implements ChannelService {
     @Override
     public boolean isProfileOwner(Profile profile, Channel channel) {
         return profile == channel.getOwner();
+    }
+
+    @Override
+    public void subscribeToChannel(Profile profile, Channel channel) throws Exception {
+        if (isProfileOwner(profile, channel)) {
+            throw new Exception("The user is the owner of the channel");
+        }
+
+        profile.addSubscription(channel);
+        profileRepository.save(profile);
+
+        channel.addSubscriber(profile);
+        channelRepository.save(channel);
+
     }
 
     @Override

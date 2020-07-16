@@ -113,4 +113,19 @@ public class ChannelController {
 
     }
 
+    @PostMapping("/api/channel/{id}/subscribe")
+    @CrossOrigin
+    public String subscribeToChannel(Principal principal, @PathVariable(name = "id") Long id) {
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+        Channel currentChannel = channelService.findById(id);
+
+        try {
+            channelService.subscribeToChannel(currentProfile, currentChannel);
+        } catch (Exception e) {
+            return "Failure: " + e.getMessage();
+        }
+
+        return "Success: user " + currentProfile.getUser().getUsername() + " subscribed to " + currentChannel.getName() + " channel!";
+    }
+
 }

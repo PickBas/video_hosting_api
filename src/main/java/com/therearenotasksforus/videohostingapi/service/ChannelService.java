@@ -17,6 +17,8 @@ public interface ChannelService {
 
     boolean isProfileOwner(Profile profile, Channel channel);
 
+    void subscribeToChannel(Profile profile, Channel channel) throws Exception;
+
     List<Channel> getAll();
 
     List<Channel> getAllOwnedChannels(Profile profile);
