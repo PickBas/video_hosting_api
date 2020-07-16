@@ -1,6 +1,8 @@
 package com.therearenotasksforus.videohostingapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.therearenotasksforus.videohostingapi.models.marks.Comment;
+import com.therearenotasksforus.videohostingapi.models.marks.Dislike;
 import com.therearenotasksforus.videohostingapi.models.marks.Like;
 
 import javax.persistence.*;
@@ -26,11 +28,17 @@ public class Video extends BaseEntity {
     @Column(name = "is_available_by_link")
     private boolean isAvailableByLink;
 
-    //    private List<Comment> comments;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Comment> comments;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Like> likes;
-//    private List<Dislike> dislikes;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Dislike> dislikes;
 
     public Video() {
         channel = null;

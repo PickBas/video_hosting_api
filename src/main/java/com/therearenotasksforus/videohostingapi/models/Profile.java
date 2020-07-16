@@ -32,10 +32,6 @@ public class Profile  extends BaseEntity {
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
-//    @JoinTable(name = "profile_likes",
-//            joinColumns = {@JoinColumn(name = "profile_id", referencedColumnName = "id")},
-//            inverseJoinColumns = {@JoinColumn(name = "like_id", referencedColumnName = "id")}
-//    )
     private List<Like> likes;
 
     @OneToMany(cascade = CascadeType.ALL)
@@ -55,6 +51,7 @@ public class Profile  extends BaseEntity {
         customUrl = "";
         ownedChannels = null;
         subscriptions = null;
+        likes = null;
         avatarUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/default/profileavatars/0.jpg";
     }
 
@@ -140,5 +137,13 @@ public class Profile  extends BaseEntity {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
     }
 }
