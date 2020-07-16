@@ -62,8 +62,10 @@ public class VideoServiceImplementation implements VideoService {
 
         metadata.put("content-length", String.valueOf(file.getSize()));
 
+        String originalFileName = Objects.requireNonNull(file.getOriginalFilename()).replaceAll(" ", "_");
+
         String path = String.format("%s/%s", BucketName.PROFILE_IMAGE.getBucketName(), channel.getId());
-        String filename = String.format("%s-%s", UUID.randomUUID(), file.getOriginalFilename());
+        String filename = String.format("%s-%s", UUID.randomUUID(), originalFileName);
 
         try {
             fileStore.save(path, filename, Optional.of(metadata), file.getInputStream());
@@ -78,6 +80,11 @@ public class VideoServiceImplementation implements VideoService {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @Override
+    public Video findVideoById(Long id) {
+        return videoRepository.findById(id).orElse(null);
     }
 
     @Override

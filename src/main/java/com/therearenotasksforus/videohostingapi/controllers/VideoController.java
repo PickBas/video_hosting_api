@@ -36,6 +36,39 @@ public class VideoController {
         return videoService.getAll();
     }
 
+    @PostMapping("/api/video/{id}/like")
+    @CrossOrigin
+    public String setLike(Principal principal, @PathVariable(name = "id") Long id) {
+        Video currentVideo = videoService.findVideoById(id);
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+
+        videoService.setLike(currentProfile, currentVideo);
+
+        return "Success: user " + principal.getName() + " liked video!";
+    }
+
+    @PostMapping("/api/video/{id}/dislike")
+    @CrossOrigin
+    public String setDislike(Principal principal, @PathVariable(name = "id") Long id) {
+        Video currentVideo = videoService.findVideoById(id);
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+
+        videoService.setDislike(currentProfile, currentVideo);
+
+        return "Success: user " + principal.getName() + " disliked video!";
+    }
+
+    @PostMapping("/api/video/{id}/comment")
+    @CrossOrigin
+    public String setLike(Principal principal, @PathVariable(name = "id") Long id, @RequestBody String commentBody) {
+        Video currentVideo = videoService.findVideoById(id);
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+
+        videoService.saveComment(currentProfile, currentVideo, commentBody);
+
+        return "Success: user " + principal.getName() + " commented videos!";
+    }
+
     @GetMapping("/api/channels/{id}/videos")
     @CrossOrigin
     public List<Video> getAllChannelVideos(@PathVariable(name = "id") Long id) {

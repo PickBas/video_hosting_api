@@ -13,6 +13,8 @@ import java.util.List;
 public interface VideoService {
     void uploadVideo(Profile profile, Channel channel, MultipartFile file);
 
+    Video findVideoById(Long id);
+
     List<Video> getAll();
     List<Like> getAllLikes(Video video);
     List<Dislike> getAllDislikes(Video video);
