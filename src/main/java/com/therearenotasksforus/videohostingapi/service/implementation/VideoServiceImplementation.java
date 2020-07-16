@@ -72,6 +72,7 @@ public class VideoServiceImplementation implements VideoService {
 
             Video video = new Video();
             video.setVideoFileUrl(basicUrl + profile.getId() + "/" + filename);
+            video.setName(filename);
             videoRepository.save(video);
 
             channel.addVideo(video);
@@ -83,7 +84,14 @@ public class VideoServiceImplementation implements VideoService {
     }
 
     @Override
-    public Video findVideoById(Long id) {
+    public void updateName(Video video, String name) {
+        video.setName(name);
+
+        videoRepository.save(video);
+    }
+
+    @Override
+    public Video findById(Long id) {
         return videoRepository.findById(id).orElse(null);
     }
 

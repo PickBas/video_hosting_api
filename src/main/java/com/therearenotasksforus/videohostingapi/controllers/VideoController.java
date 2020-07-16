@@ -1,5 +1,6 @@
 package com.therearenotasksforus.videohostingapi.controllers;
 
+import com.therearenotasksforus.videohostingapi.dto.video.NameUpdateDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.Video;
@@ -36,10 +37,16 @@ public class VideoController {
         return videoService.getAll();
     }
 
+    @GetMapping("/api/video/{id}")
+    @CrossOrigin
+    public Video getVideo(@PathVariable(name = "id") Long id) {
+        return videoService.findById(id);
+    }
+
     @PostMapping("/api/video/{id}/like")
     @CrossOrigin
     public String setLike(Principal principal, @PathVariable(name = "id") Long id) {
-        Video currentVideo = videoService.findVideoById(id);
+        Video currentVideo = videoService.findById(id);
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
 
         videoService.setLike(currentProfile, currentVideo);
@@ -50,7 +57,7 @@ public class VideoController {
     @PostMapping("/api/video/{id}/dislike")
     @CrossOrigin
     public String setDislike(Principal principal, @PathVariable(name = "id") Long id) {
-        Video currentVideo = videoService.findVideoById(id);
+        Video currentVideo = videoService.findById(id);
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
 
         videoService.setDislike(currentProfile, currentVideo);
@@ -61,7 +68,7 @@ public class VideoController {
     @PostMapping("/api/video/{id}/comment")
     @CrossOrigin
     public String setLike(Principal principal, @PathVariable(name = "id") Long id, @RequestBody String commentBody) {
-        Video currentVideo = videoService.findVideoById(id);
+        Video currentVideo = videoService.findById(id);
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
 
         videoService.saveComment(currentProfile, currentVideo, commentBody);
@@ -94,6 +101,15 @@ public class VideoController {
         Channel currentChannel = channelService.findById(id);
 
         videoService.uploadVideo(currentProfile, currentChannel, file);
-
     }
+
+    @PostMapping("/api/video/{id}/update/name")
+    @CrossOrigin
+    public String updateVideoName(@PathVariable(name = "id") Long id, @RequestBody NameUpdateDto requestDto) {
+        Video currentVideo = videoService.findById(id);
+        videoService.updateName(currentVideo, requestDto.getName());
+
+        return "Success: the video is called " + currentVideo.getName() + " !";
+    }
+
 }

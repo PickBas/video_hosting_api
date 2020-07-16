@@ -13,7 +13,9 @@ import java.util.List;
 public interface VideoService {
     void uploadVideo(Profile profile, Channel channel, MultipartFile file);
 
-    Video findVideoById(Long id);
+    void updateName(Video video, String name);
+
+    Video findById(Long id);
 
     List<Video> getAll();
     List<Like> getAllLikes(Video video);

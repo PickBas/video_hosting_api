@@ -16,6 +16,9 @@ public class Video extends BaseEntity {
     @ManyToOne
     private Channel channel;
 
+    @Column(name = "video_name")
+    private String name;
+
     @Column(name = "time")
     private Timestamp timestamp;
 
@@ -47,6 +50,7 @@ public class Video extends BaseEntity {
         isPrivate = false;
         isAvailableByLink = false;
         likes = new ArrayList<>();
+        name = "";
     }
 
     public Channel getChannel() {
@@ -135,5 +139,13 @@ public class Video extends BaseEntity {
 
     public void removeComment(Comment comment) {
         comments.remove(comment);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
