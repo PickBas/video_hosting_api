@@ -11,7 +11,6 @@ A token which you get after logging in has to be provided as a request header wi
 ### Sign in/up:
     /api/auth/register - Registration. POST request. JSON Example: {"email": "example@example.com", "username": "example", "password": "example"}
     /api/auth/login - Authentication. POST request. JSON Example: {"username": "example", "password": "example"}
-    /api/auth/logout - Logging out. POST request. JSON Example: {"logout": "true"}
 ### User
     /api/users - Getting all the users. GET request.
     /api/user - Getting the current user. GET request.
