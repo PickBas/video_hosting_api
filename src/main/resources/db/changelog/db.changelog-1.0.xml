@@ -39,10 +39,6 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="jwt_token" type="VARCHAR(500)">
-                <constraints nullable="true"/>
-            </column>
-
         </createTable>
     </changeSet>
 

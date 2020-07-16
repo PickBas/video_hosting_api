@@ -2,15 +2,7 @@ package com.therearenotasksforus.videohostingapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.CascadeType;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -37,10 +29,6 @@ public class User extends BaseEntity {
 
     @Column(name = "password")
     private String password;
-
-    @JsonIgnore
-    @Column(name = "jwt_token")
-    private String jwtToken;
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
@@ -95,14 +83,6 @@ public class User extends BaseEntity {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
-    }
-
-    public String getJwtToken() {
-        return jwtToken;
-    }
-
-    public void setJwtToken(String jwtToken) {
-        this.jwtToken = jwtToken;
     }
 
     public Profile getProfile() {

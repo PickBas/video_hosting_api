@@ -27,14 +27,11 @@ public class AuthenticationController {
 
     private final UserService userService;
 
-    private final InvalidJwtsService invalidJwtsService;
-
     @Autowired
-    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, UserService userService, InvalidJwtsService invalidJwtsService) {
+    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, UserService userService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
-        this.invalidJwtsService = invalidJwtsService;
     }
 
     @PostMapping("login")
@@ -51,8 +48,6 @@ public class AuthenticationController {
             }
 
             String token = jwtTokenProvider.createToken(username, user.getRoles());
-
-            userService.updateUserToken(user, token);
 
             Map<String, String> response = new HashMap<>();
             response.put("username", username);
@@ -79,15 +74,6 @@ public class AuthenticationController {
         } catch (Exception e) {
             return "Failure: " + e.getMessage();
         }
-    }
-
-    @CrossOrigin
-    @PostMapping("logout")
-    public String logout(@RequestHeader(name = "Authorization") String jwtToken, @RequestBody LogoutRequestDto requestDto) {
-        if (requestDto.getLogout().equals("true"))
-            invalidJwtsService.addNew(jwtToken.substring(6));
-
-        return "Success: You've logged out!";
     }
 
 }

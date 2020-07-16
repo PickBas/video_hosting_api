@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.bind.ValidationException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +31,8 @@ public class ChannelController {
 
     @PostMapping("/api/channel/create")
     @CrossOrigin
-    public String channelCreate(@RequestHeader(name = "Authorization") String jwtToken, @RequestBody ChannelCreateDto requestDto) {
-        Profile channelOwner = userService.findByJwtToken(jwtToken.substring(6)).getProfile();
+    public String channelCreate(Principal principal, @RequestBody ChannelCreateDto requestDto) {
+        Profile channelOwner = userService.findByUsername(principal.getName()).getProfile();
 
         if (requestDto.getName().isEmpty()) {
             return "Failure: No channel name was provided!";
@@ -64,11 +65,11 @@ public class ChannelController {
 
     @GetMapping("/api/channels/owned")
     @CrossOrigin
-    public List<Channel> getAllOwnedChannels(@RequestHeader(name = "Authorization") String jwtToken) {
+    public List<Channel> getAllOwnedChannels(Principal principal) {
         Profile channelsOwner;
 
         try {
-            channelsOwner = userService.findByJwtToken(jwtToken.substring(6)).getProfile();
+            channelsOwner = userService.findByUsername(principal.getName()).getProfile();
         } catch (Exception e) {
             return null;
         }
@@ -90,8 +91,8 @@ public class ChannelController {
 
     @PostMapping("/api/channel/{id}/update")
     @CrossOrigin
-    public String updateChannel(@RequestHeader(name = "Authorization") String jwtToken, @PathVariable(name = "id") Long id, @RequestBody ChannelUpdateDto requestDto) {
-        Profile ownerProfile = userService.findByJwtToken(jwtToken.substring(6)).getProfile();
+    public String updateChannel(Principal principal, @PathVariable(name = "id") Long id, @RequestBody ChannelUpdateDto requestDto) {
+        Profile ownerProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel channel = channelService.findById(id);
 
         if (channel == null) {

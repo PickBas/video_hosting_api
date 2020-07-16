@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.bind.ValidationException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +42,9 @@ public class ProfileController {
 
     @GetMapping("/api/profile")
     @CrossOrigin
-    public ProfileDto getCurrentProfile(@RequestHeader(name = "Authorization") String jwtToken) {
+    public ProfileDto getCurrentProfile(Principal principal) {
         try {
-            User currentUser = userService.findByJwtToken(jwtToken.substring(6));
+            User currentUser = userService.findByUsername(principal.getName());
             Profile currentProfile = currentUser.getProfile();
             return ProfileDto.fromProfile(currentProfile);
         } catch (Exception e) {
@@ -59,8 +60,8 @@ public class ProfileController {
 
     @PostMapping("/api/profile/update")
     @CrossOrigin
-    public String updateProfile(@RequestHeader(name = "Authorization") String jwtToken, @RequestBody ProfileUpdateDto requestDto) {
-        User currentUser = userService.findByJwtToken(jwtToken.substring(6));
+    public String updateProfile(Principal principal, @RequestBody ProfileUpdateDto requestDto) {
+        User currentUser = userService.findByUsername(principal.getName());
         Profile currentProfile = currentUser.getProfile();
 
         try {
@@ -73,3 +74,4 @@ public class ProfileController {
     }
 
 }
+

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.bind.ValidationException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +38,9 @@ public class UserController {
 
     @GetMapping("/api/user")
     @CrossOrigin
-    public UserDto getCurrentUser(@RequestHeader(name = "Authorization") String jwtToken) {
+    public UserDto getCurrentUser(Principal principal) {
         try {
-            return UserDto.fromUser(userService.findByJwtToken(jwtToken.substring(6)));
+            return UserDto.fromUser(userService.findByUsername(principal.getName()));
         } catch (Exception e) {
             return null;
         }
@@ -53,11 +54,11 @@ public class UserController {
 
     @PostMapping("/api/user/update")
     @CrossOrigin
-    public String updateUser(@RequestHeader(name = "Authorization") String jwtToken, @RequestBody UpdateUserDto requestDto) {
+    public String updateUser(Principal principal, @RequestBody UpdateUserDto requestDto) {
         User userToUpdate;
 
         try {
-             userToUpdate = userService.findByJwtToken(jwtToken.substring(6));
+             userToUpdate = userService.findByUsername(principal.getName());
         } catch (Exception e) {
             return "Failure: cannot find the user!";
         }

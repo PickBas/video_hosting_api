@@ -59,12 +59,6 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public void updateUserToken(User user, String jwtToken) {
-        user.setJwtToken(jwtToken);
-        userRepository.save(user);
-    }
-
-    @Override
     public void updateNames(User user, UpdateUserDto updateUserDto) throws ValidationException {
         if (updateUserDto.getFirstName() == null && updateUserDto.getLastName() == null) {
             throw new ValidationException("Failure: wrong data was provided");
@@ -96,11 +90,6 @@ public class UserServiceImplementation implements UserService {
     @Override
     public User findByProfile(Profile profile) {
         return userRepository.findByProfile(profile);
-    }
-
-    @Override
-    public User findByJwtToken(String jwtToken) {
-        return userRepository.findByJwtToken(jwtToken);
     }
 
     @Override

@@ -38,9 +38,6 @@ public class JwtTokenProvider {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    @Autowired
-    private InvalidJwtsService invalidJwtsService;
-
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -79,7 +76,7 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest req) {
         String authorizationToken = req.getHeader("Authorization");
-        if (authorizationToken != null && authorizationToken.startsWith("TOKEN_") && !invalidJwtsService.findByToken(authorizationToken.substring(6))) {
+        if (authorizationToken != null && authorizationToken.startsWith("TOKEN_")) {
             return authorizationToken.substring(6);
         }
         return null;
