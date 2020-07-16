@@ -19,6 +19,8 @@ public interface ChannelService {
 
     void subscribeToChannel(Profile profile, Channel channel) throws Exception;
 
+    void unsubscribeFromChannel(Profile profile, Channel channel) throws Exception;
+
     List<Channel> getAll();
 
     List<Channel> getAllOwnedChannels(Profile profile);

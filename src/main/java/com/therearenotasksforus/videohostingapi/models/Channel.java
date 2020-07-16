@@ -74,4 +74,8 @@ public class Channel extends BaseEntity {
     public void addSubscriber(Profile profile) {
         this.subscribers.add(profile);
     }
+
+    public void removeSubscriber(Profile profile) {
+        this.subscribers.remove(profile);
+    }
 }

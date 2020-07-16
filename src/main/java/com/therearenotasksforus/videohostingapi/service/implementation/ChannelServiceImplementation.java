@@ -64,13 +64,27 @@ public class ChannelServiceImplementation implements ChannelService {
     @Override
     public void subscribeToChannel(Profile profile, Channel channel) throws Exception {
         if (isProfileOwner(profile, channel)) {
-            throw new Exception("The user is the owner of the channel");
+            throw new Exception("the user is the owner of the channel");
         }
 
         profile.addSubscription(channel);
         profileRepository.save(profile);
 
         channel.addSubscriber(profile);
+        channelRepository.save(channel);
+
+    }
+
+    @Override
+    public void unsubscribeFromChannel(Profile profile, Channel channel) throws Exception {
+        if (!channel.getSubscribers().contains(profile)) {
+            throw new Exception("the user did not subscribe to the channel");
+        }
+
+        profile.removeSubscription(channel);
+        profileRepository.save(profile);
+
+        channel.removeSubscriber(profile);
         channelRepository.save(channel);
 
     }

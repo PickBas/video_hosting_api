@@ -116,4 +116,8 @@ public class Profile  extends BaseEntity {
     public void addSubscription(Channel channel) {
         this.subscriptions.add(channel);
     }
+
+    public void removeSubscription(Channel channel) {
+        this.subscriptions.remove(channel);
+    }
 }

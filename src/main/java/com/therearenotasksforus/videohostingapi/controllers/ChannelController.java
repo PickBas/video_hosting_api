@@ -128,4 +128,19 @@ public class ChannelController {
         return "Success: user " + currentProfile.getUser().getUsername() + " subscribed to " + currentChannel.getName() + " channel!";
     }
 
+    @PostMapping("/api/channel/{id}/unsubscribe")
+    @CrossOrigin
+    public String unsubscribeFromChannel(Principal principal, @PathVariable(name = "id") Long id) {
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+        Channel currentChannel = channelService.findById(id);
+
+        try {
+            channelService.unsubscribeFromChannel(currentProfile, currentChannel);
+        } catch (Exception e) {
+            return "Failure: " + e.getMessage();
+        }
+
+        return "Success: user " + currentProfile.getUser().getUsername() + " unsubscribed from " + currentChannel.getName() + " channel!";
+    }
+
 }
