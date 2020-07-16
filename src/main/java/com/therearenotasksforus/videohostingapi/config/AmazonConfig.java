@@ -17,11 +17,14 @@ public class AmazonConfig {
                 "AKIAQK4KPRGP42RF2AUO",
                 "eRfmVb6Z5srwmEg6gfwsmJqoLodKowSIW+vCks4e"
         );
-
         return AmazonS3ClientBuilder
                 .standard()
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                .withRegion("eu-north-1")
                 .build();
     }
 
 }
+
+//AKIAQK4KPRGP42RF2AUO
+//eRfmVb6Z5srwmEg6gfwsmJqoLodKowSIW+vCks4e

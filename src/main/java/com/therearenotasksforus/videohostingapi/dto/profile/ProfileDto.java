@@ -14,6 +14,7 @@ public class ProfileDto {
     private char gender;
     private String country;
     private String customUrl;
+    private String avatarUrl;
     private boolean isPrivateSublist;
     private List<Channel> ownedChannels;
     private List<Channel> subscriptions;
@@ -26,6 +27,7 @@ public class ProfileDto {
         profile.setGender(gender);
         profile.setCountry(country);
         profile.setCustomUrl(customUrl);
+        profile.setAvatarUrl(avatarUrl);
         profile.setUser(user);
         profile.setOwnedChannels(ownedChannels);
         profile.setSubscriptions(subscriptions);
@@ -42,6 +44,7 @@ public class ProfileDto {
         profileDto.setCountry(profile.getCountry());
         profileDto.setCustomUrl(profile.getCustomUrl());
         profileDto.setUser(profile.getUser());
+        profileDto.setAvatarUrl(profile.getAvatarUrl());
         profileDto.setOwnedChannels(profile.getOwnedChannels());
         profileDto.setSubscriptions(profile.getSubscriptions());
 
@@ -128,4 +131,11 @@ public class ProfileDto {
         return subscriptionsIds;
     }
 
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
 }

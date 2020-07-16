@@ -8,7 +8,9 @@ import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.bind.ValidationException;
 import java.security.Principal;
@@ -61,8 +63,7 @@ public class ProfileController {
     @PostMapping("/api/profile/update")
     @CrossOrigin
     public String updateProfile(Principal principal, @RequestBody ProfileUpdateDto requestDto) {
-        User currentUser = userService.findByUsername(principal.getName());
-        Profile currentProfile = currentUser.getProfile();
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
 
         try {
             profileService.update(currentProfile, requestDto);
@@ -71,6 +72,18 @@ public class ProfileController {
         }
 
         return "Success: profile " + currentProfile.getUser().getUsername() + " was updated!";
+    }
+
+    @PostMapping(
+            path = "/api/profile/upload/avatar",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public void uploadProfileAvatar(Principal principal, @RequestParam("file") MultipartFile file){
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+
+        profileService.uploadProfileAvatar(currentProfile, file);
+
     }
 
 }
