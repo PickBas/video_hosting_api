@@ -96,4 +96,44 @@ public class Video extends BaseEntity {
     public void setLikes(List<Like> likes) {
         this.likes = likes;
     }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public List<Dislike> getDislikes() {
+        return dislikes;
+    }
+
+    public void setDislikes(List<Dislike> dislikes) {
+        this.dislikes = dislikes;
+    }
+
+    public void addLike(Like like) {
+        likes.add(like);
+    }
+
+    public void removeLike(Like like) {
+        likes.remove(like);
+    }
+
+    public void addDislike(Dislike dislike) {
+        dislikes.add(dislike);
+    }
+
+    public void removeLike(Dislike dislike) {
+        dislikes.remove(dislike);
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
+    }
+
+    public void removeComment(Comment comment) {
+        comments.remove(comment);
+    }
 }

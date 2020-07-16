@@ -13,17 +13,17 @@ public interface VideoService {
     void uploadVideo(Profile profile, Channel channel);
 
     List<Video> getAll();
-    List<Like> getAllLikes();
-    List<Dislike> getAllDislikes();
-    List<Comment> getAllComments();
+    List<Like> getAllLikes(Video video);
+    List<Dislike> getAllDislikes(Video video);
+    List<Comment> getAllComments(Video video);
 
     void setLike(Profile profile, Video video);
     void setDislike(Profile profile, Video video);
-    void saveComment(Profile profile, Video video);
+    void saveComment(Profile profile, Video video, String commentBody);
 
-    void delete();
-    void deleteLikes();
-    void deleteDislikes();
-    void deleteComments();
+    void delete(Long id);
+    void deleteLikes(Long id);
+    void deleteDislikes(Long id);
+    void deleteComments(Long id);
 
 }

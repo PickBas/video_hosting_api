@@ -1,6 +1,7 @@
 package com.therearenotasksforus.videohostingapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.therearenotasksforus.videohostingapi.models.marks.Comment;
 import com.therearenotasksforus.videohostingapi.models.marks.Like;
 
 import javax.persistence.*;
@@ -33,6 +34,10 @@ public class Profile  extends BaseEntity {
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
     private List<Like> likes;
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Comment> comments;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JsonIgnore
@@ -143,7 +148,31 @@ public class Profile  extends BaseEntity {
         return likes;
     }
 
+    public void addLike(Like like) {
+        likes.add(like);
+    }
+
+    public void removeLike(Like like) {
+        likes.remove(like);
+    }
+
     public void setLikes(List<Like> likes) {
         this.likes = likes;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
+    }
+
+    public void removeComment(Comment comment) {
+        comments.remove(comment);
     }
 }
