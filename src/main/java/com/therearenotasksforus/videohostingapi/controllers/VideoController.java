@@ -1,5 +1,6 @@
 package com.therearenotasksforus.videohostingapi.controllers;
 
+import com.therearenotasksforus.videohostingapi.dto.video.CommentDto;
 import com.therearenotasksforus.videohostingapi.dto.video.NameUpdateDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
@@ -67,11 +68,11 @@ public class VideoController {
 
     @PostMapping("/api/video/{id}/comment")
     @CrossOrigin
-    public String setLike(Principal principal, @PathVariable(name = "id") Long id, @RequestBody String commentBody) {
+    public String setLike(Principal principal, @PathVariable(name = "id") Long id, @RequestBody CommentDto requestDto) {
         Video currentVideo = videoService.findById(id);
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
 
-        videoService.saveComment(currentProfile, currentVideo, commentBody);
+        videoService.saveComment(currentProfile, currentVideo, requestDto.getCommentBody());
 
         return "Success: user " + principal.getName() + " commented videos!";
     }
