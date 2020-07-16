@@ -1,6 +1,7 @@
 package com.therearenotasksforus.videohostingapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.therearenotasksforus.videohostingapi.models.marks.Like;
 
 import javax.persistence.*;
 import java.util.List;
@@ -28,6 +29,14 @@ public class Profile  extends BaseEntity {
 
     @Column(name = "avatar_url")
     private String avatarUrl;
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL)
+//    @JoinTable(name = "profile_likes",
+//            joinColumns = {@JoinColumn(name = "profile_id", referencedColumnName = "id")},
+//            inverseJoinColumns = {@JoinColumn(name = "like_id", referencedColumnName = "id")}
+//    )
+    private List<Like> likes;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JsonIgnore
