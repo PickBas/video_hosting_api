@@ -4,6 +4,7 @@ import com.therearenotasksforus.videohostingapi.dto.profile.ProfileUpdateDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.bind.ValidationException;
 import java.util.List;
@@ -18,6 +19,8 @@ public interface ProfileService {
     List<Profile> getAll();
 
     void update(Profile profile, ProfileUpdateDto profileUpdateDto) throws ValidationException;
+
+    void uploadProfileAvatar(Profile profile, MultipartFile file);
 
     void delete(Long id);
 

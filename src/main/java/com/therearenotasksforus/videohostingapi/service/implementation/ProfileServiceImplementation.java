@@ -1,6 +1,8 @@
 package com.therearenotasksforus.videohostingapi.service.implementation;
 
+import com.therearenotasksforus.videohostingapi.bucket.BucketName;
 import com.therearenotasksforus.videohostingapi.dto.profile.ProfileUpdateDto;
+import com.therearenotasksforus.videohostingapi.filestore.FileStore;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
@@ -8,18 +10,24 @@ import com.therearenotasksforus.videohostingapi.repositories.ProfileRepository;
 import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.bind.ValidationException;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
+
+import static org.apache.http.entity.ContentType.*;
 
 @Service
 public class ProfileServiceImplementation implements ProfileService {
 
     private final ProfileRepository profileRepository;
+    private final FileStore fileStore;
 
     @Autowired
-    public ProfileServiceImplementation(ProfileRepository profileRepository) {
+    public ProfileServiceImplementation(ProfileRepository profileRepository, FileStore fileStore) {
         this.profileRepository = profileRepository;
+        this.fileStore = fileStore;
     }
 
 
@@ -69,6 +77,37 @@ public class ProfileServiceImplementation implements ProfileService {
 
         profileRepository.save(profile);
 
+    }
+
+    @Override
+    public void uploadProfileAvatar(Profile profile, MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new IllegalStateException("Failure: cannot upload empty file [ " + file.getSize() + "]");
+        }
+        if (!Arrays.asList(
+                IMAGE_JPEG.getMimeType(),
+                IMAGE_PNG.getMimeType(),
+                IMAGE_GIF.getMimeType()).contains(file.getContentType())) {
+            throw new IllegalStateException("Failure: file must be an image [" + file.getContentType() + "]");
+        }
+
+        String basicUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/";
+
+        Map<String, String> metadata = new HashMap<>();
+
+        metadata.put("Content-Type", file.getContentType());
+        metadata.put("content-length", String.valueOf(file.getSize()));
+
+        String path = String.format("%s/%s", BucketName.PROFILE_IMAGE.getBucketName(), profile.getId());
+        String filename = String.format("%s-%s", UUID.randomUUID(), file.getOriginalFilename());
+
+        try {
+            fileStore.save(path, filename, Optional.of(metadata), file.getInputStream());
+            profile.setAvatarUrl(basicUrl + profile.getId() + "/" + filename);
+            profileRepository.save(profile);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override

@@ -26,6 +26,9 @@ public class Profile  extends BaseEntity {
     @Column(name = "is_private_sublist")
     private boolean isPrivateSublist;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Channel> ownedChannels;
@@ -43,6 +46,7 @@ public class Profile  extends BaseEntity {
         customUrl = "";
         ownedChannels = null;
         subscriptions = null;
+        avatarUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/default/profileavatars/0.jpg";
     }
 
     public String getAboutProfileInfo() {
@@ -119,5 +123,13 @@ public class Profile  extends BaseEntity {
 
     public void removeSubscription(Channel channel) {
         this.subscriptions.remove(channel);
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }

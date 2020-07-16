@@ -124,6 +124,10 @@
                 <constraints nullable="true" unique="false"/>
             </column>
 
+            <column name="avatar_url" type="VARCHAR(1000)">
+                <constraints nullable="true" unique="false"/>
+            </column>
+
             <column name="gender" type="VARCHAR(5)">
                 <constraints nullable="true" unique="false"/>
             </column>
