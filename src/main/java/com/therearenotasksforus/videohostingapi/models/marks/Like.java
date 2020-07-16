@@ -54,4 +54,5 @@ public class Like extends BaseEntity {
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
+
 }

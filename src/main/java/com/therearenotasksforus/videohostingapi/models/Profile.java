@@ -5,6 +5,7 @@ import com.therearenotasksforus.videohostingapi.models.marks.Comment;
 import com.therearenotasksforus.videohostingapi.models.marks.Like;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -174,5 +175,15 @@ public class Profile  extends BaseEntity {
 
     public void removeComment(Comment comment) {
         comments.remove(comment);
+    }
+
+    public List<Video> getLikedVideos() {
+        List<Video> likedVideos = new ArrayList<>();
+
+        for (Like like : likes) {
+            likedVideos.add(like.getVideo());
+        }
+
+        return likedVideos;
     }
 }

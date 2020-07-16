@@ -6,11 +6,12 @@ import com.therearenotasksforus.videohostingapi.models.Video;
 import com.therearenotasksforus.videohostingapi.models.marks.Comment;
 import com.therearenotasksforus.videohostingapi.models.marks.Dislike;
 import com.therearenotasksforus.videohostingapi.models.marks.Like;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface VideoService {
-    void uploadVideo(Profile profile, Channel channel);
+    void uploadVideo(Profile profile, Channel channel, MultipartFile file);
 
     List<Video> getAll();
     List<Like> getAllLikes(Video video);

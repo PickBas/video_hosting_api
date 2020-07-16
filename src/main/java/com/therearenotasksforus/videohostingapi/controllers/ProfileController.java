@@ -79,6 +79,7 @@ public class ProfileController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @CrossOrigin
     public void uploadProfileAvatar(Principal principal, @RequestParam("file") MultipartFile file){
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
 

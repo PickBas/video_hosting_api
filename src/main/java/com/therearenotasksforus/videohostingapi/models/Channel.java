@@ -87,4 +87,13 @@ public class Channel extends BaseEntity {
     public void setVideos(List<Video> videos) {
         this.videos = videos;
     }
+
+    public void addVideo(Video video) {
+        videos.add(video);
+    }
+
+    public void removeVideo(Video video) {
+        videos.remove(video);
+    }
+
 }

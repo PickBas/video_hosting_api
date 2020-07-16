@@ -125,7 +125,7 @@ public class Video extends BaseEntity {
         dislikes.add(dislike);
     }
 
-    public void removeLike(Dislike dislike) {
+    public void removeDislike(Dislike dislike) {
         dislikes.remove(dislike);
     }
 
