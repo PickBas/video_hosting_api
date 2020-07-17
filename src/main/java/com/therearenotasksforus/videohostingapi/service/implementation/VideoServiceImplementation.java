@@ -53,6 +53,11 @@ public class VideoServiceImplementation implements VideoService {
             throw new IllegalStateException("Failure: cannot upload empty file [ " + file.getSize() + "]");
         }
 
+        if (!Arrays.asList("video/x-matroska", "video/quicktime", "video/mp4",
+                            "video/avi", "video/mpeg").contains(file.getContentType())) {
+            throw new IllegalStateException("Failure: the API does not support this file format!");
+        }
+
         String basicUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/";
 
         Map<String, String> metadata = new HashMap<>();
@@ -102,6 +107,21 @@ public class VideoServiceImplementation implements VideoService {
     @Override
     public Video findById(Long id) {
         return videoRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Like findLikeById(Long id) {
+        return likeRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Dislike findDislikeById(Long id) {
+        return dislikeRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Comment findCommentById(Long id) {
+        return commentRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -187,7 +207,7 @@ public class VideoServiceImplementation implements VideoService {
             return;
         }
 
-        deleteLikes(isSetLike.getId());
+        deleteLikes(profile, video, isSetLike.getId());
 
     }
 
@@ -209,7 +229,7 @@ public class VideoServiceImplementation implements VideoService {
             return;
         }
 
-        deleteDislikes(isSetDislike.getId());
+        deleteDislikes(video, isSetDislike.getId());
 
     }
 
@@ -236,17 +256,36 @@ public class VideoServiceImplementation implements VideoService {
     }
 
     @Override
-    public void deleteLikes(Long id) {
-        likeRepository.deleteById(id);
+    public void deleteLikes(Profile profile, Video video, Long id) {
+        Like like = findLikeById(id);
+
+        profile.removeLike(like);
+        profileRepository.save(profile);
+
+        video.removeLike(like);
+        videoRepository.save(video);
+
+        likeRepository.delete(like);
     }
 
     @Override
-    public void deleteDislikes(Long id) {
-        dislikeRepository.deleteById(id);
+    public void deleteDislikes(Video video, Long id) {
+        Dislike dislike = findDislikeById(id);
+
+
+        video.removeDislike(dislike);
+        videoRepository.save(video);
+
+        dislikeRepository.delete(dislike);
     }
 
     @Override
-    public void deleteComments(Long id) {
+    public void deleteComments(Video video, Long id) {
+        Comment comment = findCommentById(id);
+
+        video.removeComment(comment);
+        videoRepository.save(video);
+
         commentRepository.deleteById(id);
     }
 }

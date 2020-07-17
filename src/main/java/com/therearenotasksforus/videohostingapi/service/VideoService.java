@@ -17,6 +17,10 @@ public interface VideoService {
 
     Video findById(Long id);
 
+    Like findLikeById(Long id);
+    Dislike findDislikeById(Long id);
+    Comment findCommentById(Long id);
+
     List<Video> getAll();
     List<Like> getAllLikes(Video video);
     List<Dislike> getAllDislikes(Video video);
@@ -27,8 +31,8 @@ public interface VideoService {
     void saveComment(Profile profile, Video video, String commentBody);
 
     void delete(Long id);
-    void deleteLikes(Long id);
-    void deleteDislikes(Long id);
-    void deleteComments(Long id);
+    void deleteLikes(Profile profile, Video video, Long id);
+    void deleteDislikes(Video video, Long id);
+    void deleteComments(Video video, Long id);
 
 }

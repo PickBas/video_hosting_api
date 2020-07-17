@@ -3,6 +3,7 @@ package com.therearenotasksforus.videohostingapi.dto.profile;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
+import com.therearenotasksforus.videohostingapi.models.marks.Like;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ public class ProfileDto {
     private String customUrl;
     private String avatarUrl;
     private boolean isPrivateSublist;
+    private List<Like> likes;
     private List<Channel> ownedChannels;
     private List<Channel> subscriptions;
 
@@ -28,6 +30,7 @@ public class ProfileDto {
         profile.setCountry(country);
         profile.setCustomUrl(customUrl);
         profile.setAvatarUrl(avatarUrl);
+        profile.setLikes(likes);
         profile.setUser(user);
         profile.setOwnedChannels(ownedChannels);
         profile.setSubscriptions(subscriptions);
@@ -44,6 +47,7 @@ public class ProfileDto {
         profileDto.setCountry(profile.getCountry());
         profileDto.setCustomUrl(profile.getCustomUrl());
         profileDto.setUser(profile.getUser());
+        profileDto.setLikes(profile.getLikes());
         profileDto.setAvatarUrl(profile.getAvatarUrl());
         profileDto.setOwnedChannels(profile.getOwnedChannels());
         profileDto.setSubscriptions(profile.getSubscriptions());
@@ -137,5 +141,13 @@ public class ProfileDto {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
     }
 }
