@@ -27,15 +27,16 @@ public class Channel extends BaseEntity {
     @Column(name = "info")
     private String info;
 
-    // TODO: Add videos and playlists
-    // private Video videos;
-    // private Playlist playlists;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Video> videos;
 
     public Channel() {
         owner = null;
         subscribers = null;
         name = "";
         info = "";
+        videos = null;
     }
 
 
@@ -78,4 +79,21 @@ public class Channel extends BaseEntity {
     public void removeSubscriber(Profile profile) {
         this.subscribers.remove(profile);
     }
+
+    public List<Video> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(List<Video> videos) {
+        this.videos = videos;
+    }
+
+    public void addVideo(Video video) {
+        videos.add(video);
+    }
+
+    public void removeVideo(Video video) {
+        videos.remove(video);
+    }
+
 }

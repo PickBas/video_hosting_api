@@ -94,12 +94,13 @@ public class ProfileServiceImplementation implements ProfileService {
         String basicUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/";
 
         Map<String, String> metadata = new HashMap<>();
+        String originalFileName = Objects.requireNonNull(file.getOriginalFilename()).replaceAll(" ", "_");
 
         metadata.put("Content-Type", file.getContentType());
         metadata.put("content-length", String.valueOf(file.getSize()));
 
         String path = String.format("%s/%s", BucketName.PROFILE_IMAGE.getBucketName(), profile.getId());
-        String filename = String.format("%s-%s", UUID.randomUUID(), file.getOriginalFilename());
+        String filename = String.format("%s-%s", UUID.randomUUID(), originalFileName);
 
         try {
             fileStore.save(path, filename, Optional.of(metadata), file.getInputStream());

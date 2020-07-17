@@ -15,7 +15,7 @@ public class User extends BaseEntity {
             inverseJoinColumns = {@JoinColumn(name = "profile_id", referencedColumnName = "id")})
     private Profile profile;
 
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
 
     @Column(name = "first_name")
@@ -24,7 +24,7 @@ public class User extends BaseEntity {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "password")

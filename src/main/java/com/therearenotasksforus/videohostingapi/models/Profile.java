@@ -1,8 +1,11 @@
 package com.therearenotasksforus.videohostingapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.therearenotasksforus.videohostingapi.models.marks.Comment;
+import com.therearenotasksforus.videohostingapi.models.marks.Like;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,6 +32,14 @@ public class Profile  extends BaseEntity {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Like> likes;
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Channel> ownedChannels;
@@ -46,6 +57,7 @@ public class Profile  extends BaseEntity {
         customUrl = "";
         ownedChannels = null;
         subscriptions = null;
+        likes = null;
         avatarUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/default/profileavatars/0.jpg";
     }
 
@@ -131,5 +143,47 @@ public class Profile  extends BaseEntity {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void addLike(Like like) {
+        likes.add(like);
+    }
+
+    public void removeLike(Like like) {
+        likes.remove(like);
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
+    }
+
+    public void removeComment(Comment comment) {
+        comments.remove(comment);
+    }
+
+    public List<Video> getLikedVideos() {
+        List<Video> likedVideos = new ArrayList<>();
+
+        for (Like like : likes) {
+            likedVideos.add(like.getVideo());
+        }
+
+        return likedVideos;
     }
 }
