@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping(value = "/api/auth/")
@@ -60,10 +62,56 @@ public class AuthenticationController {
         }
     }
 
+    public void passwordValidation(String password) throws Exception {
+        if (password.length() < 8)
+            throw new Exception("the password must contain at least 8 characters!");
+
+        boolean hasSpecialCharacter = false;
+        boolean hasLowerCase = false;
+        boolean hasDigits = false;
+
+        for (int i = 0; i < password.length(); ++i) {
+            if (Character.isDigit(password.charAt(i))) {
+                hasDigits = true;
+            }
+
+            if (!Character.isLetter(password.charAt(i)) && !Character.isDigit(password.charAt(i))) {
+                hasSpecialCharacter = true;
+            }
+
+            if (Character.isLowerCase(password.charAt(i))) {
+                hasLowerCase = true;
+            }
+
+            if (hasDigits && hasLowerCase && hasSpecialCharacter) {
+                return;
+            }
+
+        }
+
+        throw new Exception("the password must contain lowercase letters, special characters and digits!");
+
+    }
+
+    public void emailValidation(String email) throws Exception {
+        Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = emailPattern.matcher(email);
+
+        if (matcher.find()) {
+            return;
+        }
+
+        throw new Exception("invalid email!");
+    }
+
     @CrossOrigin
     @PostMapping("register")
     public String register(@RequestBody UserRegistrationDto requestDto) {
         try {
+
+            passwordValidation(requestDto.getPassword());
+            emailValidation(requestDto.getEmail());
+
             User userToRegister = new User();
             userToRegister.setUsername(requestDto.getUsername());
             userToRegister.setEmail(requestDto.getEmail());
