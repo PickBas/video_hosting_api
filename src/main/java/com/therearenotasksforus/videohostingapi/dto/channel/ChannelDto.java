@@ -2,6 +2,7 @@ package com.therearenotasksforus.videohostingapi.dto.channel;
 
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
+import com.therearenotasksforus.videohostingapi.models.Video;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ public class ChannelDto {
     private String info;
     private Profile owner;
     private List<Profile> subscribers;
+    private List<Video> videos;
 
     public static ChannelDto fromChannel(Channel channel) {
         ChannelDto channelDto = new ChannelDto();
@@ -21,6 +23,7 @@ public class ChannelDto {
         channelDto.info = channel.getInfo();
         channelDto.owner = channel.getOwner();
         channelDto.subscribers = channel.getSubscribers();
+        channelDto.videos = channel.getVideos();
 
         return channelDto;
     }
@@ -71,4 +74,11 @@ public class ChannelDto {
         this.subscribers = subscribers;
     }
 
+    public List<Video> getVideos () {
+        return videos;
+    }
+
+    public void setVideos(List<Video> videos) {
+        this.videos = videos;
+    }
 }
