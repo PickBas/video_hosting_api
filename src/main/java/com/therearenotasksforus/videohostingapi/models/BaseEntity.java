@@ -8,7 +8,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import java.util.Date;
+import java.sql.Timestamp;
 
 @MappedSuperclass
 public class BaseEntity {
@@ -18,11 +18,11 @@ public class BaseEntity {
 
     @CreatedDate
     @Column(name = "created")
-    private Date created;
+    private Timestamp created;
 
     @LastModifiedDate
     @Column(name = "updated")
-    private Date updated;
+    private Timestamp updated;
 
     public Long getId() {
         return id;
@@ -32,19 +32,19 @@ public class BaseEntity {
         this.id = id;
     }
 
-    public Date getCreated() {
+    public Timestamp getCreated() {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(Timestamp created) {
         this.created = created;
     }
 
-    public Date getUpdated() {
+    public Timestamp getUpdated() {
         return updated;
     }
 
-    public void setUpdated(Date updated) {
+    public void setUpdated(Timestamp updated) {
         this.updated = updated;
     }
 }

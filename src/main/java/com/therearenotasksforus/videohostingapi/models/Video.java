@@ -6,7 +6,6 @@ import com.therearenotasksforus.videohostingapi.models.marks.Dislike;
 import com.therearenotasksforus.videohostingapi.models.marks.Like;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +17,6 @@ public class Video extends BaseEntity {
 
     @Column(name = "video_name")
     private String name;
-
-    @Column(name = "time")
-    private Timestamp timestamp;
 
     @Column(name = "video_file_url")
     private String videoFileUrl;
@@ -45,7 +41,6 @@ public class Video extends BaseEntity {
 
     public Video() {
         channel = null;
-        timestamp = new Timestamp(System.currentTimeMillis());
         videoFileUrl = "";
         isPrivate = false;
         isAvailableByLink = false;
@@ -61,14 +56,6 @@ public class Video extends BaseEntity {
         this.channel = channel;
     }
 
-    public Timestamp getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public String getVideoFileUrl() {
         return videoFileUrl;
     }
@@ -77,19 +64,19 @@ public class Video extends BaseEntity {
         this.videoFileUrl = videoFileUrl;
     }
 
-    public boolean isIs_private() {
+    public boolean isPrivate() {
         return isPrivate;
     }
 
-    public void setIs_private(boolean is_private) {
+    public void setPrivate(boolean is_private) {
         this.isPrivate = is_private;
     }
 
-    public boolean isIs_available_by_link() {
+    public boolean isAvailableByLink() {
         return isAvailableByLink;
     }
 
-    public void setIs_available_by_link(boolean is_available_by_link) {
+    public void setAvailableByLink(boolean is_available_by_link) {
         this.isAvailableByLink = is_available_by_link;
     }
 

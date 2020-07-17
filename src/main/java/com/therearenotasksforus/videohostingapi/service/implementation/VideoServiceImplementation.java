@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -73,6 +74,9 @@ public class VideoServiceImplementation implements VideoService {
             Video video = new Video();
             video.setVideoFileUrl(basicUrl + profile.getId() + "/" + filename);
             video.setName(filename);
+            video.setChannel(channel);
+            video.setUpdated(new Timestamp(System.currentTimeMillis()));
+            video.setCreated(new Timestamp(System.currentTimeMillis()));
             videoRepository.save(video);
 
             channel.addVideo(video);
@@ -84,8 +88,13 @@ public class VideoServiceImplementation implements VideoService {
     }
 
     @Override
-    public void updateName(Video video, String name) {
+    public void updateName(Profile profile, Video video, String name) {
+        if (profile != video.getChannel().getOwner()) {
+            throw new IllegalStateException("Failure: the user does not have rights for this operation!");
+        }
+
         video.setName(name);
+        video.setUpdated(new Timestamp(System.currentTimeMillis()));
 
         videoRepository.save(video);
     }
@@ -137,6 +146,8 @@ public class VideoServiceImplementation implements VideoService {
         Like like = new Like();
         like.setOwner(profile);
         like.setVideo(video);
+        like.setCreated(new Timestamp(System.currentTimeMillis()));
+        like.setUpdated(new Timestamp(System.currentTimeMillis()));
         likeRepository.save(like);
 
         profile.addLike(like);
@@ -150,6 +161,8 @@ public class VideoServiceImplementation implements VideoService {
         Dislike dislike = new Dislike();
         dislike.setOwner(profile);
         dislike.setVideo(video);
+        dislike.setCreated(new Timestamp(System.currentTimeMillis()));
+        dislike.setUpdated(new Timestamp(System.currentTimeMillis()));
         dislikeRepository.save(dislike);
 
         video.addDislike(dislike);
@@ -206,6 +219,8 @@ public class VideoServiceImplementation implements VideoService {
         comment.setProfile(profile);
         comment.setCommentBody(commentBody);
         comment.setVideo(video);
+        comment.setUpdated(new Timestamp(System.currentTimeMillis()));
+        comment.setCreated(new Timestamp(System.currentTimeMillis()));
         commentRepository.save(comment);
 
         profile.addComment(comment);

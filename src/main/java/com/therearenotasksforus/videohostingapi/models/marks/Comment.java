@@ -9,7 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.sql.Timestamp;
 
 @Entity
 @Table(name = "comments")
@@ -22,16 +21,12 @@ public class Comment extends BaseEntity {
     @JsonIgnore
     private Video video;
 
-    @Column(name = "time")
-    private Timestamp timestamp;
-
     @Column(name = "comment_body")
     private String commentBody;
 
     public Comment() {
         profile = null;
         video = null;
-        timestamp = new Timestamp(System.currentTimeMillis());
         commentBody = "";
     }
 
@@ -49,14 +44,6 @@ public class Comment extends BaseEntity {
 
     public void setVideo(Video video) {
         this.video = video;
-    }
-
-    public Timestamp getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
     }
 
     public String getCommentBody() {

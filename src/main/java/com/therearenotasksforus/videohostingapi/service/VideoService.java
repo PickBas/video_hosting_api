@@ -13,7 +13,7 @@ import java.util.List;
 public interface VideoService {
     void uploadVideo(Profile profile, Channel channel, MultipartFile file);
 
-    void updateName(Video video, String name);
+    void updateName(Profile profile, Video video, String name);
 
     Video findById(Long id);
 

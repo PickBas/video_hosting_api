@@ -2,6 +2,7 @@ package com.therearenotasksforus.videohostingapi.controllers;
 
 import com.therearenotasksforus.videohostingapi.dto.video.CommentDto;
 import com.therearenotasksforus.videohostingapi.dto.video.NameUpdateDto;
+import com.therearenotasksforus.videohostingapi.dto.video.VideoDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.Video;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -34,14 +36,21 @@ public class VideoController {
 
     @GetMapping("/api/videos")
     @CrossOrigin
-    public List<Video> getAllVideos() {
-        return videoService.getAll();
+    public List<VideoDto> getAllVideos() {
+        List<Video> videos = videoService.getAll();
+        List<VideoDto> videoDtos = new ArrayList<>();
+
+        for (Video video : videos) {
+            videoDtos.add(VideoDto.fromVideo(video));
+        }
+
+        return videoDtos;
     }
 
     @GetMapping("/api/video/{id}")
     @CrossOrigin
-    public Video getVideo(@PathVariable(name = "id") Long id) {
-        return videoService.findById(id);
+    public VideoDto getVideo(@PathVariable(name = "id") Long id) {
+        return VideoDto.fromVideo(videoService.findById(id));
     }
 
     @PostMapping("/api/video/{id}/like")
@@ -97,18 +106,30 @@ public class VideoController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @CrossOrigin
-    public void uploadVideo(Principal principal, @PathVariable(name = "id") Long id, @RequestParam("file") MultipartFile file){
+    public String uploadVideo(Principal principal, @PathVariable(name = "id") Long id, @RequestParam("file") MultipartFile file){
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel currentChannel = channelService.findById(id);
 
-        videoService.uploadVideo(currentProfile, currentChannel, file);
+        try {
+            videoService.uploadVideo(currentProfile, currentChannel, file);
+        } catch (IllegalStateException e) {
+            return e.getMessage();
+        }
+
+        return "Success: video was uploaded!";
     }
 
     @PostMapping("/api/video/{id}/update/name")
     @CrossOrigin
-    public String updateVideoName(@PathVariable(name = "id") Long id, @RequestBody NameUpdateDto requestDto) {
+    public String updateVideoName(Principal principal, @PathVariable(name = "id") Long id, @RequestBody NameUpdateDto requestDto) {
         Video currentVideo = videoService.findById(id);
-        videoService.updateName(currentVideo, requestDto.getName());
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+
+        try {
+            videoService.updateName(currentProfile, currentVideo, requestDto.getName());
+        } catch (IllegalStateException e) {
+            return e.getMessage();
+        }
 
         return "Success: the video is called " + currentVideo.getName() + " !";
     }
