@@ -1,3 +1,4 @@
+![GitHub](https://img.shields.io/github/license/ThereAreNoTasksForUs/video_hosting?color=bright%20green)
 # video_hosting_java_api
 API based on Java Spring framework
 
