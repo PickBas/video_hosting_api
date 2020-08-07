@@ -1,4 +1,4 @@
-# video_hosting_java_api
+# Video Hosting Api
 API based on Java Spring framework
 
 ## Run
@@ -26,9 +26,9 @@ A token which you get after logging in has to be provided as a request header wi
     /api/channel/{id}/unsubscribe - Unsubscription from a channel. POST request.
 ### Profile
     /api/profiles - Getting all the profiles. GET request.
-    /api/profilee - Getting the current profile. GET request.
+    /api/profile - Getting the current profile. GET request.
     /api/profile/id/{id} - Getting a profile with its id. GET request.
-    /api/profile/upload/avatar - Uploading an avatar. PSOT request. form-data: key = "file"; value = jpg, png or gif pictures.
+    /api/profile/upload/avatar - Uploading an avatar. POST request. form-data: key = "file"; value = jpg, png or gif pictures.
     /api/profile/update - Updating profiles's data. POST request. JSON Example: {"aboutProfileInfo": "example", "gender": "M/F", "country": "example", "customUrl": "example", "isPrivateSublist": "false/true"}
 ### Video
     /api/videos - Getting all the videos. GET request.
