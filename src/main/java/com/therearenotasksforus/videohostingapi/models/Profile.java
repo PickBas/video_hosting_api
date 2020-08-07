@@ -1,72 +1,64 @@
 package com.therearenotasksforus.videohostingapi.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.therearenotasksforus.videohostingapi.models.marks.Comment;
+import com.therearenotasksforus.videohostingapi.models.marks.Like;
+
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-public class Profile {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+@Table(name = "profiles")
+public class Profile  extends BaseEntity {
+    @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL)
+    private User user;
 
-    private String username;
-
-    private String firstName;
-    private String lastName;
-
-    private final Timestamp dateJoined;
-
+    @Column(name = "about_profile_info")
     private String aboutProfileInfo;
+
+    @Column(name = "gender")
     private char gender;
+
+    @Column(name = "country")
     private String country;
 
-    @Column(unique=true)
-    private String custom_url;
+    @Column(name = "custom_url")
+    private String customUrl;
 
-    private boolean is_private_sublist;
+    @Column(name = "is_private_sublist")
+    private boolean isPrivateSublist;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Like> likes;
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Channel> ownedChannels;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Channel> subscriptions;
 
     public Profile() {
-        username = "";
-        firstName = "";
-        lastName = "";
-        dateJoined = new Timestamp(System.currentTimeMillis());
+        user = null;
         aboutProfileInfo = "";
         gender = 'M';
-        is_private_sublist = false;
+        isPrivateSublist = false;
         country = "";
-        custom_url = "";
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public Timestamp getDateJoined() {
-        return dateJoined;
+        customUrl = "";
+        ownedChannels = null;
+        subscriptions = null;
+        likes = null;
+        avatarUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/default/profileavatars/0.jpg";
     }
 
     public String getAboutProfileInfo() {
@@ -93,19 +85,105 @@ public class Profile {
         this.country = country;
     }
 
-    public String getCustom_url() {
-        return custom_url;
+    public String getCustomUrl() {
+        return customUrl;
     }
 
-    public void setCustom_url(String custom_url) {
-        this.custom_url = custom_url;
+    public void setCustomUrl(String customUrl) {
+        this.customUrl = customUrl;
     }
 
-    public boolean isIs_private_sublist() {
-        return is_private_sublist;
+    public boolean getIsPrivateSublist() {
+        return isPrivateSublist;
     }
 
-    public void setIs_private_sublist(boolean is_private_sublist) {
-        this.is_private_sublist = is_private_sublist;
+    public void setIsPrivateSublist(boolean is_private_sublist) {
+        this.isPrivateSublist = is_private_sublist;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<Channel> getOwnedChannels() {
+        return ownedChannels;
+    }
+
+    public void setOwnedChannels(List<Channel> ownedChannels) {
+        this.ownedChannels = ownedChannels;
+    }
+
+    public List<Channel> getSubscriptions() {
+        return subscriptions;
+    }
+
+    public void setSubscriptions(List<Channel> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
+
+    public void addOwnedChannel(Channel channel) {
+        this.ownedChannels.add(channel);
+    }
+
+    public void addSubscription(Channel channel) {
+        this.subscriptions.add(channel);
+    }
+
+    public void removeSubscription(Channel channel) {
+        this.subscriptions.remove(channel);
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void addLike(Like like) {
+        likes.add(like);
+    }
+
+    public void removeLike(Like like) {
+        likes.remove(like);
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
+    }
+
+    public void removeComment(Comment comment) {
+        comments.remove(comment);
+    }
+
+    public List<Video> getLikedVideos() {
+        List<Video> likedVideos = new ArrayList<>();
+
+        for (Like like : likes) {
+            likedVideos.add(like.getVideo());
+        }
+
+        return likedVideos;
     }
 }

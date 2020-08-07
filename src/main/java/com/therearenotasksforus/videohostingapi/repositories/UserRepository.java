@@ -4,7 +4,7 @@ import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ProfileRepository extends JpaRepository<Profile, Long> {
-    Profile findByCustomUrl(String customUrl);
-    Profile findByUser(User user);
+public interface UserRepository extends JpaRepository<User, Long> {
+    User findByUsername(String name);
+    User findByProfile(Profile profile);
 }
