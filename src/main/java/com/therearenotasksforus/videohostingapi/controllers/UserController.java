@@ -5,12 +5,16 @@ import com.therearenotasksforus.videohostingapi.dto.user.UserDto;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.bind.ValidationException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class UserController {
@@ -38,38 +42,46 @@ public class UserController {
 
     @GetMapping("/api/user")
     @CrossOrigin
-    public UserDto getCurrentUser(Principal principal) {
+    public ResponseEntity<UserDto> getCurrentUser(Principal principal) {
         try {
-            return UserDto.fromUser(userService.findByUsername(principal.getName()));
+            UserDto userDto = UserDto.fromUser(userService.findByUsername(principal.getName()));
+            return ResponseEntity.ok(userDto);
         } catch (Exception e) {
-            return null;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
     @GetMapping("/api/user/id/{id}")
     @CrossOrigin
-    public UserDto getUserById(@PathVariable(name = "id") Long id) {
-        return UserDto.fromUser(userService.findById(id));
+    public ResponseEntity<UserDto> getUserById(@PathVariable(name = "id") Long id) {
+        User user = userService.findById(id);
+
+        return user == null ?
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body(null) :
+                ResponseEntity.ok(UserDto.fromUser(user));
     }
 
     @PostMapping("/api/user/update")
     @CrossOrigin
-    public String updateUser(Principal principal, @RequestBody UpdateUserDto requestDto) {
+    public ResponseEntity<Map<String, String>> updateUser(Principal principal, @RequestBody UpdateUserDto requestDto) {
         User userToUpdate;
+        Map<String, String> response = new HashMap<>();
 
         try {
              userToUpdate = userService.findByUsername(principal.getName());
         } catch (Exception e) {
-            return "Failure: cannot find the user!";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
         try {
             userService.updateNames(userToUpdate, requestDto);
         } catch (ValidationException e) {
-            return "Failure: invalid data was provided!";
+            response.put("Error", "Invalid data was provided!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        return "Success: the user has been updated!";
+        response.put("Success", "The user has been updated!");
+        return ResponseEntity.ok(response);
     }
 
 }
