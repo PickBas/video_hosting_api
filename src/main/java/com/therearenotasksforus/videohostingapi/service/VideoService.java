@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface VideoService {
-    void uploadVideo(Profile profile, Channel channel, MultipartFile file);
+    Long uploadVideo(Profile profile, Channel channel, MultipartFile file);
 
     void updateName(Profile profile, Video video, String name);
 

@@ -11,13 +11,18 @@ import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import com.therearenotasksforus.videohostingapi.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class VideoController {
@@ -49,55 +54,85 @@ public class VideoController {
 
     @GetMapping("/api/video/{id}")
     @CrossOrigin
-    public VideoDto getVideo(@PathVariable(name = "id") Long id) {
-        return VideoDto.fromVideo(videoService.findById(id));
+    public ResponseEntity<VideoDto> getVideo(@PathVariable(name = "id") Long id) {
+        Video video = videoService.findById(id);
+
+        return video == null ?
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body(null) :
+                ResponseEntity.ok(VideoDto.fromVideo(video));
     }
 
     @PostMapping("/api/video/{id}/like")
     @CrossOrigin
-    public String setLike(Principal principal, @PathVariable(name = "id") Long id) {
+    public ResponseEntity<Map<String, String>> setLike(Principal principal, @PathVariable(name = "id") Long id) {
         Video currentVideo = videoService.findById(id);
+
+        if (currentVideo == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+        Map<String, String> response = new HashMap<>();
 
         videoService.setLike(currentProfile, currentVideo);
 
-        return "Success: user " + principal.getName() + " liked video!";
+        response.put("Success", "User " + principal.getName() + " liked video!");
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/api/video/{id}/dislike")
     @CrossOrigin
-    public String setDislike(Principal principal, @PathVariable(name = "id") Long id) {
+    public ResponseEntity<Map<String, String>> setDislike(Principal principal, @PathVariable(name = "id") Long id) {
         Video currentVideo = videoService.findById(id);
+        Map<String, String> response = new HashMap<>();
+
+        if (currentVideo == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
 
         videoService.setDislike(currentProfile, currentVideo);
+        response.put("Success", "User " + principal.getName() + " disliked video!");
 
-        return "Success: user " + principal.getName() + " disliked video!";
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/api/video/{id}/comment")
     @CrossOrigin
-    public String setLike(Principal principal, @PathVariable(name = "id") Long id, @RequestBody CommentDto requestDto) {
+    public ResponseEntity<Map<String, String>> comment(Principal principal, @PathVariable(name = "id") Long id, @RequestBody CommentDto requestDto) {
         Video currentVideo = videoService.findById(id);
+
+        if (currentVideo == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        Map<String, String> response = new HashMap<>();
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
 
         videoService.saveComment(currentProfile, currentVideo, requestDto.getCommentBody());
 
-        return "Success: user " + principal.getName() + " commented videos!";
+        response.put("Success", "User " + principal.getName() + " commented videos!");
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/api/channels/{id}/videos")
+    @GetMapping("/api/channel/{id}/videos")
     @CrossOrigin
-    public List<Video> getAllChannelVideos(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<List<Video>> getAllChannelVideos(@PathVariable(name = "id") Long id) {
         Channel channel = channelService.findById(id);
-        return channel.getVideos();
+        return channel == null ?
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body(null) :
+                ResponseEntity.ok(channel.getVideos());
     }
 
     @GetMapping("/api/profiles/{id}/likedvideos")
     @CrossOrigin
-    public List<Video> getAllLikedVideos(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<List<Video>> getAllLikedVideos(@PathVariable(name = "id") Long id) {
         Profile profile = profileService.findById(id);
-        return profile.getLikedVideos();
+        return profile == null ?
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body(null) :
+                ResponseEntity.ok(profile.getLikedVideos());
     }
 
     @PostMapping(
@@ -106,32 +141,48 @@ public class VideoController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @CrossOrigin
-    public String uploadVideo(Principal principal, @PathVariable(name = "id") Long id, @RequestParam("file") MultipartFile file){
+    public ResponseEntity<?> uploadVideo(
+            Principal principal,
+            @PathVariable(name = "id") Long id,
+            @RequestParam("file") MultipartFile file
+    ) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel currentChannel = channelService.findById(id);
+        Long newVideoId;
 
         try {
-            videoService.uploadVideo(currentProfile, currentChannel, file);
+            newVideoId = videoService.uploadVideo(currentProfile, currentChannel, file);
         } catch (IllegalStateException e) {
-            return e.getMessage();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HashMap<>() {{
+                put("Error", e.getMessage());
+            }});
         }
 
-        return "Success: video was uploaded!";
+        return ResponseEntity.ok(VideoDto.fromVideo(videoService.findById(newVideoId)));
     }
 
     @PostMapping("/api/video/{id}/update/name")
     @CrossOrigin
-    public String updateVideoName(Principal principal, @PathVariable(name = "id") Long id, @RequestBody NameUpdateDto requestDto) {
+    public ResponseEntity<?> updateVideoName(Principal principal,
+                                             @PathVariable(name = "id") Long id,
+                                             @RequestBody NameUpdateDto requestDto) {
         Video currentVideo = videoService.findById(id);
+
+        if (currentVideo == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
 
         try {
             videoService.updateName(currentProfile, currentVideo, requestDto.getName());
         } catch (IllegalStateException e) {
-            return e.getMessage();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HashMap<>() {{
+                put("Error", e.getMessage());
+            }});
         }
 
-        return "Success: the video is called " + currentVideo.getName() + " !";
+        return ResponseEntity.ok(VideoDto.fromVideo(currentVideo));
     }
 
 }

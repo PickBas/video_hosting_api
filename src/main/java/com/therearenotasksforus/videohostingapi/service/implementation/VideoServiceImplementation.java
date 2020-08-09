@@ -48,7 +48,7 @@ public class VideoServiceImplementation implements VideoService {
     }
 
     @Override
-    public void uploadVideo(Profile profile, Channel channel, MultipartFile file) {
+    public Long uploadVideo(Profile profile, Channel channel, MultipartFile file) {
         if (file.isEmpty()) {
             throw new IllegalStateException("Failure: cannot upload empty file [ " + file.getSize() + "]");
         }
@@ -90,6 +90,8 @@ public class VideoServiceImplementation implements VideoService {
 
             channel.addVideo(video);
             channelRepository.save(channel);
+
+            return video.getId();
 
         } catch (IOException e) {
             throw new IllegalStateException(e);

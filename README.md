@@ -36,7 +36,7 @@ A token which you get after logging in has to be provided as a request header wi
     /api/video/{id}/like - Setting like. POST request.
     /api/video/{id}/dislike - Setting dislike. POST request.
     /api/video/{id}/comment - Commenting a video. POST request. JSON Example: {"commentBody": "example"}
-    /api/channels/{id}/videos - Getting all the videos of a channel. GET request.
+    /api/channel/{id}/videos - Getting all the videos of a channel. GET request.
     /api/profiles/{id}/likedvideos - Getting all the profile's liked videos. GET request.
     /api/channel/{id}/upload/video - Uploading a video. POST request.
     /api/video/{id}/update/name - Updating a video name. POST request. JSON Example: {"name": "example"}
