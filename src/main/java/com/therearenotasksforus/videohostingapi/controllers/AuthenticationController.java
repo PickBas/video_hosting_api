@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -36,7 +35,7 @@ public class AuthenticationController {
 
     @PostMapping("login")
     @CrossOrigin
-    public ResponseEntity login(@RequestBody AuthenticationRequestDto requestDto) {
+    public ResponseEntity<?> login(@RequestBody AuthenticationRequestDto requestDto) {
         try {
             String username = requestDto.getUsername();
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, requestDto.getPassword());
@@ -44,7 +43,9 @@ public class AuthenticationController {
             User user = userService.findByUsername(username);
 
             if (user == null) {
-                throw new UsernameNotFoundException("User with username: " + username + " not found!");
+                Map<String, String> response = new HashMap<>();
+                response.put("Error", "user was not found");
+                return ResponseEntity.badRequest().body(response);
             }
 
             String token = jwtTokenProvider.createToken(username, user.getRoles());
@@ -55,8 +56,9 @@ public class AuthenticationController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return null;
+            Map<String, String> response = new HashMap<>();
+            response.put("Error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         }
     }
 
@@ -104,9 +106,8 @@ public class AuthenticationController {
 
     @CrossOrigin
     @PostMapping("register")
-    public String register(@RequestBody UserRegistrationDto requestDto) {
+    public ResponseEntity<?> register(@RequestBody UserRegistrationDto requestDto) {
         try {
-
             passwordValidation(requestDto.getPassword());
             emailValidation(requestDto.getEmail());
 
@@ -116,9 +117,16 @@ public class AuthenticationController {
             userToRegister.setPassword(requestDto.getPassword());
 
             userService.register(userToRegister);
-            return "Success: User with username " + userToRegister.getUsername() + " has been registered!";
+
+            Map<String, String> response = new HashMap<>();
+            response.put("Success", "User with username " + userToRegister.getUsername() + " has been registered!");
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return "Failure: " + e.getMessage();
+            Map<String, String> response = new HashMap<>();
+            response.put("Error", e.getMessage());
+
+            return ResponseEntity.badRequest().body(response);
         }
     }
 
