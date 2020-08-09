@@ -9,12 +9,16 @@ import com.therearenotasksforus.videohostingapi.service.ChannelService;
 import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.bind.ValidationException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ChannelController {
@@ -31,18 +35,21 @@ public class ChannelController {
 
     @PostMapping("/api/channel/create")
     @CrossOrigin
-    public String channelCreate(Principal principal, @RequestBody ChannelCreateDto requestDto) {
+    public ResponseEntity<Map<String, String>> channelCreate(Principal principal, @RequestBody ChannelCreateDto requestDto) {
+        Map<String, String> response = new HashMap<>();
         Profile channelOwner = userService.findByUsername(principal.getName()).getProfile();
 
         if (requestDto.getName().isEmpty()) {
-            return "Failure: No channel name was provided!";
+            response.put("Error", "No channel name was provided!");
+            return ResponseEntity.badRequest().body(response);
         }
 
         Channel channel = channelService.create(channelOwner, requestDto);
-
         profileService.addOwnedChannel(channelOwner, channel);
 
-        return String.format("Success: Channel %s was created!", channel.getName());
+        response.put("Success", "Channel " + channel.getName() +" was created!");
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/api/channels")
@@ -79,68 +86,83 @@ public class ChannelController {
 
     @GetMapping("/api/channel/{id}")
     @CrossOrigin
-    public ChannelDto getChannelById(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<?> getChannelById(@PathVariable(name = "id") Long id) {
         Channel channel = channelService.findById(id);
 
         if (channel == null) {
-            return null;
+            Map <String, String> response = new HashMap<>();
+            response.put("Error", "Cannot find the channel!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        return ChannelDto.fromChannel(channel);
+        return ResponseEntity.status(HttpStatus.OK).body(ChannelDto.fromChannel(channel));
     }
 
     @PostMapping("/api/channel/{id}/update")
     @CrossOrigin
-    public String updateChannel(Principal principal, @PathVariable(name = "id") Long id, @RequestBody ChannelUpdateDto requestDto) {
+    public ResponseEntity<?> updateChannel(Principal principal, @PathVariable(name = "id") Long id, @RequestBody ChannelUpdateDto requestDto) {
         Profile ownerProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel channel = channelService.findById(id);
+        Map<String, String> response = new HashMap<>();
 
         if (channel == null) {
-            return "Failure: No channel with such id found!";
+            response.put("Error", "No channel with such id found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
         if (!channelService.isProfileOwner(ownerProfile, channel)) {
-            return "Failure: the profile is not the owner of the channel!";
+            response.put("Error", "The profile is not the owner of the channel!");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
         }
 
         try {
             channelService.update(channel, requestDto);
         } catch (ValidationException e) {
-            return "Failure: wrong data was provided!";
+            response.put("Error", "Wrong data was provided!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        return "Success: channel " + channel.getName() + " was updated!";
-
+        return ResponseEntity.status(HttpStatus.OK).body(channelService.findById(id));
     }
 
     @PostMapping("/api/channel/{id}/subscribe")
     @CrossOrigin
-    public String subscribeToChannel(Principal principal, @PathVariable(name = "id") Long id) {
+    public ResponseEntity<Map<String, String>> subscribeToChannel(Principal principal, @PathVariable(name = "id") Long id) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel currentChannel = channelService.findById(id);
+        Map<String, String> response = new HashMap<>();
 
         try {
             channelService.subscribeToChannel(currentProfile, currentChannel);
         } catch (Exception e) {
-            return "Failure: " + e.getMessage();
+            response.put("Error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         }
 
-        return "Success: user " + currentProfile.getUser().getUsername() + " subscribed to " + currentChannel.getName() + " channel!";
+        response.put("Success", "User" +
+                currentProfile.getUser().getUsername() + " subscribed to " +
+                currentChannel.getName() + " channel!");
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/api/channel/{id}/unsubscribe")
     @CrossOrigin
-    public String unsubscribeFromChannel(Principal principal, @PathVariable(name = "id") Long id) {
+    public ResponseEntity<Map<String, String>> unsubscribeFromChannel(Principal principal, @PathVariable(name = "id") Long id) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel currentChannel = channelService.findById(id);
+        Map<String, String> response = new HashMap<>();
 
         try {
             channelService.unsubscribeFromChannel(currentProfile, currentChannel);
         } catch (Exception e) {
-            return "Failure: " + e.getMessage();
+            response.put("Error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         }
 
-        return "Success: user " + currentProfile.getUser().getUsername() + " unsubscribed from " + currentChannel.getName() + " channel!";
+        response.put("Success", "User " + currentProfile.getUser().getUsername() +
+                " unsubscribed from " + currentChannel.getName() + " channel!");
+
+        return ResponseEntity.ok().body(response);
     }
 
 }

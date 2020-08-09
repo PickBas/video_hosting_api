@@ -6,6 +6,7 @@ import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.security.jwt.JwtTokenProvider;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,7 +36,7 @@ public class AuthenticationController {
 
     @PostMapping("login")
     @CrossOrigin
-    public ResponseEntity<?> login(@RequestBody AuthenticationRequestDto requestDto) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody AuthenticationRequestDto requestDto) {
         try {
             String username = requestDto.getUsername();
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, requestDto.getPassword());
@@ -44,7 +45,7 @@ public class AuthenticationController {
 
             if (user == null) {
                 Map<String, String> response = new HashMap<>();
-                response.put("Error", "user was not found");
+                response.put("Error", "User was not found");
                 return ResponseEntity.badRequest().body(response);
             }
 
@@ -106,7 +107,7 @@ public class AuthenticationController {
 
     @CrossOrigin
     @PostMapping("register")
-    public ResponseEntity<?> register(@RequestBody UserRegistrationDto requestDto) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody UserRegistrationDto requestDto) {
         try {
             passwordValidation(requestDto.getPassword());
             emailValidation(requestDto.getEmail());
@@ -121,12 +122,12 @@ public class AuthenticationController {
             Map<String, String> response = new HashMap<>();
             response.put("Success", "User with username " + userToRegister.getUsername() + " has been registered!");
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             Map<String, String> response = new HashMap<>();
             response.put("Error", e.getMessage());
 
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
