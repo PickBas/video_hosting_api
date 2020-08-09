@@ -2,20 +2,23 @@ package com.therearenotasksforus.videohostingapi.controllers;
 
 import com.therearenotasksforus.videohostingapi.dto.profile.ProfileDto;
 import com.therearenotasksforus.videohostingapi.dto.profile.ProfileUpdateDto;
-import com.therearenotasksforus.videohostingapi.dto.user.UserDto;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.bind.ValidationException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ProfileController {
@@ -44,34 +47,46 @@ public class ProfileController {
 
     @GetMapping("/api/profile")
     @CrossOrigin
-    public ProfileDto getCurrentProfile(Principal principal) {
+    public ResponseEntity<ProfileDto> getCurrentProfile(Principal principal) {
         try {
             User currentUser = userService.findByUsername(principal.getName());
             Profile currentProfile = currentUser.getProfile();
-            return ProfileDto.fromProfile(currentProfile);
+            return ResponseEntity.ok().body(ProfileDto.fromProfile(currentProfile));
         } catch (Exception e) {
-            return null;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
     @GetMapping("/api/profile/id/{id}")
     @CrossOrigin
-    public ProfileDto getProfileById(@PathVariable(name = "id") Long id) {
-        return ProfileDto.fromProfile(profileService.findById(id));
+    public ResponseEntity<ProfileDto> getProfileById(@PathVariable(name = "id") Long id) {
+        Profile profile = profileService.findById(id);
+
+        if (profile == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        return ResponseEntity.ok().body(ProfileDto.fromProfile(profileService.findById(id)));
     }
 
     @PostMapping("/api/profile/update")
     @CrossOrigin
-    public String updateProfile(Principal principal, @RequestBody ProfileUpdateDto requestDto) {
+    public ResponseEntity<Map<String, String>> updateProfile(
+            Principal principal,
+            @RequestBody ProfileUpdateDto requestDto
+    ) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+        Map<String, String> response = new HashMap<>();
 
         try {
             profileService.update(currentProfile, requestDto);
         } catch (ValidationException e) {
-            return "Failure: wrong data was provided";
+            response.put("Error", "Wrong data was provided!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        return "Success: profile " + currentProfile.getUser().getUsername() + " was updated!";
+        response.put("Success", "profile " + currentProfile.getUser().getUsername() + " was updated!");
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping(
@@ -80,11 +95,10 @@ public class ProfileController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @CrossOrigin
-    public void uploadProfileAvatar(Principal principal, @RequestParam("file") MultipartFile file){
+    public void uploadProfileAvatar(Principal principal, @RequestParam("file") MultipartFile file) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
 
         profileService.uploadProfileAvatar(currentProfile, file);
-
     }
 
 }
