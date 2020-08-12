@@ -20,20 +20,9 @@ class LoginTests extends AbstractTest {
 
     @Test
     public void loginPostRequestTest() throws Exception {
-        String uri = "/api/auth/register";
+        super.register();
 
-        Map<String, String> requestBodyRegister = new HashMap<>();
-        requestBodyRegister.put("email", "firsttestuser@firsttestuser.com");
-        requestBodyRegister.put("username", "firsttestuser");
-        requestBodyRegister.put("password", "asdf123!");
-
-        String jsonBodyRegister = super.mapToJson(requestBodyRegister);
-
-        mvc.perform(MockMvcRequestBuilders.post(uri)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(jsonBodyRegister)).andReturn();
-
-        uri = "/api/auth/login";
+        String uri = "/api/auth/login";
 
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", "firsttestuser");

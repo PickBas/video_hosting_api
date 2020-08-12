@@ -44,8 +44,6 @@ public class UserServiceImplementation implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreated(new Timestamp(System.currentTimeMillis()));
         user.setUpdated(new Timestamp(System.currentTimeMillis()));
-        user.setFirstName("Undecided");
-        user.setLastName("Undecided");
 
         Profile profile = new Profile();
 

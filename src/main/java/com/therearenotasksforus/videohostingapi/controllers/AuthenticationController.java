@@ -1,6 +1,7 @@
 package com.therearenotasksforus.videohostingapi.controllers;
 
 import com.therearenotasksforus.videohostingapi.dto.auth.AuthenticationRequestDto;
+import com.therearenotasksforus.videohostingapi.dto.user.UserDto;
 import com.therearenotasksforus.videohostingapi.dto.user.UserRegistrationDto;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.security.jwt.JwtTokenProvider;
@@ -107,7 +108,7 @@ public class AuthenticationController {
 
     @CrossOrigin
     @PostMapping("register")
-    public ResponseEntity<Map<String, String>> register(@RequestBody UserRegistrationDto requestDto) {
+    public ResponseEntity<?> register(@RequestBody UserRegistrationDto requestDto) {
         try {
             passwordValidation(requestDto.getPassword());
             emailValidation(requestDto.getEmail());
@@ -119,10 +120,8 @@ public class AuthenticationController {
 
             userService.register(userToRegister);
 
-            Map<String, String> response = new HashMap<>();
-            response.put("Success", "User with username " + userToRegister.getUsername() + " has been registered!");
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(UserDto.fromUser(userService.findById(userToRegister.getId())));
         } catch (Exception e) {
             Map<String, String> response = new HashMap<>();
             response.put("Error", e.getMessage());
