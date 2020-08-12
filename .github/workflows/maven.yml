@@ -11,6 +11,17 @@ on:
 
 jobs:
   build:
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_USER: user
+          MYSQL_PASSWORD: 1234
+          MYSQL_ROOT_PASSWORD: toor
+          MYSQL_DATABASE: video_hosting_db
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     runs-on: ubuntu-latest
 
