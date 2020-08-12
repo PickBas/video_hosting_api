@@ -1,4 +1,5 @@
-![Java CI with Maven](https://github.com/ThereAreNoTasksForUs/video_hosting_api/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master)
+![Build](https://github.com/ThereAreNoTasksForUs/video_hosting_api/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master)
+![Spring Tests](https://github.com/ThereAreNoTasksForUs/video_hosting_api/workflows/Spring%20Tests/badge.svg)
 
 # Video Hosting Api
 API based on Java Spring framework
