@@ -5,9 +5,10 @@
 API based on Java Spring framework
 
 ## Run
-  docker-compose up --build -d
+Enter your S3 keys into docker-compose file
+docker-compose up --build -d
   
-  The container is going to be on port 8080
+The container is going to be on port 8080
  
 ## URLs
 A token which you get after logging in has to be provided as a request header with any request (except Sign in/up). Example: header key - Authorization, value - TOKEN_<token>
