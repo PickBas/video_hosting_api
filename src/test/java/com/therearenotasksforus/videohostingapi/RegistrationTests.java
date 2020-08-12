@@ -3,7 +3,6 @@ package com.therearenotasksforus.videohostingapi;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MvcResult;
@@ -14,9 +13,9 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-@SpringBootTest
+@SpringBootTest(properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
 @RunWith(SpringRunner.class)
-class VideoHostingApiApplicationTests extends AbstractTest {
+class RegistrationTests extends AbstractTest {
 
 	@Test
 	public void registerGetRequest() throws Exception {
@@ -32,8 +31,8 @@ class VideoHostingApiApplicationTests extends AbstractTest {
 		String uri = "/api/auth/register";
 
 		Map<String, String> requestBody = new HashMap<>();
-		requestBody.put("email", "test@test.test");
-		requestBody.put("name", "test");
+		requestBody.put("email", "test1@test.test");
+		requestBody.put("username", "test1");
 		requestBody.put("password", "asdf123!");
 
 		String jsonBody = super.mapToJson(requestBody);
@@ -47,19 +46,22 @@ class VideoHostingApiApplicationTests extends AbstractTest {
 	}
 
 	@Test
-	public void profilesLoads() throws Exception {
-		String uri = "/api/profiles";
-		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
-											.accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+	public void registerWithWeakPassword() throws Exception {
+		String uri = "/api/auth/register";
+
+		Map<String, String> requestBody = new HashMap<>();
+		requestBody.put("email", "test2@test.test");
+		requestBody.put("username", "test2");
+		requestBody.put("password", "asd");
+
+		String jsonBody = super.mapToJson(requestBody);
+
+		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(jsonBody)).andReturn();
 
 		int status = mvcResult.getResponse().getStatus();
-		int jsonLength = mvcResult.getResponse().getContentLength();
-		assertEquals(200, status);
-		assertEquals(0, jsonLength);
+		assertEquals(400, status);
 	}
-
-//	@Test
-//	void contextLoads() {
-//	}
 
 }
