@@ -8,6 +8,8 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "8080:8080"
+    environment:
+      MYSQL_URL: mysql://db:3306/video_hosting_db
     restart: always
     depends_on:
       - db
