@@ -36,3 +36,5 @@ jobs:
       run: mvn -B package --file pom.xml
       env:
         MYSQL_URL: mysql://localhost:3306/video_hosting_db
+        AMAZON_ACCESS_KEY: ${{ secrets.AMAZON_ACCESS_KEY }}
+        AMAZON_SECRET_KEY: ${{ secrets.AMAZON_SECRET_KEY }}
