@@ -5,9 +5,9 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ master, feature/tests ]
+    branches: [ master ]
   pull_request:
-    branches: [ master, featue/tests ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -31,5 +31,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 14
+      env:
+        MYSQL_URL: mysql://localhost:3306/video_hosting_db
     - name: Build with Maven
       run: mvn -B package --file pom.xml
