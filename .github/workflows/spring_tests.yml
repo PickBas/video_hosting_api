@@ -32,7 +32,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 14
-    - name: Build with Maven
+    - name: Test Spring
       run: ./mvnw test
       env:
         MYSQL_URL: mysql://localhost:3306/video_hosting_db
