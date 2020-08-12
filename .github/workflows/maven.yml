@@ -11,6 +11,7 @@ on:
 
 jobs:
   build:
+    
     services:
       mysql:
         image: mysql:5.7
@@ -31,7 +32,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 14
-      env:
-        MYSQL_URL: mysql://localhost:3306/video_hosting_db
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+      env:
+        MYSQL_URL: mysql://localhost:3306/video_hosting_db
