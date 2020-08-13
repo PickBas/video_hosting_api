@@ -125,6 +125,9 @@ class ProfileTests extends AbstractTest {
         String uri = "/api/profile/upload/avatar";
         String token = super.getToken();
 
+        String prevAvatar = super.mapFromJson(super.getRequest("/api/profile", token))
+                .get("avatarUrl").toString();
+
         final InputStream inputStream = Thread.currentThread()
                 .getContextClassLoader()
                 .getResourceAsStream("test.png");
@@ -141,6 +144,10 @@ class ProfileTests extends AbstractTest {
                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andReturn();
 
+        String currentAvatar = super.mapFromJson(super.getRequest("/api/profile", token))
+                .get("avatarUrl").toString();
+
         assertEquals(200, mvcResult.getResponse().getStatus());
+        assertNotEquals(prevAvatar, currentAvatar);
     }
 }
