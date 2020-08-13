@@ -66,7 +66,6 @@ class UserTests extends AbstractTest {
 
         assertEquals(200, status);
         assertNotEquals(null, responseBody.get("username"));
-        assertEquals(1, responseBody.get("profile"));
         assertEquals(responseBody.get("id"), responseBody.get("profile"));
         assertNotEquals(null, responseBody.get("email"));
     }
