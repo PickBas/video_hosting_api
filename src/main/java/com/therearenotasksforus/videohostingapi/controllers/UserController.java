@@ -63,7 +63,7 @@ public class UserController {
 
     @PostMapping("/api/user/update")
     @CrossOrigin
-    public ResponseEntity<Map<String, String>> updateUser(Principal principal, @RequestBody UpdateUserDto requestDto) {
+    public ResponseEntity<?> updateUser(Principal principal, @RequestBody UpdateUserDto requestDto) {
         User userToUpdate;
         Map<String, String> response = new HashMap<>();
 
@@ -80,8 +80,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        response.put("Success", "The user has been updated!");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(UserDto.fromUser(userService.findById(userToUpdate.getId())));
     }
 
 }

@@ -45,10 +45,7 @@ class RegistrationTests extends AbstractTest {
 
 		int status = mvcResult.getResponse().getStatus();
 
-		Map<String, Object> responseBody = new ObjectMapper().readValue(
-				mvcResult.getResponse().getContentAsString(),
-				HashMap.class
-		);
+		Map<String, Object> responseBody = super.mapFromJson(mvcResult);
 
 		assertEquals(201, status);
 		assertNotEquals(null, responseBody.get("username"));

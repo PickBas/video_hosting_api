@@ -35,10 +35,7 @@ class LoginTests extends AbstractTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonBody)).andReturn();
 
-        Map<String, Object> responseBody = new ObjectMapper().readValue(
-                mvcResult.getResponse().getContentAsString(),
-                HashMap.class
-        );
+        Map<String, Object> responseBody = super.mapFromJson(mvcResult);
 
         int status = mvcResult.getResponse().getStatus();
 
