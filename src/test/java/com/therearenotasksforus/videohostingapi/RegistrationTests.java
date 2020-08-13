@@ -1,6 +1,5 @@
 package com.therearenotasksforus.videohostingapi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,7 +48,6 @@ class RegistrationTests extends AbstractTest {
 
 		assertEquals(201, status);
 		assertNotEquals(null, responseBody.get("username"));
-		assertEquals(responseBody.get("id"), responseBody.get("profile"));
 		assertNotEquals(null, responseBody.get("email"));
 	}
 
