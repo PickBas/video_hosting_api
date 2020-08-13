@@ -1,5 +1,6 @@
 package com.therearenotasksforus.videohostingapi;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 @SpringBootTest(properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
 @RunWith(SpringRunner.class)
@@ -42,7 +44,17 @@ class RegistrationTests extends AbstractTest {
 				.content(jsonBody)).andReturn();
 
 		int status = mvcResult.getResponse().getStatus();
+
+		Map<String, Object> responseBody = new ObjectMapper().readValue(
+				mvcResult.getResponse().getContentAsString(),
+				HashMap.class
+		);
+
 		assertEquals(201, status);
+		assertNotEquals(null, responseBody.get("username"));
+		assertEquals(1, responseBody.get("profile"));
+		assertEquals(responseBody.get("id"), responseBody.get("profile"));
+		assertNotEquals(null, responseBody.get("email"));
 	}
 
 	@Test
