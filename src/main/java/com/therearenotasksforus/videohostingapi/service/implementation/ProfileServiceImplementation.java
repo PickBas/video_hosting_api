@@ -67,13 +67,13 @@ public class ProfileServiceImplementation implements ProfileService {
         char gender = profile.getGender() == 'M' || profile.getGender() == 'F' ? profile.getGender() : 'M';
         String country = profileUpdateDto.getCountry() != null ? profileUpdateDto.getCountry() : "";
         String customUrl = profileUpdateDto.getCustomUrl();
-        boolean isPrivateSublist = profileUpdateDto.isPrivateSublist();
+        boolean isPrivateSublist = profileUpdateDto.getPrivateSublist();
 
         profile.setAboutProfileInfo(aboutProfileInfo);
         profile.setGender(gender);
         profile.setCountry(country);
         profile.setCustomUrl(customUrl);
-        profile.setIsPrivateSublist(isPrivateSublist);
+        profile.setPrivateSublist(isPrivateSublist);
 
         profileRepository.save(profile);
 
@@ -81,9 +81,6 @@ public class ProfileServiceImplementation implements ProfileService {
 
     @Override
     public void uploadProfileAvatar(Profile profile, MultipartFile file) {
-        if (file.isEmpty()) {
-            throw new IllegalStateException("Failure: cannot upload empty file [ " + file.getSize() + "]");
-        }
         if (!Arrays.asList(
                 IMAGE_JPEG.getMimeType(),
                 IMAGE_PNG.getMimeType(),

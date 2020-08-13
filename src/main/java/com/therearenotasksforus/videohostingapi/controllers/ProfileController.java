@@ -71,7 +71,7 @@ public class ProfileController {
 
     @PostMapping("/api/profile/update")
     @CrossOrigin
-    public ResponseEntity<Map<String, String>> updateProfile(
+    public ResponseEntity<?> updateProfile(
             Principal principal,
             @RequestBody ProfileUpdateDto requestDto
     ) {
@@ -86,7 +86,7 @@ public class ProfileController {
         }
 
         response.put("Success", "profile " + currentProfile.getUser().getUsername() + " was updated!");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ProfileDto.fromProfile(profileService.findById(currentProfile.getId())));
     }
 
     @PostMapping(

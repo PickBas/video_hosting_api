@@ -5,7 +5,7 @@ public class ProfileUpdateDto {
     private char gender;
     private String country;
     private String customUrl;
-    private boolean isPrivateSublist;
+    private boolean privateSublist;
 
     public String getAboutProfileInfo() {
         return aboutProfileInfo;
@@ -39,12 +39,12 @@ public class ProfileUpdateDto {
         this.customUrl = customUrl;
     }
 
-    public boolean isPrivateSublist() {
-        return isPrivateSublist;
+    public boolean getPrivateSublist() {
+        return privateSublist;
     }
 
     public void setPrivateSublist(boolean privateSublist) {
-        isPrivateSublist = privateSublist;
+        this.privateSublist = privateSublist;
     }
 
 }

@@ -77,7 +77,6 @@ class UserTests extends AbstractTest {
     }
 
     @Test
-    @AutoConfigureMockMvc(addFilters = true)
     public void userUpdate() throws Exception {
         super.register();
         String uri = "/api/user/update";

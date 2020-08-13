@@ -16,7 +16,7 @@ public class ProfileDto {
     private String country;
     private String customUrl;
     private String avatarUrl;
-    private boolean isPrivateSublist;
+    private boolean privateSublist;
     private List<Like> likes;
     private List<Channel> ownedChannels;
     private List<Channel> subscriptions;
@@ -34,6 +34,7 @@ public class ProfileDto {
         profile.setUser(user);
         profile.setOwnedChannels(ownedChannels);
         profile.setSubscriptions(subscriptions);
+        profile.setPrivateSublist(privateSublist);
 
         return profile;
     }
@@ -51,8 +52,13 @@ public class ProfileDto {
         profileDto.setAvatarUrl(profile.getAvatarUrl());
         profileDto.setOwnedChannels(profile.getOwnedChannels());
         profileDto.setSubscriptions(profile.getSubscriptions());
+        profileDto.setPrivateSublist(profile.getPrivateSublist());
 
         return profileDto;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Long getUser() {
@@ -91,12 +97,12 @@ public class ProfileDto {
         this.customUrl = customUrl;
     }
 
-    public boolean isPrivateSublist() {
-        return isPrivateSublist;
+    public boolean getPrivateSublist() {
+        return privateSublist;
     }
 
     public void setPrivateSublist(boolean privateSublist) {
-        isPrivateSublist = privateSublist;
+        this.privateSublist = privateSublist;
     }
 
     public void setId(Long id) {

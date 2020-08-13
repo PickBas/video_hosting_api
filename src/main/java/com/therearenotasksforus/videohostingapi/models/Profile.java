@@ -26,8 +26,8 @@ public class Profile  extends BaseEntity {
     @Column(name = "custom_url")
     private String customUrl;
 
-    @Column(name = "is_private_sublist")
-    private boolean isPrivateSublist;
+    @Column(name = "private_sublist")
+    private boolean privateSublist;
 
     @Column(name = "avatar_url")
     private String avatarUrl;
@@ -52,7 +52,7 @@ public class Profile  extends BaseEntity {
         user = null;
         aboutProfileInfo = "";
         gender = 'M';
-        isPrivateSublist = false;
+        privateSublist = false;
         country = "";
         customUrl = "";
         ownedChannels = null;
@@ -93,12 +93,12 @@ public class Profile  extends BaseEntity {
         this.customUrl = customUrl;
     }
 
-    public boolean getIsPrivateSublist() {
-        return isPrivateSublist;
+    public boolean getPrivateSublist() {
+        return privateSublist;
     }
 
-    public void setIsPrivateSublist(boolean is_private_sublist) {
-        this.isPrivateSublist = is_private_sublist;
+    public void setPrivateSublist(boolean privateSublist) {
+        this.privateSublist = privateSublist;
     }
 
     public User getUser() {
