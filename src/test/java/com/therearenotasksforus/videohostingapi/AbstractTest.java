@@ -123,7 +123,7 @@ public abstract class AbstractTest {
                 .content(jsonBody)).andReturn();
     }
 
-    public MvcResult crateChannel(String token) throws Exception {
+    public MvcResult createChannel(String token) throws Exception {
         String uri = "/api/channel/create";
 
         Map<String, String> requestBody = new HashMap<>();

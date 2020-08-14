@@ -96,7 +96,7 @@ class ChannelTests extends AbstractTest {
         super.register();
 
         String token = super.getToken();
-        MvcResult mvcResult = super.crateChannel(token);
+        MvcResult mvcResult = super.createChannel(token);
 
         int channelId = (int)super.mapFromJson(mvcResult).get("id");
 
@@ -123,7 +123,7 @@ class ChannelTests extends AbstractTest {
         super.register();
 
         String token = super.getToken();
-        MvcResult mvcResult = super.crateChannel(token);
+        MvcResult mvcResult = super.createChannel(token);
 
         int channelId = (int)super.mapFromJson(mvcResult).get("id");
         String uri = "/api/channel/" + channelId + "/subscribe";
@@ -141,7 +141,7 @@ class ChannelTests extends AbstractTest {
         super.register();
 
         String token = super.getToken();
-        MvcResult mvcResult = super.crateChannel(token);
+        MvcResult mvcResult = super.createChannel(token);
 
         int channelId = (int)super.mapFromJson(mvcResult).get("id");
 
@@ -177,7 +177,7 @@ class ChannelTests extends AbstractTest {
         super.register();
 
         String token = super.getToken();
-        MvcResult mvcResult = super.crateChannel(token);
+        MvcResult mvcResult = super.createChannel(token);
 
         int channelId = (int)super.mapFromJson(mvcResult).get("id");
         String uri = "/api/channel/" + channelId + "/unsubscribe";
@@ -195,7 +195,7 @@ class ChannelTests extends AbstractTest {
         super.register();
 
         String token = super.getToken();
-        MvcResult mvcResult = super.crateChannel(token);
+        MvcResult mvcResult = super.createChannel(token);
 
         int channelId = (int)super.mapFromJson(mvcResult).get("id");
         String uri = "/api/channel/" + channelId + "/unsubscribe";
@@ -216,7 +216,7 @@ class ChannelTests extends AbstractTest {
         super.register();
 
         String token = super.getToken();
-        MvcResult mvcResult = super.crateChannel(token);
+        MvcResult mvcResult = super.createChannel(token);
 
         int channelId = (int)super.mapFromJson(mvcResult).get("id");
         String uri = "/api/channel/" + channelId + "/subscribe";

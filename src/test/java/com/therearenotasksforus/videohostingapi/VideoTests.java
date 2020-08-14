@@ -1,9 +1,16 @@
 package com.therearenotasksforus.videohostingapi;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 class VideoTests extends AbstractTest{
 
@@ -20,10 +27,43 @@ class VideoTests extends AbstractTest{
     }
 
     @Test
-    public void videoLoadsById () throws Exception {
+    public void uploadVideoByChannelOwner() throws Exception {
         super.register();
         String token = super.getToken();
-        int channelId = (int)super.mapFromJson(super.crateChannel(token)).get("id");
+        int channelId = (int)super.mapFromJson(super.createChannel(token)).get("id");
+        String uri = "/api/channel/" + channelId + "/upload/video";
+
+        final MockMultipartFile videoFile = new MockMultipartFile("file",
+                "test.mp4",
+                "video/mp4",
+                "test video".getBytes());
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
+                .multipart(uri)
+                .file(videoFile)
+                .headers(this.getHttpHeaders(token))
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andReturn();
+
+        Map<String, Object> responseBody = super.mapFromJson(mvcResult);
+
+        int status = mvcResult.getResponse().getStatus();
+
+        assertEquals(201, status);
+        assertEquals(channelId, responseBody.get("channel"));
+
+        mvcResult = super.getRequest("/api/channel/" + channelId + "/videos", token);
+
+        ArrayList<Map<String, Object>> responseBodyChannelVideosList = super
+                .mapFromJsonList(mvcResult);
+        assertNotEquals(0, responseBodyChannelVideosList.size());
+    }
+
+    @Test
+    public void videoLoadsById() throws Exception {
+        super.register();
+        String token = super.getToken();
+        int channelId = (int)super.mapFromJson(super.createChannel(token)).get("id");
 
         MvcResult uploadedVideo = super
                 .uploadVideoWithUriAndToken("/api/channel/" + channelId + "/upload/video", token);

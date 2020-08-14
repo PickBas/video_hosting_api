@@ -119,11 +119,20 @@ public class VideoController {
 
     @GetMapping("/api/channel/{id}/videos")
     @CrossOrigin
-    public ResponseEntity<List<Video>> getAllChannelVideos(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<List<VideoDto>> getAllChannelVideos(@PathVariable(name = "id") Long id) {
         Channel channel = channelService.findById(id);
-        return channel == null ?
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body(null) :
-                ResponseEntity.ok(channel.getVideos());
+
+        if (channel == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        ArrayList<VideoDto> videoDtos = new ArrayList<>();
+
+        for (Video video : channel.getVideos()) {
+            videoDtos.add(VideoDto.fromVideo(video));
+        }
+
+        return ResponseEntity.ok(videoDtos);
     }
 
     @GetMapping("/api/profiles/{id}/likedvideos")
@@ -159,7 +168,9 @@ public class VideoController {
             }});
         }
 
-        return ResponseEntity.ok(VideoDto.fromVideo(videoService.findById(newVideoId)));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(VideoDto.fromVideo(videoService.findById(newVideoId)));
     }
 
     @PostMapping("/api/video/{id}/update/name")
