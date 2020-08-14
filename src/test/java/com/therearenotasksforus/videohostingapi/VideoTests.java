@@ -114,10 +114,13 @@ class VideoTests extends AbstractTest{
     public void likeVideo() throws Exception {
         super.register();
         String token = super.getToken();
-        int channelId = (int)super.mapFromJson(super.createChannel(token)).get("id");
+        int channelId = (int) super.mapFromJson(super.createChannel(token)).get("id");
 
         MvcResult uploadedVideo = super
                 .uploadVideoWithUriAndToken("/api/channel/" + channelId + "/upload/video", token);
+
+        int videoId = (int) super.mapFromJson(uploadedVideo).get("id");
+
         String uri = "/api/video/" + mapFromJson(uploadedVideo).get("id") + "/like";
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
@@ -131,6 +134,11 @@ class VideoTests extends AbstractTest{
         assertEquals(200, status);
         assertNotEquals(0, likeList.size());
 
+        mvcResult = super.getRequest("/api/profile", token);
+        likeList = super.getLongArrayByKey(super.mapFromJson(mvcResult), "likes");
+
+        assertNotEquals(0, likeList.size());
+
         mvcResult = mvc.perform(MockMvcRequestBuilders
                 .post(uri)
                 .headers(this.getHttpHeaders(token)))
@@ -141,5 +149,38 @@ class VideoTests extends AbstractTest{
 
         assertEquals(200, status);
         assertEquals(0, likeList.size());
+    }
+
+    @Test
+    public void dislikeVideo() throws Exception {
+        super.register();
+        String token = super.getToken();
+        int channelId = (int)super.mapFromJson(super.createChannel(token)).get("id");
+
+        MvcResult uploadedVideo = super
+                .uploadVideoWithUriAndToken("/api/channel/" + channelId + "/upload/video", token);
+        String uri = "/api/video/" + mapFromJson(uploadedVideo).get("id") + "/dislike";
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
+                .post(uri)
+                .headers(this.getHttpHeaders(token)))
+                .andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        ArrayList<Object> dislikeList = super.getLongArrayByKey(super.mapFromJson(mvcResult), "dislikes");
+
+        assertEquals(200, status);
+        assertNotEquals(0, dislikeList.size());
+
+        mvcResult = mvc.perform(MockMvcRequestBuilders
+                .post(uri)
+                .headers(this.getHttpHeaders(token)))
+                .andReturn();
+
+        status = mvcResult.getResponse().getStatus();
+        dislikeList = super.getLongArrayByKey(super.mapFromJson(mvcResult), "dislikes");
+
+        assertEquals(200, status);
+        assertEquals(0, dislikeList.size());
     }
 }

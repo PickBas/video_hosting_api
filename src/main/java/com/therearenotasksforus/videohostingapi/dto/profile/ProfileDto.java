@@ -149,8 +149,14 @@ public class ProfileDto {
         this.avatarUrl = avatarUrl;
     }
 
-    public List<Like> getLikes() {
-        return likes;
+    public List<Long> getLikes() {
+        List<Long> likesIds = new ArrayList<>();
+
+        for (Like like : likes) {
+            likesIds.add(like.getId());
+        }
+
+        return likesIds;
     }
 
     public void setLikes(List<Like> likes) {

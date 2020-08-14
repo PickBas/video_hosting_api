@@ -71,31 +71,24 @@ public class VideoController {
         }
 
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
-        Map<String, String> response = new HashMap<>();
-
         videoService.setLike(currentProfile, currentVideo);
-
-        response.put("Success", "User " + principal.getName() + " liked video!");
 
         return ResponseEntity.ok(VideoDto.fromVideo(videoService.findById(currentVideo.getId())));
     }
 
     @PostMapping("/api/video/{id}/dislike")
     @CrossOrigin
-    public ResponseEntity<Map<String, String>> setDislike(Principal principal, @PathVariable(name = "id") Long id) {
+    public ResponseEntity<VideoDto> setDislike(Principal principal, @PathVariable(name = "id") Long id) {
         Video currentVideo = videoService.findById(id);
-        Map<String, String> response = new HashMap<>();
 
         if (currentVideo == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
-
         videoService.setDislike(currentProfile, currentVideo);
-        response.put("Success", "User " + principal.getName() + " disliked video!");
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(VideoDto.fromVideo(videoService.findById(currentVideo.getId())));
     }
 
     @PostMapping("/api/video/{id}/comment")
