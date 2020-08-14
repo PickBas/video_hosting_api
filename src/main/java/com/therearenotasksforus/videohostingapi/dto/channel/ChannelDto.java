@@ -1,5 +1,6 @@
 package com.therearenotasksforus.videohostingapi.dto.channel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.Video;

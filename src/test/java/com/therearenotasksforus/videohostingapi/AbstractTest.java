@@ -81,6 +81,21 @@ public abstract class AbstractTest {
                 .content(jsonBodyRegister)).andReturn();
     }
 
+    public void registerWithEmailAndUsername(String email, String username) throws Exception {
+        String uri = "/api/auth/register";
+
+        Map<String, String> requestBodyRegister = new HashMap<>();
+        requestBodyRegister.put("email", email);
+        requestBodyRegister.put("username", username);
+        requestBodyRegister.put("password", "asdf123!");
+
+        String jsonBodyRegister = this.mapToJson(requestBodyRegister);
+
+        mvc.perform(MockMvcRequestBuilders.post(uri)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(jsonBodyRegister)).andReturn();
+    }
+
     public MvcResult login() throws Exception {
         String uri = "/api/auth/login";
 
@@ -95,8 +110,40 @@ public abstract class AbstractTest {
                 .content(jsonBody)).andReturn();
     }
 
+    public MvcResult loginWithUsername(String username) throws Exception {
+        String uri = "/api/auth/login";
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", username);
+        requestBody.put("password", "asdf123!");
+
+        String jsonBody = this.mapToJson(requestBody);
+
+        return mvc.perform(MockMvcRequestBuilders.post(uri)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(jsonBody)).andReturn();
+    }
+
+    public MvcResult crateChannel(String token) throws Exception {
+        String uri = "/api/channel/create";
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("name", "TestChannel");
+        requestBody.put("info", "TestChannel information");
+
+        String requestBodyJson = this.mapToJson(requestBody);
+        return this.postRequest(uri, token, requestBodyJson);
+    }
+
     public String getToken() throws Exception {
         return "TOKEN_" + this.mapFromJson(this.login()).get("token").toString();
+    }
+
+    public String getTokenWithUsername(String username) throws Exception {
+        return "TOKEN_" + this
+                .mapFromJson(this.loginWithUsername(username))
+                .get("token")
+                .toString();
     }
 
     public HttpHeaders getHttpHeaders (String token) {

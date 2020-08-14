@@ -35,7 +35,7 @@ public class ChannelController {
 
     @PostMapping("/api/channel/create")
     @CrossOrigin
-    public ResponseEntity<Map<String, String>> channelCreate(Principal principal, @RequestBody ChannelCreateDto requestDto) {
+    public ResponseEntity<?> channelCreate(Principal principal, @RequestBody ChannelCreateDto requestDto) {
         Map<String, String> response = new HashMap<>();
         Profile channelOwner = userService.findByUsername(principal.getName()).getProfile();
 
@@ -47,9 +47,7 @@ public class ChannelController {
         Channel channel = channelService.create(channelOwner, requestDto);
         profileService.addOwnedChannel(channelOwner, channel);
 
-        response.put("Success", "Channel " + channel.getName() +" was created!");
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ChannelDto.fromChannel(channel));
     }
 
     @GetMapping("/api/channels")
@@ -122,7 +120,7 @@ public class ChannelController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(channelService.findById(id));
+        return ResponseEntity.status(HttpStatus.OK).body(ChannelDto.fromChannel(channelService.findById(id)));
     }
 
     @PostMapping("/api/channel/{id}/subscribe")

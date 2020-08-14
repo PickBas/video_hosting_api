@@ -8,6 +8,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Column;
 import javax.persistence.CascadeType;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,10 +34,10 @@ public class Channel extends BaseEntity {
 
     public Channel() {
         owner = null;
-        subscribers = null;
+        subscribers = new ArrayList<>();
         name = "";
         info = "";
-        videos = null;
+        videos = new ArrayList<>();
     }
 
 
