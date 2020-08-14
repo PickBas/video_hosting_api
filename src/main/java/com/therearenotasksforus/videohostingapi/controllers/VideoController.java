@@ -139,13 +139,21 @@ public class VideoController {
         return ResponseEntity.ok(videoDtos);
     }
 
-    @GetMapping("/api/profiles/{id}/likedvideos")
+    @GetMapping("/api/profile/{id}/likedvideos")
     @CrossOrigin
-    public ResponseEntity<List<Video>> getAllLikedVideos(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<List<VideoDto>> getAllLikedVideos(@PathVariable(name = "id") Long id) {
         Profile profile = profileService.findById(id);
-        return profile == null ?
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body(null) :
-                ResponseEntity.ok(profile.getLikedVideos());
+
+        if (profile == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        ArrayList<VideoDto> dtos = new ArrayList<>();
+        for (Video video : profile.getLikedVideos()) {
+            dtos.add(VideoDto.fromVideo(video));
+        }
+
+        return ResponseEntity.ok(dtos);
     }
 
     @PostMapping(
