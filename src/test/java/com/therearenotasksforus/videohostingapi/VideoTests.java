@@ -10,10 +10,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 @SpringBootTest(properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
 @RunWith(SpringRunner.class)
@@ -182,5 +182,39 @@ class VideoTests extends AbstractTest{
 
         assertEquals(200, status);
         assertEquals(0, dislikeList.size());
+    }
+
+    @Test
+    public void commentVideo() throws Exception {
+        super.register();
+        String token = super.getToken();
+        int channelId = (int)super.mapFromJson(super.createChannel(token)).get("id");
+
+        MvcResult uploadedVideo = super
+                .uploadVideoWithUriAndToken("/api/channel/" + channelId + "/upload/video", token);
+
+        int videoId = (int)mapFromJson(uploadedVideo).get("id");
+
+        String uri = "/api/video/" + videoId + "/comment";
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("commentBody", "Test comment");
+
+        String requestBodyJson = super.mapToJson(requestBody);
+        MvcResult mvcResult = super.postRequest(uri, token, requestBodyJson);
+
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(201, status);
+
+        uri = "/api/video/" + videoId + "/get/comments";
+
+        mvcResult = super.getRequest(uri, token);
+
+        ArrayList<Map<String, Object>> responseBody = super.mapFromJsonList(mvcResult);
+
+        assertNotEquals(0, responseBody.size());
+        assertTrue(requestBody.containsKey("commentBody") &&
+                        requestBody.containsValue("Test comment"));
+
     }
 }

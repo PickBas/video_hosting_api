@@ -6,6 +6,7 @@ import com.therearenotasksforus.videohostingapi.dto.video.VideoDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.Video;
+import com.therearenotasksforus.videohostingapi.models.marks.Comment;
 import com.therearenotasksforus.videohostingapi.service.ChannelService;
 import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
@@ -21,7 +22,6 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class VideoController {
@@ -93,20 +93,32 @@ public class VideoController {
 
     @PostMapping("/api/video/{id}/comment")
     @CrossOrigin
-    public ResponseEntity<Map<String, String>> comment(Principal principal, @PathVariable(name = "id") Long id, @RequestBody CommentDto requestDto) {
+    public ResponseEntity<VideoDto> comment(Principal principal, @PathVariable(name = "id") Long id, @RequestBody CommentDto requestDto) {
         Video currentVideo = videoService.findById(id);
 
         if (currentVideo == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        Map<String, String> response = new HashMap<>();
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
 
         videoService.saveComment(currentProfile, currentVideo, requestDto.getCommentBody());
 
-        response.put("Success", "User " + principal.getName() + " commented videos!");
-        return ResponseEntity.ok(response);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(VideoDto.fromVideo(videoService.findById(id)));
+    }
+
+    @GetMapping("/api/video/{id}/get/comments")
+    @CrossOrigin
+    public ResponseEntity<List<Comment>> getComments(@PathVariable(name = "id") Long id) {
+        Video currentVideo = videoService.findById(id);
+        if (currentVideo == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        List<Comment> comments = currentVideo.getComments();
+        return ResponseEntity.ok(comments);
     }
 
     @GetMapping("/api/channel/{id}/videos")
