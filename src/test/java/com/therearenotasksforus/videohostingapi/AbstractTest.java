@@ -1,13 +1,11 @@
 package com.therearenotasksforus.videohostingapi;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
@@ -37,11 +35,9 @@ public abstract class AbstractTest {
     @Autowired
     protected WebApplicationContext webApplicationContext;
 
-    protected void setUp() {
+    public void setUp() {
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
-
-
 
     protected String mapToJson(Object obj) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -81,7 +77,7 @@ public abstract class AbstractTest {
                 .content(jsonBodyRegister)).andReturn();
     }
 
-    public void registerWithEmailAndUsername(String email, String username) throws Exception {
+    public int registerWithEmailAndUsername(String email, String username) throws Exception {
         String uri = "/api/auth/register";
 
         Map<String, String> requestBodyRegister = new HashMap<>();
@@ -91,9 +87,10 @@ public abstract class AbstractTest {
 
         String jsonBodyRegister = this.mapToJson(requestBodyRegister);
 
-        mvc.perform(MockMvcRequestBuilders.post(uri)
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonBodyRegister)).andReturn();
+        return (int)mapFromJson(mvcResult).get("id");
     }
 
     public MvcResult login() throws Exception {
@@ -164,5 +161,9 @@ public abstract class AbstractTest {
                 .headers(this.getHttpHeaders(token))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonBody)).andReturn();
+    }
+
+    public ArrayList<Object> getLongArrayByKey(Map<String, Object> responseBody, String key) {
+        return (ArrayList) responseBody.get(key);
     }
 }

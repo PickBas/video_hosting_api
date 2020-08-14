@@ -136,11 +136,7 @@ public class ChannelController {
             response.put("Error", e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }
-
-        response.put("Success", "User" +
-                currentProfile.getUser().getUsername() + " subscribed to " +
-                currentChannel.getName() + " channel!");
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @PostMapping("/api/channel/{id}/unsubscribe")

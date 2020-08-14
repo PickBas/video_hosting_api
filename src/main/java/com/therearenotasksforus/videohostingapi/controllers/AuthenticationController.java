@@ -112,7 +112,14 @@ public class AuthenticationController {
         try {
             passwordValidation(requestDto.getPassword());
             emailValidation(requestDto.getEmail());
+        } catch (Exception e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("Error", e.getMessage());
 
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        try {
             User userToRegister = new User();
             userToRegister.setUsername(requestDto.getUsername());
             userToRegister.setEmail(requestDto.getEmail());
@@ -122,7 +129,7 @@ public class AuthenticationController {
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(UserDto.fromUser(userService.findById(userToRegister.getId())));
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
             Map<String, String> response = new HashMap<>();
             response.put("Error", e.getMessage());
 

@@ -70,4 +70,37 @@ class RegistrationTests extends AbstractTest {
 		assertEquals(400, status);
 	}
 
+	@Test
+	public void registerWithUsedEmailAndUsername() throws Exception {
+		String uri = "/api/auth/register";
+
+		Map<String, String> requestBody = new HashMap<>();
+		requestBody.put("email", "test2@test.test");
+		requestBody.put("username", "test2");
+		requestBody.put("password", "asdf123!");
+
+		String jsonBody = super.mapToJson(requestBody);
+
+		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(jsonBody)).andReturn();
+
+		int status = mvcResult.getResponse().getStatus();
+		assertEquals(201, status);
+
+		requestBody = new HashMap<>();
+		requestBody.put("email", "test2@test.test");
+		requestBody.put("username", "test2");
+		requestBody.put("password", "asdf123!");
+
+		jsonBody = super.mapToJson(requestBody);
+
+		mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(jsonBody)).andReturn();
+
+		status = mvcResult.getResponse().getStatus();
+		assertEquals(400, status);
+
+	}
 }

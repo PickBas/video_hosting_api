@@ -62,9 +62,13 @@ public class ChannelServiceImplementation implements ChannelService {
     }
 
     @Override
-    public void subscribeToChannel(Profile profile, Channel channel) throws Exception {
+    public void subscribeToChannel(Profile profile, Channel channel) throws IllegalStateException {
         if (isProfileOwner(profile, channel)) {
-            throw new Exception("the user is the owner of the channel");
+            throw new IllegalStateException("The user is the owner of the channel!");
+        }
+
+        if (channel.getSubscribers().contains(profile)) {
+            throw new IllegalStateException("The user has already subscribed to the channel!");
         }
 
         profile.addSubscription(channel);

@@ -36,6 +36,16 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public void register(User user) {
+
+        List<User> users = this.getAll();
+
+        for (User iterUser : users) {
+            if (user.getEmail().equals(iterUser.getEmail()) ||
+                    user.getUsername().equals(iterUser.getUsername())) {
+                throw new IllegalStateException("User with such name or email already exists");
+            }
+        }
+
         Role roleUser = roleRepository.findByName("ROLE_USER");
         List<Role> userRoles = new ArrayList<>();
 
