@@ -4,11 +4,20 @@
 # Video Hosting Api
 API based on Java Spring framework
 
-## Run
-Enter your S3 keys into docker-compose file
-docker-compose up --build -d
+## How to run the API
+### Docker
+Enter your S3 keys into the docker-compose.yml file which is in the root of the repository.
+Next, open your termianl, go to the video_hosting_api folder. Then, run the command:
+
+      docker-compose up --build -d
   
-The container is going to be on port 8080
+If you did everything correctly, the API should be up and running on port 8080.
+### Localhost
+Open video_hosting_api folder in an IDE (e.g. IntelliJ IDEA). Add environment variables: AMAZON_ACCESS_KEY, AMAZON_SECRET_KEY, MYSQL_URL. The first one is the access key for your S3 storage. The second one is the secret key for your S3 storage. The third one is the URL for the database. If you run containerized MySQL, URL should look like this:
+
+    mysql://localhost:3306/video_hosting_db
+    
+Then run the API. If you did everything correctly, the API should be up and running on port 8080.
  
 ## URLs
 A token which you get after logging in has to be provided as a request header with any request (except Sign in/up). Example: header key - Authorization, value - TOKEN_<token>
