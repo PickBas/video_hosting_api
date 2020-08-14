@@ -172,6 +172,12 @@ public class VideoController {
 
         Long newVideoId;
 
+        if (currentProfile != currentChannel.getOwner()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new HashMap<>() {{
+                put("Error", "This profile is not the channel owner!");
+            }});
+        }
+
         try {
             newVideoId = videoService.uploadVideo(currentProfile, currentChannel, file);
         } catch (IllegalStateException e) {
@@ -201,7 +207,7 @@ public class VideoController {
         try {
             videoService.updateName(currentProfile, currentVideo, requestDto.getName());
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HashMap<>() {{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new HashMap<>() {{
                 put("Error", e.getMessage());
             }});
         }

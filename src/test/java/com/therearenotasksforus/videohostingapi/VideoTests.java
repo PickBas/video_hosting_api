@@ -91,7 +91,7 @@ class VideoTests extends AbstractTest{
 
         int status = mvcResult.getResponse().getStatus();
 
-        assertEquals(400, status);
+        assertEquals(403, status);
     }
 
     @Test
@@ -226,8 +226,6 @@ class VideoTests extends AbstractTest{
         MvcResult uploadedVideo = super
                 .uploadVideoWithUriAndToken("/api/channel/" + channelId + "/upload/video", token);
 
-        super.mapFromJson(uploadedVideo).get("id");
-
         String uri = "/api/video/" + mapFromJson(uploadedVideo).get("id") + "/like";
 
         mvc.perform(MockMvcRequestBuilders
@@ -247,6 +245,53 @@ class VideoTests extends AbstractTest{
 
         assertEquals(200, status);
         assertNotEquals(0, requestBody.size());
-
     }
+
+    @Test
+    public void updateVideoName() throws Exception {
+        super.register();
+        String token = super.getToken();
+        int channelId = (int) super.mapFromJson(super.createChannel(token)).get("id");
+
+        MvcResult uploadedVideo = super
+                .uploadVideoWithUriAndToken("/api/channel/" + channelId + "/upload/video", token);
+
+        int videoId = (int)super.mapFromJson(uploadedVideo).get("id");
+
+        String uri = "/api/video/" + videoId + "/update/name";
+
+        String requestBodyJson = super.mapToJson(Map.of("name", "updated name"));
+
+        MvcResult mvcResult = super.postRequest(uri, token, requestBodyJson);
+        int status = mvcResult.getResponse().getStatus();
+        Map<String, Object> responseBody = super.mapFromJson(mvcResult);
+
+        assertEquals(200, status);
+        assertEquals("updated name", responseBody.get("name"));
+    }
+
+    @Test
+    public void updateVideoNameByRandomUser() throws Exception {
+        super.register();
+        String token = super.getToken();
+        int channelId = (int) super.mapFromJson(super.createChannel(token)).get("id");
+
+        MvcResult uploadedVideo = super
+                .uploadVideoWithUriAndToken("/api/channel/" + channelId + "/upload/video", token);
+
+        int videoId = (int)super.mapFromJson(uploadedVideo).get("id");
+        super.registerWithEmailAndUsername(
+                "randomUserVideoNameUpdate@upload.com",
+                "randomUserVideoNameUpdate");
+
+        String randomUserToken = super.getTokenWithUsername("randomUserVideoNameUpdate");
+        String uri = "/api/video/" + videoId + "/update/name";
+        String requestBodyJson = super.mapToJson(Map.of("name", "updated name"));
+
+        MvcResult mvcResult = super.postRequest(uri, randomUserToken, requestBodyJson);
+        int status = mvcResult.getResponse().getStatus();
+
+        assertEquals(403, status);
+    }
+
 }

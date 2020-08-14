@@ -58,10 +58,6 @@ public class VideoServiceImplementation implements VideoService {
             throw new IllegalStateException("Failure: the API does not support this file format!");
         }
 
-        if (profile != channel.getOwner()) {
-            throw new IllegalStateException("Failure: this profile is not the channel owner!");
-        }
-
         String basicUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/";
 
         Map<String, String> metadata = new HashMap<>();
