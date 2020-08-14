@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -64,7 +63,7 @@ public class VideoController {
 
     @PostMapping("/api/video/{id}/like")
     @CrossOrigin
-    public ResponseEntity<Map<String, String>> setLike(Principal principal, @PathVariable(name = "id") Long id) {
+    public ResponseEntity<VideoDto> setLike(Principal principal, @PathVariable(name = "id") Long id) {
         Video currentVideo = videoService.findById(id);
 
         if (currentVideo == null) {
@@ -78,7 +77,7 @@ public class VideoController {
 
         response.put("Success", "User " + principal.getName() + " liked video!");
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(VideoDto.fromVideo(videoService.findById(currentVideo.getId())));
     }
 
     @PostMapping("/api/video/{id}/dislike")

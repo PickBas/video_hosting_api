@@ -1,8 +1,11 @@
 package com.therearenotasksforus.videohostingapi;
 
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -12,6 +15,8 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+@SpringBootTest(properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
+@RunWith(SpringRunner.class)
 class VideoTests extends AbstractTest{
 
     @Test
@@ -103,6 +108,38 @@ class VideoTests extends AbstractTest{
         int status = mvcResult.getResponse().getStatus();
 
         assertEquals(200, status);
+    }
 
+    @Test
+    public void likeVideo() throws Exception {
+        super.register();
+        String token = super.getToken();
+        int channelId = (int)super.mapFromJson(super.createChannel(token)).get("id");
+
+        MvcResult uploadedVideo = super
+                .uploadVideoWithUriAndToken("/api/channel/" + channelId + "/upload/video", token);
+        String uri = "/api/video/" + mapFromJson(uploadedVideo).get("id") + "/like";
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
+                .post(uri)
+                .headers(this.getHttpHeaders(token)))
+                .andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        ArrayList<Object> likeList = super.getLongArrayByKey(super.mapFromJson(mvcResult), "likes");
+
+        assertEquals(200, status);
+        assertNotEquals(0, likeList.size());
+
+        mvcResult = mvc.perform(MockMvcRequestBuilders
+                .post(uri)
+                .headers(this.getHttpHeaders(token)))
+                .andReturn();
+
+        status = mvcResult.getResponse().getStatus();
+        likeList = super.getLongArrayByKey(super.mapFromJson(mvcResult), "likes");
+
+        assertEquals(200, status);
+        assertEquals(0, likeList.size());
     }
 }
