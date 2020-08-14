@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -165,5 +167,19 @@ public abstract class AbstractTest {
 
     public ArrayList<Object> getLongArrayByKey(Map<String, Object> responseBody, String key) {
         return (ArrayList) responseBody.get(key);
+    }
+
+    public MvcResult uploadVideoWithUriAndToken(String uri, String token) throws Exception {
+        final MockMultipartFile video = new MockMultipartFile("file",
+                "test.mp4",
+                "video/mp4",
+                "test video".getBytes());
+
+        return mvc.perform(MockMvcRequestBuilders
+                .multipart(uri)
+                .file(video)
+                .headers(this.getHttpHeaders(token))
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andReturn();
     }
 }

@@ -36,7 +36,7 @@ A token which you get after logging in has to be provided as a request header wi
     /api/profile/update - Updating profiles's data. POST request. JSON Example: {"aboutProfileInfo": "example", "gender": "M/F", "country": "example", "customUrl": "example", "isPrivateSublist": "false/true"}
 ### Video
     /api/videos - Getting all the videos. GET request.
-    /api/video/id - Getting a video by its id. GET request.
+    /api/video/{id} - Getting a video by its id. GET request.
     /api/video/{id}/like - Setting like. POST request.
     /api/video/{id}/dislike - Setting dislike. POST request.
     /api/video/{id}/comment - Commenting a video. POST request. JSON Example: {"commentBody": "example"}

@@ -127,14 +127,10 @@ class ProfileTests extends AbstractTest {
         String prevAvatar = super.mapFromJson(super.getRequest("/api/profile", token))
                 .get("avatarUrl").toString();
 
-        final InputStream inputStream = Thread.currentThread()
-                .getContextClassLoader()
-                .getResourceAsStream("test.png");
-
         final MockMultipartFile avatar = new MockMultipartFile("file",
                 "test.png",
                 "image/png",
-                inputStream);
+                "test.png".getBytes());
 
         final MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
                 .multipart(uri)

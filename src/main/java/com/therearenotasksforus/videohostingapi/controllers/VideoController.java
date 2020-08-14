@@ -141,7 +141,7 @@ public class VideoController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @CrossOrigin
-    public ResponseEntity<Map<String, String>> uploadVideo(
+    public ResponseEntity<?> uploadVideo(
             Principal principal,
             @PathVariable(name = "id") Long id,
             @RequestParam("file") MultipartFile file
@@ -149,17 +149,17 @@ public class VideoController {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel currentChannel = channelService.findById(id);
 
+        Long newVideoId;
+
         try {
-            videoService.uploadVideo(currentProfile, currentChannel, file);
+            newVideoId = videoService.uploadVideo(currentProfile, currentChannel, file);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HashMap<>() {{
                 put("Error", e.getMessage());
             }});
         }
 
-        return ResponseEntity.ok(new HashMap<>() {{
-            put("Success", "Video was uploaded!");
-        }});
+        return ResponseEntity.ok(VideoDto.fromVideo(videoService.findById(newVideoId)));
     }
 
     @PostMapping("/api/video/{id}/update/name")

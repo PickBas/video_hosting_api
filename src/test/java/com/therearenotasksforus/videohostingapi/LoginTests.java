@@ -48,8 +48,8 @@ class LoginTests extends AbstractTest {
         String uri = "/api/auth/login";
 
         Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("username", "firsttestuser");
-        requestBody.put("password", "asdf123!");
+        requestBody.put("username", "BadCredentials");
+        requestBody.put("password", "BadCredentials");
 
         String jsonBody = super.mapToJson(requestBody);
 

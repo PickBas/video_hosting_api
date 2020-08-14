@@ -40,11 +40,13 @@ public class Video extends BaseEntity {
     private List<Dislike> dislikes;
 
     public Video() {
-        channel = null;
+        channel = new Channel();
         videoFileUrl = "";
         isPrivate = false;
         isAvailableByLink = false;
         likes = new ArrayList<>();
+        dislikes = new ArrayList<>();
+        comments = new ArrayList<>();
         name = "";
     }
 

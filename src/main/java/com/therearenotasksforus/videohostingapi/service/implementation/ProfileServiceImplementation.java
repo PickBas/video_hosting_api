@@ -81,6 +81,10 @@ public class ProfileServiceImplementation implements ProfileService {
 
     @Override
     public void uploadProfileAvatar(Profile profile, MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new IllegalStateException("Failure: cannot upload empty file [ " + file.getSize() + "]");
+        }
+
         if (!Arrays.asList(
                 IMAGE_JPEG.getMimeType(),
                 IMAGE_PNG.getMimeType(),
