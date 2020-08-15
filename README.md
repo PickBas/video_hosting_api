@@ -1,5 +1,6 @@
 ![Build](https://github.com/PickBas/video_hosting_api/workflows/Build/badge.svg)
 ![Spring Tests](https://github.com/PickBas/video_hosting_api/workflows/Spring%20Tests/badge.svg)
+![license](https://img.shields.io/badge/license-MIT-brightgreen)
 
 # Video Hosting Api
 API based on Java Spring framework
