@@ -1,5 +1,5 @@
-![Build](https://github.com/ThereAreNoTasksForUs/video_hosting_api/workflows/Build/badge.svg)
-![Spring Tests](https://github.com/ThereAreNoTasksForUs/video_hosting_api/workflows/Spring%20Tests/badge.svg)
+![Build](https://github.com/PickBas/video_hosting_api/workflows/Build/badge.svg)
+![Spring Tests](https://github.com/PickBas/video_hosting_api/workflows/Spring%20Tests/badge.svg)
 
 # Video Hosting Api
 API based on Java Spring framework
