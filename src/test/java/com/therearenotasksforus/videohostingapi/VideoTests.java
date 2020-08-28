@@ -294,4 +294,21 @@ class VideoTests extends AbstractTest{
         assertEquals(403, status);
     }
 
+    @Test
+    public void videoDeleteTest() throws Exception {
+        super.register();
+        String token = super.getToken();
+        int channelId = (int) super.mapFromJson(super.createChannel(token)).get("id");
+
+        int videoId = (int) super.mapFromJson(super
+                .uploadVideoWithUriAndToken("/api/channel/" + channelId + "/upload/video", token)).get("id");
+
+        String uri = "/api/video/" + videoId;
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)
+                .headers(this.getHttpHeaders(token)))
+                .andReturn();
+        assertEquals(200, mvcResult.getResponse().getStatus());
+    }
+
 }

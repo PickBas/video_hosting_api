@@ -5,6 +5,7 @@ import com.therearenotasksforus.videohostingapi.dto.video.NameUpdateDto;
 import com.therearenotasksforus.videohostingapi.dto.video.VideoDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
+import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.models.Video;
 import com.therearenotasksforus.videohostingapi.models.marks.Comment;
 import com.therearenotasksforus.videohostingapi.service.ChannelService;
@@ -213,6 +214,22 @@ public class VideoController {
         }
 
         return ResponseEntity.ok(VideoDto.fromVideo(currentVideo));
+    }
+
+    @DeleteMapping("/api/video/{id}")
+    @CrossOrigin
+    public ResponseEntity<?> deleteVideo(Principal principal,
+                                      @PathVariable(name = "id") Long id) {
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+        Video currentVideo = videoService.findById(id);
+        if (currentVideo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (currentProfile != currentVideo.getChannel().getOwner()) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        videoService.delete(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
