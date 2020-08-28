@@ -299,11 +299,14 @@ class VideoTests extends AbstractTest{
         super.register();
         String token = super.getToken();
         int channelId = (int) super.mapFromJson(super.createChannel(token)).get("id");
-
-
-
         int videoId = (int) super.mapFromJson(super
                 .uploadVideoWithUriAndToken("/api/channel/" + channelId + "/upload/video", token)).get("id");
+        super.postRequest("/api/video/" + videoId + "/like", token, "");
+        int amountOfLikesBefore = mapFromJsonList(super.getRequest("/api/profile/" + super
+                .mapFromJson(super
+                        .getRequest("/api/profile", token))
+                .get("id") +"/likedvideos", token)).size();
+
 
         ArrayList <Map<String, Object>> beforeVideos = super.
                 mapFromJsonList(super.getRequest("/api/videos", token));
@@ -317,8 +320,15 @@ class VideoTests extends AbstractTest{
 
         assertEquals(200, mvcResult.getResponse().getStatus());
 
-        ArrayList <Map<String, Object>> afterVideos =  super.mapFromJsonList(super.getRequest("/api/videos", token));
+        ArrayList <Map<String, Object>> afterVideos =  super
+                .mapFromJsonList(super.getRequest("/api/videos", token));
+        int amountOfLikesAfter = mapFromJsonList(super.getRequest("/api/profile/" + super
+                .mapFromJson(super
+                        .getRequest("/api/profile", token))
+                .get("id") +"/likedvideos", token)).size();
+
         assertEquals(beforeVideos.size(), afterVideos.size());
+        assertEquals(amountOfLikesBefore, amountOfLikesAfter);
     }
 
 }
