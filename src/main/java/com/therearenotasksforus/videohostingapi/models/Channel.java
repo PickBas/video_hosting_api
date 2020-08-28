@@ -7,6 +7,7 @@ import javax.persistence.Table;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
 import javax.persistence.CascadeType;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class Channel extends BaseEntity {
     @Column(name = "info")
     private String info;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Video> videos;
 

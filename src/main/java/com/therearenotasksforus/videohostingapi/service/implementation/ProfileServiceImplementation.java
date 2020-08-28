@@ -6,6 +6,7 @@ import com.therearenotasksforus.videohostingapi.filestore.FileStore;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
+import com.therearenotasksforus.videohostingapi.models.marks.Like;
 import com.therearenotasksforus.videohostingapi.repositories.ProfileRepository;
 import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,5 +116,13 @@ public class ProfileServiceImplementation implements ProfileService {
     @Override
     public void delete(Long id) {
         profileRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteLikedVideoById(Profile profile, Long id) {
+        List <Like> profileLikes = profile.getLikes();
+        profileLikes.removeIf(like -> like.getId().equals(id));
+        profile.setLikes(profileLikes);
+        profileRepository.save(profile);
     }
 }

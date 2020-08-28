@@ -23,5 +23,6 @@ public interface ProfileService {
     void uploadProfileAvatar(Profile profile, MultipartFile file);
 
     void delete(Long id);
+    void deleteLikedVideoById(Profile profile, Long id);
 
 }
