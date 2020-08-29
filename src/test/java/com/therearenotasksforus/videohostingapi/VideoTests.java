@@ -212,9 +212,20 @@ class VideoTests extends AbstractTest{
 
         ArrayList<Map<String, Object>> responseBody = super.mapFromJsonList(mvcResult);
 
-        assertNotEquals(0, responseBody.size());
-        assertTrue(requestBody.containsKey("commentBody") &&
-                        requestBody.containsValue("Test comment"));
+        assertEquals(1, responseBody.size());
+        assertTrue(responseBody.get(0).containsKey("commentBody") &&
+                responseBody.get(0).containsValue("Test comment"));
+
+        uri = "/api/video/" + videoId + "/comment/" + responseBody.get(0).get("id");
+        mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)
+                .headers(this.getHttpHeaders(token)))
+                .andReturn();
+
+        assertEquals(200, mvcResult.getResponse().getStatus());
+
+        uri = "/api/video/" + videoId + "/get/comments";
+        mvcResult = super.getRequest(uri, token);
+        assertEquals(0, super.mapFromJsonList(mvcResult).size());
     }
 
     @Test

@@ -110,6 +110,27 @@ public class VideoController {
                 .body(VideoDto.fromVideo(videoService.findById(id)));
     }
 
+    @DeleteMapping("/api/video/{video_id}/comment/{comment_id}")
+    @CrossOrigin
+    public ResponseEntity<?> deleteCommentById(Principal principal,
+                                                      @PathVariable(name = "video_id") Long videoId,
+                                                      @PathVariable(name = "comment_id") Long commentId) {
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+        Video currentVideo = videoService.findById(videoId);
+        Comment comment = videoService.findCommentById(commentId);
+
+        if (currentVideo == null || comment == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (currentProfile != comment.getProfile()) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        videoService.deleteComments(currentVideo, commentId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @GetMapping("/api/video/{id}/get/comments")
     @CrossOrigin
     public ResponseEntity<List<Comment>> getComments(@PathVariable(name = "id") Long id) {
