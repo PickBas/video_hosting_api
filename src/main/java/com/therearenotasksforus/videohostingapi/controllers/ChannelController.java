@@ -159,4 +159,26 @@ public class ChannelController {
         return ResponseEntity.ok().body(response);
     }
 
+    @DeleteMapping("/api/channel/{id}")
+    @CrossOrigin
+    public ResponseEntity<?> deleteChannelById(Principal principal,
+                                               @PathVariable(name = "id") Long id) {
+        Channel channel = channelService.findById(id);
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+
+        if (channel == null) {
+            Map <String, String> response = new HashMap<>();
+            response.put("Error", "Cannot find the channel!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        if (currentProfile != channel.getOwner()) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        channelService.delete(channel);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

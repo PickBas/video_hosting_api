@@ -52,7 +52,6 @@ public class VideoServiceImplementation implements VideoService {
         if (file.isEmpty()) {
             throw new IllegalStateException("Failure: cannot upload empty file [ " + file.getSize() + "]");
         }
-
         if (!Arrays.asList("video/x-matroska", "video/quicktime", "video/mp4",
                             "video/avi", "video/mpeg").contains(file.getContentType())) {
             throw new IllegalStateException("Failure: the API does not support this file format!");
@@ -61,15 +60,10 @@ public class VideoServiceImplementation implements VideoService {
         String basicUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/";
 
         Map<String, String> metadata = new HashMap<>();
-
         metadata.put("Content-Type", file.getContentType());
-
-        System.out.println(file.getContentType());
-
         metadata.put("content-length", String.valueOf(file.getSize()));
 
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename()).replaceAll(" ", "_");
-
         String path = String.format("%s/%s", BucketName.PROFILE_IMAGE.getBucketName(), channel.getId());
         String filename = String.format("%s-%s", UUID.randomUUID(), originalFileName);
 
@@ -287,6 +281,9 @@ public class VideoServiceImplementation implements VideoService {
 
         video.removeComment(comment);
         videoRepository.save(video);
+
+        comment.getProfile().removeComment(comment);
+        profileRepository.save(comment.getProfile());
 
         commentRepository.deleteById(id);
     }

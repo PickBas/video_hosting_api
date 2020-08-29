@@ -55,9 +55,9 @@ public class Profile  extends BaseEntity {
         privateSublist = false;
         country = "";
         customUrl = "";
-        ownedChannels = null;
-        subscriptions = null;
-        likes = null;
+        ownedChannels = new ArrayList<>();
+        subscriptions = new ArrayList<>();
+        likes = new ArrayList<>();
         avatarUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/default/profileavatars/0.jpg";
     }
 

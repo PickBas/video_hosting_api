@@ -5,6 +5,7 @@ import com.therearenotasksforus.videohostingapi.dto.video.NameUpdateDto;
 import com.therearenotasksforus.videohostingapi.dto.video.VideoDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
+import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.models.Video;
 import com.therearenotasksforus.videohostingapi.models.marks.Comment;
 import com.therearenotasksforus.videohostingapi.service.ChannelService;
@@ -107,6 +108,27 @@ public class VideoController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(VideoDto.fromVideo(videoService.findById(id)));
+    }
+
+    @DeleteMapping("/api/video/{video_id}/comment/{comment_id}")
+    @CrossOrigin
+    public ResponseEntity<?> deleteCommentById(Principal principal,
+                                                      @PathVariable(name = "video_id") Long videoId,
+                                                      @PathVariable(name = "comment_id") Long commentId) {
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+        Video currentVideo = videoService.findById(videoId);
+        Comment comment = videoService.findCommentById(commentId);
+
+        if (currentVideo == null || comment == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (currentProfile != comment.getProfile()) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        videoService.deleteComments(currentVideo, commentId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/api/video/{id}/get/comments")
@@ -213,6 +235,22 @@ public class VideoController {
         }
 
         return ResponseEntity.ok(VideoDto.fromVideo(currentVideo));
+    }
+
+    @DeleteMapping("/api/video/{id}")
+    @CrossOrigin
+    public ResponseEntity<?> deleteVideo(Principal principal,
+                                      @PathVariable(name = "id") Long id) {
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+        Video currentVideo = videoService.findById(id);
+        if (currentVideo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (currentProfile != currentVideo.getChannel().getOwner()) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        videoService.delete(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

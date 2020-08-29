@@ -25,5 +25,5 @@ public interface ChannelService {
 
     List<Channel> getAllOwnedChannels(Profile profile);
 
-    void delete(Long id);
+    void delete(Channel channel);
 }

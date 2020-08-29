@@ -4,9 +4,11 @@ import com.therearenotasksforus.videohostingapi.dto.channel.ChannelCreateDto;
 import com.therearenotasksforus.videohostingapi.dto.channel.ChannelUpdateDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
+import com.therearenotasksforus.videohostingapi.models.Video;
 import com.therearenotasksforus.videohostingapi.repositories.ChannelRepository;
 import com.therearenotasksforus.videohostingapi.repositories.ProfileRepository;
 import com.therearenotasksforus.videohostingapi.service.ChannelService;
+import com.therearenotasksforus.videohostingapi.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,17 +16,22 @@ import javax.xml.bind.ValidationException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ChannelServiceImplementation implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final ProfileRepository profileRepository;
+    private final VideoService videoService;
 
     @Autowired
-    public ChannelServiceImplementation(ChannelRepository channelRepository, ProfileRepository profileRepository) {
+    public ChannelServiceImplementation(ChannelRepository channelRepository,
+                                        ProfileRepository profileRepository,
+                                        VideoService videoService) {
         this.channelRepository = channelRepository;
         this.profileRepository = profileRepository;
+        this.videoService = videoService;
     }
 
     @Override
@@ -113,7 +120,17 @@ public class ChannelServiceImplementation implements ChannelService {
     }
 
     @Override
-    public void delete(Long id) {
-        channelRepository.findById(id).ifPresent(channel -> channelRepository.deleteById(id));
+    public void delete(Channel channel) {
+        for (Video video : channel.getVideos())
+            videoService.delete(video.getId());
+        channel.setSubscribers(new ArrayList<>());
+        channelRepository.save(channel);
+
+        List<Channel> ownedChannels = channel.getOwner().getOwnedChannels();
+        ownedChannels.remove(channel);
+        channel.getOwner().setOwnedChannels(ownedChannels);
+        profileRepository.save(channel.getOwner());
+
+        channelRepository.deleteById(channel.getId());
     }
 }

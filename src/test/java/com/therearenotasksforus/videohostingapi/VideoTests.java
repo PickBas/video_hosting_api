@@ -212,9 +212,20 @@ class VideoTests extends AbstractTest{
 
         ArrayList<Map<String, Object>> responseBody = super.mapFromJsonList(mvcResult);
 
-        assertNotEquals(0, responseBody.size());
-        assertTrue(requestBody.containsKey("commentBody") &&
-                        requestBody.containsValue("Test comment"));
+        assertEquals(1, responseBody.size());
+        assertTrue(responseBody.get(0).containsKey("commentBody") &&
+                responseBody.get(0).containsValue("Test comment"));
+
+        uri = "/api/video/" + videoId + "/comment/" + responseBody.get(0).get("id");
+        mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)
+                .headers(this.getHttpHeaders(token)))
+                .andReturn();
+
+        assertEquals(200, mvcResult.getResponse().getStatus());
+
+        uri = "/api/video/" + videoId + "/get/comments";
+        mvcResult = super.getRequest(uri, token);
+        assertEquals(0, super.mapFromJsonList(mvcResult).size());
     }
 
     @Test
@@ -292,6 +303,44 @@ class VideoTests extends AbstractTest{
         int status = mvcResult.getResponse().getStatus();
 
         assertEquals(403, status);
+    }
+
+    @Test
+    public void videoDelete() throws Exception {
+        super.register();
+        String token = super.getToken();
+        int channelId = (int) super.mapFromJson(super.createChannel(token)).get("id");
+        int videoId = (int) super.mapFromJson(super
+                .uploadVideoWithUriAndToken("/api/channel/" + channelId + "/upload/video", token)).get("id");
+        super.postRequest("/api/video/" + videoId + "/like", token, "");
+        int amountOfLikesBefore = super.mapFromJsonList(super.getRequest("/api/profile/" + super
+                .mapFromJson(super
+                        .getRequest("/api/profile", token))
+                .get("id") +"/likedvideos", token)).size();
+
+
+        ArrayList <Map<String, Object>> beforeVideos = super.
+                mapFromJsonList(super.getRequest("/api/videos", token));
+
+        assertNotEquals(0, super.mapFromJsonList(super
+                .getRequest("/api/videos", token)).size());
+
+        String uri = "/api/video/" + videoId;
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)
+                .headers(this.getHttpHeaders(token)))
+                .andReturn();
+
+        assertEquals(200, mvcResult.getResponse().getStatus());
+
+        ArrayList <Map<String, Object>> afterVideos =  super
+                .mapFromJsonList(super.getRequest("/api/videos", token));
+        int amountOfLikesAfter = super.mapFromJsonList(super.getRequest("/api/profile/" + super
+                .mapFromJson(super
+                        .getRequest("/api/profile", token))
+                .get("id") +"/likedvideos", token)).size();
+
+        assertEquals(beforeVideos.size(), afterVideos.size());
+        assertEquals(amountOfLikesBefore, amountOfLikesAfter);
     }
 
 }
