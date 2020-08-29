@@ -295,14 +295,14 @@ class VideoTests extends AbstractTest{
     }
 
     @Test
-    public void videoDeleteTest() throws Exception {
+    public void videoDelete() throws Exception {
         super.register();
         String token = super.getToken();
         int channelId = (int) super.mapFromJson(super.createChannel(token)).get("id");
         int videoId = (int) super.mapFromJson(super
                 .uploadVideoWithUriAndToken("/api/channel/" + channelId + "/upload/video", token)).get("id");
         super.postRequest("/api/video/" + videoId + "/like", token, "");
-        int amountOfLikesBefore = mapFromJsonList(super.getRequest("/api/profile/" + super
+        int amountOfLikesBefore = super.mapFromJsonList(super.getRequest("/api/profile/" + super
                 .mapFromJson(super
                         .getRequest("/api/profile", token))
                 .get("id") +"/likedvideos", token)).size();
@@ -311,7 +311,8 @@ class VideoTests extends AbstractTest{
         ArrayList <Map<String, Object>> beforeVideos = super.
                 mapFromJsonList(super.getRequest("/api/videos", token));
 
-        assertNotEquals(0, super.mapFromJsonList(super.getRequest("/api/videos", token)).size());
+        assertNotEquals(0, super.mapFromJsonList(super
+                .getRequest("/api/videos", token)).size());
 
         String uri = "/api/video/" + videoId;
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)
@@ -322,7 +323,7 @@ class VideoTests extends AbstractTest{
 
         ArrayList <Map<String, Object>> afterVideos =  super
                 .mapFromJsonList(super.getRequest("/api/videos", token));
-        int amountOfLikesAfter = mapFromJsonList(super.getRequest("/api/profile/" + super
+        int amountOfLikesAfter = super.mapFromJsonList(super.getRequest("/api/profile/" + super
                 .mapFromJson(super
                         .getRequest("/api/profile", token))
                 .get("id") +"/likedvideos", token)).size();

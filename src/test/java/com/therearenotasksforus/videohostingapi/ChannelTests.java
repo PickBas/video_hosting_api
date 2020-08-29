@@ -238,4 +238,26 @@ class ChannelTests extends AbstractTest {
 
         assertEquals(200, mvcResult.getResponse().getStatus());
     }
+
+    @Test
+    public void channelDelete() throws Exception {
+        super.register();
+        String token = super.getToken();
+        int channelId = (int) super.mapFromJson(super.createChannel(token)).get("id");
+        int ownedChannelBefore = super
+                .mapFromJsonList(super.getRequest("/api/channels/owned", token))
+                .size();
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
+                .delete("/api/channel/" + channelId)
+                .headers(super.getHttpHeaders(token)))
+                .andReturn();
+
+        int ownedChannelAfter = super
+                .mapFromJsonList(super.getRequest("/api/channels/owned", token))
+                .size();
+
+        assertEquals(200, mvcResult.getResponse().getStatus());
+        assertNotEquals(ownedChannelBefore, ownedChannelAfter);
+    }
 }
