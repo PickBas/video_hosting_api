@@ -34,6 +34,7 @@ A token which you get after logging in has to be provided as a request header wi
     /api/channels - Getting all the channels. GET request.
     /api/channels/owned - Getting all the owned channels. GET request.
     /api/channel/{id} - Getting a channel with its id. GET request.
+    /api/channel/{id} - Deletion a channel with its id. DELETE request.
     /api/channel/create - Creating a channel. POST request. JSON Example: {"name": "example", "info": "example"}
     /api/channel/{id}/update - Updating channel's data. POST request. JSON Example: {"name": "example", "info": "example"}
     /api/channel/{id}/subscribe - Subscription to a channel. POST request.
@@ -47,6 +48,7 @@ A token which you get after logging in has to be provided as a request header wi
 ### Video
     /api/videos - Getting all the videos. GET request.
     /api/video/{id} - Getting a video by its id. GET request.
+    /api/video/{id} - Deletion a video by its id. DELETE request.
     /api/video/{id}/like - Setting like. POST request.
     /api/video/{id}/dislike - Setting dislike. POST request.
     /api/video/{id}/comment - Commenting a video. POST request. JSON Example: {"commentBody": "example"}
