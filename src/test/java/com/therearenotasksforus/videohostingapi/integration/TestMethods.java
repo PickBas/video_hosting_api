@@ -1,7 +1,8 @@
-package com.therearenotasksforus.videohostingapi;
+package com.therearenotasksforus.videohostingapi.integration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.therearenotasksforus.videohostingapi.VideoHostingApiApplication;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
@@ -25,28 +26,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = VideoHostingApiApplication.class)
-@WebAppConfiguration
-@AutoConfigureMockMvc
-public abstract class AbstractTest {
+public class TestMethods {
 
-    @Autowired
-    protected MockMvc mvc;
-
-    @Autowired
-    protected WebApplicationContext webApplicationContext;
-
-    public void setUp() {
-        mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
-
-    protected String mapToJson(Object obj) throws JsonProcessingException {
+    public static String mapToJson(Object obj) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(obj);
     }
 
-    protected Map<String, Object> mapFromJson(MvcResult mvcResult)
+    public static Map<String, Object> mapFromJson(MvcResult mvcResult)
             throws IOException {
 
         return new ObjectMapper().readValue(
@@ -55,7 +42,7 @@ public abstract class AbstractTest {
         );
     }
 
-    protected ArrayList<Map<String, Object>> mapFromJsonList(MvcResult mvcResult)
+    public static ArrayList<Map<String, Object>> mapFromJsonList(MvcResult mvcResult)
             throws IOException {
 
         return new ObjectMapper().readValue(
@@ -64,7 +51,7 @@ public abstract class AbstractTest {
         );
     }
 
-    public void register() throws Exception {
+    public static void register(MockMvc mvc) throws Exception {
         String uri = "/api/auth/register";
 
         Map<String, String> requestBodyRegister = new HashMap<>();
@@ -72,14 +59,14 @@ public abstract class AbstractTest {
         requestBodyRegister.put("username", "firsttestuser");
         requestBodyRegister.put("password", "asdf123!");
 
-        String jsonBodyRegister = this.mapToJson(requestBodyRegister);
+        String jsonBodyRegister = mapToJson(requestBodyRegister);
 
         mvc.perform(MockMvcRequestBuilders.post(uri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonBodyRegister)).andReturn();
     }
 
-    public int registerWithEmailAndUsername(String email, String username) throws Exception {
+    public static int registerWithEmailAndUsername(MockMvc mvc, String email, String username) throws Exception {
         String uri = "/api/auth/register";
 
         Map<String, String> requestBodyRegister = new HashMap<>();
@@ -87,7 +74,7 @@ public abstract class AbstractTest {
         requestBodyRegister.put("username", username);
         requestBodyRegister.put("password", "asdf123!");
 
-        String jsonBodyRegister = this.mapToJson(requestBodyRegister);
+        String jsonBodyRegister = mapToJson(requestBodyRegister);
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -95,81 +82,80 @@ public abstract class AbstractTest {
         return (int)mapFromJson(mvcResult).get("id");
     }
 
-    public MvcResult login() throws Exception {
+    public static MvcResult login(MockMvc mvc) throws Exception {
         String uri = "/api/auth/login";
 
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", "firsttestuser");
         requestBody.put("password", "asdf123!");
 
-        String jsonBody = this.mapToJson(requestBody);
+        String jsonBody = mapToJson(requestBody);
 
         return mvc.perform(MockMvcRequestBuilders.post(uri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonBody)).andReturn();
     }
 
-    public MvcResult loginWithUsername(String username) throws Exception {
+    public static MvcResult loginWithUsername(MockMvc mvc, String username) throws Exception {
         String uri = "/api/auth/login";
 
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", username);
         requestBody.put("password", "asdf123!");
 
-        String jsonBody = this.mapToJson(requestBody);
+        String jsonBody = mapToJson(requestBody);
 
         return mvc.perform(MockMvcRequestBuilders.post(uri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonBody)).andReturn();
     }
 
-    public MvcResult createChannel(String token) throws Exception {
+    public static MvcResult createChannel(MockMvc mvc, String token) throws Exception {
         String uri = "/api/channel/create";
 
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("name", "TestChannel");
         requestBody.put("info", "TestChannel information");
 
-        String requestBodyJson = this.mapToJson(requestBody);
-        return this.postRequest(uri, token, requestBodyJson);
+        String requestBodyJson = mapToJson(requestBody);
+        return postRequest(mvc, uri, token, requestBodyJson);
     }
 
-    public String getToken() throws Exception {
-        return "TOKEN_" + this.mapFromJson(this.login()).get("token").toString();
+    public static String getToken(MockMvc mvc) throws Exception {
+        return "TOKEN_" + mapFromJson(login(mvc)).get("token").toString();
     }
 
-    public String getTokenWithUsername(String username) throws Exception {
-        return "TOKEN_" + this
-                .mapFromJson(this.loginWithUsername(username))
+    public static String getTokenWithUsername(MockMvc mvc, String username) throws Exception {
+        return "TOKEN_" + mapFromJson(loginWithUsername(mvc, username))
                 .get("token")
                 .toString();
     }
 
-    public HttpHeaders getHttpHeaders (String token) {
+    public static HttpHeaders getHttpHeaders (String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", token);
 
         return headers;
     }
 
-    protected MvcResult getRequest(String uri, String token) throws Exception {
+    public static MvcResult getRequest(MockMvc mvc, String uri, String token) throws Exception {
         return mvc.perform(MockMvcRequestBuilders.get(uri)
-                .headers(this.getHttpHeaders(token)))
+                .headers(getHttpHeaders(token)))
                 .andReturn();
     }
 
-    protected MvcResult postRequest(String uri, String token, String jsonBody) throws Exception {
+    public static MvcResult postRequest(MockMvc mvc, String uri, String token, String jsonBody) throws Exception {
         return mvc.perform(MockMvcRequestBuilders.post(uri)
-                .headers(this.getHttpHeaders(token))
+                .headers(getHttpHeaders(token))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonBody)).andReturn();
     }
 
-    public ArrayList<Object> getLongArrayByKey(Map<String, Object> responseBody, String key) {
+    public static ArrayList<Object> getLongArrayByKey(Map<String, Object> responseBody, String key) {
         return (ArrayList) responseBody.get(key);
     }
 
-    public MvcResult uploadVideoWithUriAndToken(String uri, String token) throws Exception {
+    public static MvcResult uploadVideoWithUriAndToken(MockMvc mvc, String uri, String token) throws Exception {
         final MockMultipartFile video = new MockMultipartFile("file",
                 "test.mp4",
                 "video/mp4",
@@ -178,7 +164,7 @@ public abstract class AbstractTest {
         return mvc.perform(MockMvcRequestBuilders
                 .multipart(uri)
                 .file(video)
-                .headers(this.getHttpHeaders(token))
+                .headers(getHttpHeaders(token))
                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andReturn();
     }
