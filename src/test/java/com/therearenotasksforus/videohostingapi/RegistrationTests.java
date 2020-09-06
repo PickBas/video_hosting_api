@@ -1,6 +1,5 @@
-package com.therearenotasksforus.videohostingapi.integration;
+package com.therearenotasksforus.videohostingapi;
 
-import com.therearenotasksforus.videohostingapi.VideoHostingApiApplication;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

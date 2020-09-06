@@ -1,4 +1,4 @@
-package com.therearenotasksforus.videohostingapi.integration;
+package com.therearenotasksforus.videohostingapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
