@@ -1,12 +1,19 @@
-package com.therearenotasksforus.videohostingapi;
+package com.therearenotasksforus.videohostingapi.integration;
 
+import com.therearenotasksforus.videohostingapi.VideoHostingApiApplication;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,9 +21,22 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-@SpringBootTest(properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
-@RunWith(SpringRunner.class)
-class RegistrationTests extends AbstractTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = VideoHostingApiApplication.class,
+		properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
+@WebAppConfiguration
+@AutoConfigureMockMvc
+class RegistrationTests {
+
+	@Autowired
+	protected MockMvc mvc;
+
+	@Autowired
+	protected WebApplicationContext webApplicationContext;
+
+	public void setUp() {
+		mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+	}
 
 	@Test
 	public void registerGetRequest() throws Exception {
@@ -36,7 +56,7 @@ class RegistrationTests extends AbstractTest {
 		requestBody.put("username", "test1");
 		requestBody.put("password", "asdf123!");
 
-		String jsonBody = super.mapToJson(requestBody);
+		String jsonBody = TestMethods.mapToJson(requestBody);
 
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -44,7 +64,7 @@ class RegistrationTests extends AbstractTest {
 
 		int status = mvcResult.getResponse().getStatus();
 
-		Map<String, Object> responseBody = super.mapFromJson(mvcResult);
+		Map<String, Object> responseBody = TestMethods.mapFromJson(mvcResult);
 
 		assertEquals(201, status);
 		assertNotEquals(null, responseBody.get("username"));
@@ -60,7 +80,7 @@ class RegistrationTests extends AbstractTest {
 		requestBody.put("username", "test2");
 		requestBody.put("password", "asd");
 
-		String jsonBody = super.mapToJson(requestBody);
+		String jsonBody = TestMethods.mapToJson(requestBody);
 
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -79,7 +99,7 @@ class RegistrationTests extends AbstractTest {
 		requestBody.put("username", "test2");
 		requestBody.put("password", "asdf123!");
 
-		String jsonBody = super.mapToJson(requestBody);
+		String jsonBody = TestMethods.mapToJson(requestBody);
 
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -93,7 +113,7 @@ class RegistrationTests extends AbstractTest {
 		requestBody.put("username", "test2");
 		requestBody.put("password", "asdf123!");
 
-		jsonBody = super.mapToJson(requestBody);
+		jsonBody = TestMethods.mapToJson(requestBody);
 
 		mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
