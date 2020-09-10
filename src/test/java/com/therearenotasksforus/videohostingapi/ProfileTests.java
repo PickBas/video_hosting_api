@@ -128,7 +128,7 @@ class ProfileTests {
                 "test.png",
                 "image/png",
                 "test.png".getBytes());
-        final MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
+        final MvcResult mvcResultUploadedImage = mvc.perform(MockMvcRequestBuilders
                 .multipart(uri)
                 .file(avatar)
                 .headers(TestMethods.getHttpHeaders(userToken))
@@ -140,7 +140,17 @@ class ProfileTests {
                         .getRequest(mvc, "/api/profile", userToken))
                 .get("avatarUrl").toString();
 
-        assertEquals(200, mvcResult.getResponse().getStatus());
+        final int profileId = (int) TestMethods
+                .mapFromJson(TestMethods
+                        .getRequest(mvc, "/api/profile", userToken))
+                .get("id");
+
+        assertEquals(200, mvcResultUploadedImage.getResponse().getStatus());
         assertNotEquals(prevAvatar, currentAvatar);
+
+        uri = "/api/profile/" + profileId + "/download/avatar";
+        MvcResult mvcResultDownloadedImage = TestMethods.getRequest(mvc, uri, userToken);
+
+        assertEquals(200, mvcResultDownloadedImage.getResponse().getStatus());
     }
 }

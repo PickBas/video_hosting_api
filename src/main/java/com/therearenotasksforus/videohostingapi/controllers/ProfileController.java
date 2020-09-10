@@ -97,8 +97,12 @@ public class ProfileController {
     @CrossOrigin
     public void uploadProfileAvatar(Principal principal, @RequestParam("file") MultipartFile file) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
-
         profileService.uploadProfileAvatar(currentProfile, file);
+    }
+
+    @GetMapping("/api/profile/{id}/download/avatar")
+    public byte[] downloadUserProfileImage(@PathVariable("id") Long id) {
+        return profileService.downloadUserProfileImage(profileService.findById(id));
     }
 
 }

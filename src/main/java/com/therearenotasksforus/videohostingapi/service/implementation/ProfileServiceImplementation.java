@@ -114,13 +114,24 @@ public class ProfileServiceImplementation implements ProfileService {
     }
 
     @Override
+    public byte[] downloadUserProfileImage(Profile profile) {
+        String path = String.format("%s/%s",
+                BucketName.PROFILE_IMAGE.getBucketName(),
+                profile.getId());
+        String[] pathArr = profile.getAvatarUrl().split("/");
+        String filename = pathArr[pathArr.length - 1];
+
+        return fileStore.download(path, filename);
+    }
+
+    @Override
     public void delete(Long id) {
         profileRepository.deleteById(id);
     }
 
     @Override
     public void deleteLikedVideoById(Profile profile, Long id) {
-        List <Like> profileLikes = profile.getLikes();
+        List<Like> profileLikes = profile.getLikes();
         profileLikes.removeIf(like -> like.getId().equals(id));
         profile.setLikes(profileLikes);
         profileRepository.save(profile);
