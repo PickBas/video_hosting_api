@@ -187,6 +187,17 @@ public class ChannelServiceImplementation implements ChannelService {
     }
 
     @Override
+    public byte[] downloadChannelImage(Channel channel) {
+        String path = String.format("%s/%s",
+                BucketName.PROFILE_IMAGE.getBucketName(),
+                channel.getId());
+        String[] pathArr = channel.getAvatarUrl().split("/");
+        String filename = pathArr[pathArr.length - 1];
+
+        return fileStore.download(path, filename);
+    }
+
+    @Override
     public void delete(Channel channel) {
         for (Video video : channel.getVideos())
             videoService.delete(video.getId());
@@ -200,4 +211,5 @@ public class ChannelServiceImplementation implements ChannelService {
 
         channelRepository.deleteById(channel.getId());
     }
+
 }

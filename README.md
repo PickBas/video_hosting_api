@@ -50,6 +50,7 @@ A token which you get after logging in has to be provided as a request header wi
     /api/channel/{id}/videos - Getting all the videos of a channel. GET request.
     /api/channel/{id}/upload/video - Uploading a video. POST request.
     /api/channel/{id}/upload/avatar - Updating an avatar. POST request. form-data: key = "file"; value = jpg, png or gif pictures.
+    /api/channel/{id}/download/avatar - Downloading avatar. GET request.
 ### Video
     /api/videos - Getting all the videos. GET request.
     /api/video/{id} - Getting a video by its id. GET request.

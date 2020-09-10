@@ -212,4 +212,9 @@ public class ChannelController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @GetMapping("/api/channel/{id}/download/avatar")
+    public byte[] downloadUserProfileImage(@PathVariable("id") Long id) {
+        return channelService.downloadChannelImage(channelService.findById(id));
+    }
+
 }

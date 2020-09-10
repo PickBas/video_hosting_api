@@ -279,10 +279,10 @@ class ChannelTests {
         assertNotEquals(null, currentAvatar);
         assertNotEquals("", currentAvatar);
 
-//        uri = "/api/profile/" + profileId + "/download/avatar";
-//        MvcResult mvcResultDownloadedImage = TestMethods.getRequest(mvc, uri, userToken);
-//
-//        assertEquals(200, mvcResultDownloadedImage.getResponse().getStatus());
+        uri = "/api/channel/" + channelId + "/download/avatar";
+        MvcResult mvcResultDownloadedImage = TestMethods.getRequest(mvc, uri, userToken);
+
+        assertEquals(200, mvcResultDownloadedImage.getResponse().getStatus());
     }
 
 }

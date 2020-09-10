@@ -29,4 +29,6 @@ public interface ChannelService {
     List<Channel> getAllOwnedChannels(Profile profile);
 
     void delete(Channel channel);
+
+    byte[] downloadChannelImage(Channel channel);
 }
