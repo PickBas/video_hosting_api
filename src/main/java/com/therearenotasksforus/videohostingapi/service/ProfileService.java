@@ -19,8 +19,9 @@ public interface ProfileService {
     List<Profile> getAll();
 
     void update(Profile profile, ProfileUpdateDto profileUpdateDto) throws ValidationException;
-
     void uploadProfileAvatar(Profile profile, MultipartFile file);
+
+    byte[] downloadUserProfileImage(Profile profile);
 
     void delete(Long id);
     void deleteLikedVideoById(Profile profile, Long id);
