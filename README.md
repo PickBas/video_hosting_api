@@ -39,12 +39,16 @@ A token which you get after logging in has to be provided as a request header wi
     /api/channel/{id}/update - Updating channel's data. POST request. JSON Example: {"name": "example", "info": "example"}
     /api/channel/{id}/subscribe - Subscription to a channel. POST request.
     /api/channel/{id}/unsubscribe - Unsubscription from a channel. POST request.
+    /api/channel/{id}/videos - Getting all the videos of a channel. GET request.
+    /api/channel/{id}/upload/video - Uploading a video. POST request.
 ### Profile
     /api/profiles - Getting all the profiles. GET request.
     /api/profile - Getting the current profile. GET request.
     /api/profile/id/{id} - Getting a profile with its id. GET request.
-    /api/profile/upload/avatar - Uploading an avatar. POST request. form-data: key = "file"; value = jpg, png or gif pictures.
+    /api/profile/upload/avatar - Updating an avatar. POST request. form-data: key = "file"; value = jpg, png or gif pictures.
+    /api/profile/{id}/download/avatar - Downloading avatar. GET request.
     /api/profile/update - Updating profiles's data. POST request. JSON Example: {"aboutProfileInfo": "example", "gender": "M/F", "country": "example", "customUrl": "example", "isPrivateSublist": "false/true"}
+    /api/profile/{id}/likedvideos - Getting all the profile's liked videos. GET request.
 ### Video
     /api/videos - Getting all the videos. GET request.
     /api/video/{id} - Getting a video by its id. GET request.
@@ -54,7 +58,4 @@ A token which you get after logging in has to be provided as a request header wi
     /api/video/{id}/comment - Commenting a video. POST request. JSON Example: {"commentBody": "example"}
     /api/video/{id}/get/comments - Get all comments on a video. GET request.
     /api/video/{video_id}/comment/{comment_id} - Delete comment. DELETE request.
-    /api/channel/{id}/videos - Getting all the videos of a channel. GET request.
-    /api/profile/{id}/likedvideos - Getting all the profile's liked videos. GET request.
-    /api/channel/{id}/upload/video - Uploading a video. POST request.
     /api/video/{id}/update/name - Updating a video name. POST request. JSON Example: {"name": "example"}
