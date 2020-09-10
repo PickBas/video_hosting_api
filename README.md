@@ -30,6 +30,14 @@ A token which you get after logging in has to be provided as a request header wi
     /api/user - Getting the current user. GET request.
     /api/user/id/{id} - Getting a user by its id. GET request.
     /api/user/update - Updating user's first name and last name. POST request. JSON Example: {"firstName": "example", "lastName": "example"}
+### Profile
+    /api/profiles - Getting all the profiles. GET request.
+    /api/profile - Getting the current profile. GET request.
+    /api/profile/id/{id} - Getting a profile with its id. GET request.
+    /api/profile/upload/avatar - Updating an avatar. POST request. form-data: key = "file"; value = jpg, png or gif pictures.
+    /api/profile/{id}/download/avatar - Downloading avatar. GET request.
+    /api/profile/update - Updating profiles's data. POST request. JSON Example: {"aboutProfileInfo": "example", "gender": "M/F", "country": "example", "customUrl": "example", "isPrivateSublist": "false/true"}
+    /api/profile/{id}/likedvideos - Getting all the profile's liked videos. GET request.
 ### Channel
     /api/channels - Getting all the channels. GET request.
     /api/channels/owned - Getting all the owned channels. GET request.
@@ -41,14 +49,8 @@ A token which you get after logging in has to be provided as a request header wi
     /api/channel/{id}/unsubscribe - Unsubscription from a channel. POST request.
     /api/channel/{id}/videos - Getting all the videos of a channel. GET request.
     /api/channel/{id}/upload/video - Uploading a video. POST request.
-### Profile
-    /api/profiles - Getting all the profiles. GET request.
-    /api/profile - Getting the current profile. GET request.
-    /api/profile/id/{id} - Getting a profile with its id. GET request.
-    /api/profile/upload/avatar - Updating an avatar. POST request. form-data: key = "file"; value = jpg, png or gif pictures.
-    /api/profile/{id}/download/avatar - Downloading avatar. GET request.
-    /api/profile/update - Updating profiles's data. POST request. JSON Example: {"aboutProfileInfo": "example", "gender": "M/F", "country": "example", "customUrl": "example", "isPrivateSublist": "false/true"}
-    /api/profile/{id}/likedvideos - Getting all the profile's liked videos. GET request.
+    /api/channel/{id}/upload/avatar - Updating an avatar. POST request. form-data: key = "file"; value = jpg, png or gif pictures.
+    /api/channel/{id}/download/avatar - Downloading avatar. GET request.
 ### Video
     /api/videos - Getting all the videos. GET request.
     /api/video/{id} - Getting a video by its id. GET request.

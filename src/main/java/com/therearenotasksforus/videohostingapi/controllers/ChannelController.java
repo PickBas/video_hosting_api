@@ -10,8 +10,10 @@ import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.bind.ValidationException;
 import java.security.Principal;
@@ -179,6 +181,40 @@ public class ChannelController {
         channelService.delete(channel);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(
+            path = "/api/channel/{id}/upload/avatar",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @CrossOrigin
+    public ResponseEntity<?> uploadChannelAvatar(Principal principal,
+                                                 @RequestParam("file") MultipartFile file,
+                                                 @PathVariable("id") Long id) {
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+        Channel currentChannel = channelService.findById(id);
+
+        if (currentChannel == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (currentChannel.getOwner() != currentProfile) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        try {
+            channelService.uploadChannelAvatar(currentChannel, file);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/api/channel/{id}/download/avatar")
+    public byte[] downloadUserProfileImage(@PathVariable("id") Long id) {
+        return channelService.downloadChannelImage(channelService.findById(id));
     }
 
 }

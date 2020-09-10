@@ -1,6 +1,5 @@
 package com.therearenotasksforus.videohostingapi.dto.channel;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.Video;
@@ -13,6 +12,7 @@ public class ChannelDto {
     private String name;
     private String info;
     private Profile owner;
+    private String avatarUrl;
     private List<Profile> subscribers;
     private List<Video> videos;
 
@@ -25,6 +25,7 @@ public class ChannelDto {
         channelDto.owner = channel.getOwner();
         channelDto.subscribers = channel.getSubscribers();
         channelDto.videos = channel.getVideos();
+        channelDto.avatarUrl = channel.getAvatarUrl();
 
         return channelDto;
     }
@@ -75,11 +76,19 @@ public class ChannelDto {
         this.subscribers = subscribers;
     }
 
-    public List<Video> getVideos () {
+    public List<Video> getVideos() {
         return videos;
     }
 
     public void setVideos(List<Video> videos) {
         this.videos = videos;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }

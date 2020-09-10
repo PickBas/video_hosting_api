@@ -82,34 +82,42 @@ public class ProfileServiceImplementation implements ProfileService {
 
     @Override
     public void uploadProfileAvatar(Profile profile, MultipartFile file) {
-        if (file.isEmpty()) {
-            throw new IllegalStateException("Failure: cannot upload empty file [ " + file.getSize() + "]");
-        }
+        isEmptyFile(file);
+        isImage(file);
 
+        String basicUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/";
+        String originalFileName = Objects.requireNonNull(file.getOriginalFilename()).replaceAll(" ", "_");
+        String path = String.format("%s/%s", BucketName.PROFILE_IMAGE.getBucketName(), profile.getId());
+        String filename = String.format("%s-%s", UUID.randomUUID(), originalFileName);
+
+        try {
+            fileStore.save(path, filename, Optional.of(getMetadata(file)), file.getInputStream());
+            profile.setAvatarUrl(basicUrl + profile.getId() + "/" + filename);
+            profileRepository.save(profile);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private Map<String, String> getMetadata(MultipartFile file) {
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("Content-Type", file.getContentType());
+        metadata.put("content-length", String.valueOf(file.getSize()));
+        return metadata;
+    }
+
+    private void isImage(MultipartFile file) {
         if (!Arrays.asList(
                 IMAGE_JPEG.getMimeType(),
                 IMAGE_PNG.getMimeType(),
                 IMAGE_GIF.getMimeType()).contains(file.getContentType())) {
             throw new IllegalStateException("Failure: file must be an image [" + file.getContentType() + "]");
         }
+    }
 
-        String basicUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/";
-
-        Map<String, String> metadata = new HashMap<>();
-        String originalFileName = Objects.requireNonNull(file.getOriginalFilename()).replaceAll(" ", "_");
-
-        metadata.put("Content-Type", file.getContentType());
-        metadata.put("content-length", String.valueOf(file.getSize()));
-
-        String path = String.format("%s/%s", BucketName.PROFILE_IMAGE.getBucketName(), profile.getId());
-        String filename = String.format("%s-%s", UUID.randomUUID(), originalFileName);
-
-        try {
-            fileStore.save(path, filename, Optional.of(metadata), file.getInputStream());
-            profile.setAvatarUrl(basicUrl + profile.getId() + "/" + filename);
-            profileRepository.save(profile);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
+    private void isEmptyFile(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new IllegalStateException("Failure: cannot upload empty file [ " + file.getSize() + "]");
         }
     }
 
