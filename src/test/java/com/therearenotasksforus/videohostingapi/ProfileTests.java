@@ -145,7 +145,7 @@ class ProfileTests {
                         .getRequest(mvc, "/api/profile", userToken))
                 .get("id");
 
-        assertEquals(200, mvcResultUploadedImage.getResponse().getStatus());
+        assertEquals(201, mvcResultUploadedImage.getResponse().getStatus());
         assertNotEquals(prevAvatar, currentAvatar);
 
         uri = "/api/profile/" + profileId + "/download/avatar";
