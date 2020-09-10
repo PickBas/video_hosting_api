@@ -8,7 +8,7 @@ API based on Java Spring framework
 ## How to run the API
 ### Docker
 Enter your S3 keys into the docker-compose.yml file which is in the root of the repository.
-Next, open your termianl, go to the video_hosting_api folder. Then, run the command:
+Next, open your terminal, go to the video_hosting_api folder. Then, run the command:
 
       docker-compose up --build -d
   
