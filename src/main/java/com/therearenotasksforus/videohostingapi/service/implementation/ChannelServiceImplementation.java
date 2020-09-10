@@ -1,7 +1,9 @@
 package com.therearenotasksforus.videohostingapi.service.implementation;
 
+import com.therearenotasksforus.videohostingapi.bucket.BucketName;
 import com.therearenotasksforus.videohostingapi.dto.channel.ChannelCreateDto;
 import com.therearenotasksforus.videohostingapi.dto.channel.ChannelUpdateDto;
+import com.therearenotasksforus.videohostingapi.filestore.FileStore;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.Video;
@@ -11,12 +13,14 @@ import com.therearenotasksforus.videohostingapi.service.ChannelService;
 import com.therearenotasksforus.videohostingapi.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.bind.ValidationException;
+import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
+import static org.apache.http.entity.ContentType.*;
 
 @Service
 public class ChannelServiceImplementation implements ChannelService {
@@ -24,14 +28,17 @@ public class ChannelServiceImplementation implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ProfileRepository profileRepository;
     private final VideoService videoService;
+    private final FileStore fileStore;
 
     @Autowired
     public ChannelServiceImplementation(ChannelRepository channelRepository,
                                         ProfileRepository profileRepository,
-                                        VideoService videoService) {
+                                        VideoService videoService,
+                                        FileStore fileStore) {
         this.channelRepository = channelRepository;
         this.profileRepository = profileRepository;
         this.videoService = videoService;
+        this.fileStore = fileStore;
     }
 
     @Override
@@ -98,6 +105,66 @@ public class ChannelServiceImplementation implements ChannelService {
         channel.removeSubscriber(profile);
         channelRepository.save(channel);
 
+    }
+
+    @Override
+    public void uploadChannelAvatar(Channel channel, MultipartFile file) {
+        isEmptyFile(file);
+        isImage(file);
+        Map<String, String> uploadPathData = getUploadPathData(channel, file);
+
+        try {
+            fileStore.save(uploadPathData.get("path"),
+                    uploadPathData.get("filename"),
+                    Optional.of(getMetadata(file)),
+                    file.getInputStream());
+            channel.setAvatarUrl(uploadPathData.get("basicUrl") +
+                    channel.getId() +
+                    "/" +
+                    uploadPathData.get("filename"));
+            channelRepository.save(channel);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private Map<String, String> getMetadata(MultipartFile file) {
+        Map<String, String> metadata = new HashMap<>();
+
+        metadata.put("Content-Type", file.getContentType());
+        metadata.put("content-length", String.valueOf(file.getSize()));
+
+        return metadata;
+    }
+
+    private void isImage(MultipartFile file) {
+        if (!Arrays.asList(
+                IMAGE_JPEG.getMimeType(),
+                IMAGE_PNG.getMimeType(),
+                IMAGE_GIF.getMimeType()).contains(file.getContentType())) {
+            throw new IllegalStateException("Failure: file must be an image [" + file.getContentType() + "]");
+        }
+    }
+
+    private void isEmptyFile(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new IllegalStateException("Failure: cannot upload empty file [ " + file.getSize() + "]");
+        }
+    }
+
+    private Map<String, String> getUploadPathData(Channel channel, MultipartFile file) {
+        Map<String, String> uploadPathData = new HashMap<>();
+
+        uploadPathData.put("basicUrl",
+                "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/");
+        uploadPathData.put("originalFileName",
+                Objects.requireNonNull(file.getOriginalFilename()).replaceAll(" ", "_"));
+        uploadPathData.put("path",
+                String.format("%s/%s", BucketName.PROFILE_IMAGE.getBucketName(), channel.getId()));
+        uploadPathData.put("filename",
+                String.format("%s-%s", UUID.randomUUID(), uploadPathData.get("originalFileName")));
+
+        return uploadPathData;
     }
 
     @Override

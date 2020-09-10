@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -245,4 +246,43 @@ class ChannelTests {
         assertEquals(200, mvcResult.getResponse().getStatus());
         assertNotEquals(ownedChannelBefore, ownedChannelAfter);
     }
+
+    @Test
+    public void channelUpdateAvatar() throws Exception {
+        int channelId = (int) TestMethods
+                .mapFromJson(TestMethods.createChannel(mvc, userToken)).get("id");
+
+        String uri = "/api/channel/" + channelId + "/upload/avatar";
+        String prevAvatar = TestMethods
+                .mapFromJson(TestMethods
+                        .getRequest(mvc, "/api/channel/" + channelId, userToken))
+                .get("avatarUrl").toString();
+
+        final MockMultipartFile avatar = new MockMultipartFile("file",
+                "test.png",
+                "image/png",
+                "test.png".getBytes());
+        final MvcResult mvcResultUploadedImage = mvc.perform(MockMvcRequestBuilders
+                .multipart(uri)
+                .file(avatar)
+                .headers(TestMethods.getHttpHeaders(userToken))
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andReturn();
+
+        final String currentAvatar = TestMethods
+                .mapFromJson(TestMethods
+                        .getRequest(mvc, "/api/channel/" + channelId, userToken))
+                .get("avatarUrl").toString();
+
+        assertEquals(201, mvcResultUploadedImage.getResponse().getStatus());
+        assertNotEquals(prevAvatar, currentAvatar);
+        assertNotEquals(null, currentAvatar);
+        assertNotEquals("", currentAvatar);
+
+//        uri = "/api/profile/" + profileId + "/download/avatar";
+//        MvcResult mvcResultDownloadedImage = TestMethods.getRequest(mvc, uri, userToken);
+//
+//        assertEquals(200, mvcResultDownloadedImage.getResponse().getStatus());
+    }
+
 }
