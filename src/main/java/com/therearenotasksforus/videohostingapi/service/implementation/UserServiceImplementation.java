@@ -68,6 +68,12 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    public void updatePassword(User user, String password) {
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
+
+    @Override
     public void updateNames(User user, UpdateUserDto updateUserDto) throws ValidationException {
         if (updateUserDto.getFirstName() == null && updateUserDto.getLastName() == null) {
             throw new ValidationException("Failure: wrong data was provided");

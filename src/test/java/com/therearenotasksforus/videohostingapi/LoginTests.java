@@ -45,7 +45,7 @@ class LoginTests {
 
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", "firsttestuser");
-        requestBody.put("password", "asdf123!");
+        requestBody.put("password", "Asdf123!");
 
         String jsonBody = TestMethods.mapToJson(requestBody);
 
