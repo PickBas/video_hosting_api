@@ -23,8 +23,9 @@ Then run the API. If you did everything correctly, the API should be up and runn
 ## URLs
 A token which you get after logging in has to be provided as a request header with any request (except Sign in/up). Example: header key - Authorization, value - TOKEN_<token>
 ### Sign in/up:
-    /api/auth/register - Registration. POST request. JSON Example: {"email": "example@example.com", "username": "example", "password": "example"}
+    /api/auth/register - Registration. POST request. JSON Example: {"email": "example@example.com", "username": "example", "password": "TestPassword1!"}
     /api/auth/login - Authentication. POST request. JSON Example: {"username": "example", "password": "example"}
+    /api/auth/password/update - Updating user password. POST request. Request must be authenticated. JSON Example: {"old_password": "TestOldPassword1!", "updated_password": "TestNewPassword1!"}
 ### User
     /api/users - Getting all the users. GET request.
     /api/user - Getting the current user. GET request.
