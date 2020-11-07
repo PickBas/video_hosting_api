@@ -6,17 +6,22 @@ import com.therearenotasksforus.videohostingapi.dto.user.UserRegistrationDto;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.security.jwt.JwtTokenProvider;
 import com.therearenotasksforus.videohostingapi.service.UserService;
+import org.h2.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Map.entry;
 
 @RestController
 @RequestMapping(value = "/api/auth/")
@@ -29,7 +34,9 @@ public class AuthenticationController {
     private final UserService userService;
 
     @Autowired
-    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, UserService userService) {
+    public AuthenticationController(AuthenticationManager authenticationManager,
+                                    JwtTokenProvider jwtTokenProvider,
+                                    UserService userService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
@@ -40,7 +47,8 @@ public class AuthenticationController {
     public ResponseEntity<Map<String, String>> login(@RequestBody AuthenticationRequestDto requestDto) {
         try {
             String username = requestDto.getUsername();
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, requestDto.getPassword());
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                    new UsernamePasswordAuthenticationToken(username, requestDto.getPassword());
             authenticationManager.authenticate(usernamePasswordAuthenticationToken);
             User user = userService.findByUsername(username);
 
@@ -70,6 +78,7 @@ public class AuthenticationController {
 
         boolean hasSpecialCharacter = false;
         boolean hasLowerCase = false;
+        boolean hasUpperCase = false;
         boolean hasDigits = false;
 
         for (int i = 0; i < password.length(); ++i) {
@@ -85,7 +94,11 @@ public class AuthenticationController {
                 hasLowerCase = true;
             }
 
-            if (hasDigits && hasLowerCase && hasSpecialCharacter) {
+            if (Character.isUpperCase(password.charAt(i))) {
+                hasUpperCase = true;
+            }
+
+            if (hasDigits && hasLowerCase && hasSpecialCharacter && hasUpperCase) {
                 return;
             }
 
@@ -113,10 +126,9 @@ public class AuthenticationController {
             passwordValidation(requestDto.getPassword());
             emailValidation(requestDto.getEmail());
         } catch (Exception e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("Error", e.getMessage());
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(entry("Error", e.getMessage()));
         }
 
         try {
@@ -130,11 +142,39 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(UserDto.fromUser(userService.findById(userToRegister.getId())));
         } catch (IllegalStateException e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("Error", e.getMessage());
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(entry("Error", e.getMessage()));
         }
+    }
+
+    @CrossOrigin
+    @PostMapping("password/update")
+    public ResponseEntity<?> updatePassword(Principal principal, @RequestBody Map<String, String> passwordUpdateInfo) {
+        User currentUser = userService.findByUsername(principal.getName());
+
+        if (StringUtils.isNullOrEmpty(passwordUpdateInfo.get("old_password"))
+                || (StringUtils.isNullOrEmpty(passwordUpdateInfo.get("updated_password")))) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        try {
+            passwordValidation(passwordUpdateInfo.get("updated_password"));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(entry("Error", e.getMessage()));
+        }
+
+        if (!new BCryptPasswordEncoder().matches(passwordUpdateInfo.get("old_password"),
+                currentUser.getPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(entry("Error",
+                    "Invalid old password!"));
+        }
+
+        userService.updatePassword(currentUser, passwordUpdateInfo.get("updated_password"));
+
+        return ResponseEntity.status(HttpStatus.OK).body(currentUser);
     }
 
 }

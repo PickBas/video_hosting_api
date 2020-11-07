@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,8 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = VideoHostingApiApplication.class,
@@ -105,5 +105,27 @@ class UserTests {
         assertEquals(200, mvcResult.getResponse().getStatus());
         assertEquals("updated_first_name", responseBody.get("firstName"));
         assertEquals("updated_last_name", responseBody.get("lastName"));
+    }
+
+    @Test
+    public void passwordUpdate() throws Exception {
+        String uri = "/api/auth/password/update";
+        String update_password = "updatedPassword123!";
+        String old_password = "Asdf123!";
+        String jsonBody = TestMethods.mapToJson(Map.ofEntries(
+                Map.entry("updated_password", update_password),
+                Map.entry("old_password", old_password)
+        ));
+
+        MvcResult mvcResult = TestMethods.postRequest(mvc, uri, userToken, jsonBody);
+        Map<String, Object> response = TestMethods.mapFromJson(mvcResult);
+
+        assertEquals(200, mvcResult.getResponse().getStatus());
+        assertTrue(new BCryptPasswordEncoder().matches(update_password, (String) response.get("password")));
+
+        TestMethods.postRequest(mvc, uri, userToken, TestMethods.mapToJson(Map.ofEntries(
+                Map.entry("updated_password", old_password),
+                Map.entry("old_password", update_password)
+        )));
     }
 }

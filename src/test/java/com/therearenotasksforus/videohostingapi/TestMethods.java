@@ -45,7 +45,7 @@ public class TestMethods {
         Map<String, String> requestBodyRegister = new HashMap<>();
         requestBodyRegister.put("email", "firsttestuser@firsttestuser.com");
         requestBodyRegister.put("username", "firsttestuser");
-        requestBodyRegister.put("password", "asdf123!");
+        requestBodyRegister.put("password", "Asdf123!");
 
         String jsonBodyRegister = mapToJson(requestBodyRegister);
 
@@ -60,7 +60,7 @@ public class TestMethods {
         Map<String, String> requestBodyRegister = new HashMap<>();
         requestBodyRegister.put("email", email);
         requestBodyRegister.put("username", username);
-        requestBodyRegister.put("password", "asdf123!");
+        requestBodyRegister.put("password", "Asdf123!");
 
         String jsonBodyRegister = mapToJson(requestBodyRegister);
 
@@ -75,7 +75,7 @@ public class TestMethods {
 
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", "firsttestuser");
-        requestBody.put("password", "asdf123!");
+        requestBody.put("password", "Asdf123!");
 
         String jsonBody = mapToJson(requestBody);
 
@@ -89,7 +89,7 @@ public class TestMethods {
 
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", username);
-        requestBody.put("password", "asdf123!");
+        requestBody.put("password", "Asdf123!");
 
         String jsonBody = mapToJson(requestBody);
 

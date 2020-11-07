@@ -53,7 +53,7 @@ class RegistrationTests {
 		Map<String, String> requestBody = new HashMap<>();
 		requestBody.put("email", "test1@test.test");
 		requestBody.put("username", "test1");
-		requestBody.put("password", "asdf123!");
+		requestBody.put("password", "Asdf123!");
 
 		String jsonBody = TestMethods.mapToJson(requestBody);
 
@@ -96,7 +96,7 @@ class RegistrationTests {
 		Map<String, String> requestBody = new HashMap<>();
 		requestBody.put("email", "test2@test.test");
 		requestBody.put("username", "test2");
-		requestBody.put("password", "asdf123!");
+		requestBody.put("password", "Asdf123!");
 
 		String jsonBody = TestMethods.mapToJson(requestBody);
 
@@ -110,7 +110,7 @@ class RegistrationTests {
 		requestBody = new HashMap<>();
 		requestBody.put("email", "test2@test.test");
 		requestBody.put("username", "test2");
-		requestBody.put("password", "asdf123!");
+		requestBody.put("password", "Asdf123!");
 
 		jsonBody = TestMethods.mapToJson(requestBody);
 
