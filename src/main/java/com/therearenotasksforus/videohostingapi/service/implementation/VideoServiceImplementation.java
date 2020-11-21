@@ -30,14 +30,18 @@ public class VideoServiceImplementation implements VideoService {
     private final LikeRepository likeRepository;
     private final DislikeRepository dislikeRepository;
     private final CommentRepository commentRepository;
-
     private final ProfileRepository profileRepository;
     private final ChannelRepository channelRepository;
-
     private final FileStore fileStore;
 
     @Autowired
-    public VideoServiceImplementation(VideoRepository videoRepository, LikeRepository likeRepository, DislikeRepository dislikeRepository, CommentRepository commentRepository, ProfileRepository profileRepository, ChannelRepository channelRepository, FileStore fileStore) {
+    public VideoServiceImplementation(VideoRepository videoRepository,
+                                      LikeRepository likeRepository,
+                                      DislikeRepository dislikeRepository,
+                                      CommentRepository commentRepository,
+                                      ProfileRepository profileRepository,
+                                      ChannelRepository channelRepository,
+                                      FileStore fileStore) {
         this.videoRepository = videoRepository;
         this.likeRepository = likeRepository;
         this.dislikeRepository = dislikeRepository;

@@ -27,7 +27,10 @@ public class UserServiceImplementation implements UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImplementation(UserRepository userRepository, RoleRepository repository, ProfileRepository profileRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImplementation(UserRepository userRepository,
+                                     RoleRepository repository,
+                                     ProfileRepository profileRepository,
+                                     BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = repository;
         this.profileRepository = profileRepository;
@@ -37,14 +40,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     public void register(User user) {
 
-        List<User> users = this.getAll();
-
-        for (User iterUser : users) {
-            if (user.getEmail().equals(iterUser.getEmail()) ||
-                    user.getUsername().equals(iterUser.getUsername())) {
-                throw new IllegalStateException("User with such name or email already exists");
-            }
-        }
+        this.checkIfUserExists(user);
 
         Role roleUser = roleRepository.findByName("ROLE_USER");
         List<Role> userRoles = new ArrayList<>();
@@ -65,6 +61,18 @@ public class UserServiceImplementation implements UserService {
         user.setProfile(profile);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public void checkIfUserExists(User user) {
+        List<User> users = this.getAll();
+
+        for (User iterUser : users) {
+            if (user.getEmail().equals(iterUser.getEmail()) ||
+                    user.getUsername().equals(iterUser.getUsername())) {
+                throw new IllegalStateException("User with such name or email already exists");
+            }
+        }
     }
 
     @Override

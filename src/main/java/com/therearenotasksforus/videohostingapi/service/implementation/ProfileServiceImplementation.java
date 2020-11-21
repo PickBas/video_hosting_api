@@ -26,7 +26,8 @@ public class ProfileServiceImplementation implements ProfileService {
     private final FileStore fileStore;
 
     @Autowired
-    public ProfileServiceImplementation(ProfileRepository profileRepository, FileStore fileStore) {
+    public ProfileServiceImplementation(ProfileRepository profileRepository,
+                                        FileStore fileStore) {
         this.profileRepository = profileRepository;
         this.fileStore = fileStore;
     }
@@ -44,7 +45,7 @@ public class ProfileServiceImplementation implements ProfileService {
 
     @Override
     public Profile findByUser(User user) {
-        return null;
+        return profileRepository.findByUser(user);
     }
 
     @Override
@@ -60,13 +61,14 @@ public class ProfileServiceImplementation implements ProfileService {
 
     @Override
     public void update(Profile profile, ProfileUpdateDto profileUpdateDto) throws ValidationException {
-        if (profileUpdateDto.getCustomUrl() == null) {
-            throw new ValidationException("Failure: wrong data was provided");
-        }
+        this.checkIfCustomUrlProvided(profileUpdateDto);
 
-        String aboutProfileInfo = profileUpdateDto.getAboutProfileInfo() != null ? profileUpdateDto.getAboutProfileInfo() : "";
-        char gender = profile.getGender() == 'M' || profile.getGender() == 'F' ? profile.getGender() : 'M';
-        String country = profileUpdateDto.getCountry() != null ? profileUpdateDto.getCountry() : "";
+        String aboutProfileInfo = profileUpdateDto.getAboutProfileInfo() != null ?
+                profileUpdateDto.getAboutProfileInfo() : "";
+        char gender = profile.getGender() == 'M' || profile.getGender() == 'F' ?
+                profile.getGender() : 'M';
+        String country = profileUpdateDto.getCountry() != null ?
+                profileUpdateDto.getCountry() : "";
         String customUrl = profileUpdateDto.getCustomUrl();
         boolean isPrivateSublist = profileUpdateDto.getPrivateSublist();
 
@@ -78,6 +80,12 @@ public class ProfileServiceImplementation implements ProfileService {
 
         profileRepository.save(profile);
 
+    }
+
+    private void checkIfCustomUrlProvided(ProfileUpdateDto profileUpdateDto) throws ValidationException {
+        if (profileUpdateDto.getCustomUrl() == null) {
+            throw new ValidationException("Failure: wrong data was provided");
+        }
     }
 
     @Override
