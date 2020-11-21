@@ -54,20 +54,24 @@ public class ChannelServiceImplementation implements ChannelService {
         channel.setOwner(channelOwner);
         channel.setCreated(new Timestamp(System.currentTimeMillis()));
         channel.setUpdated(new Timestamp(System.currentTimeMillis()));
+
         return channelRepository.save(channel);
     }
 
     @Override
     public void update(Channel channel, ChannelUpdateDto channelUpdateDto) throws ValidationException {
-        if (channelUpdateDto.getName() == null && channel.getInfo() == null)
-            throw new ValidationException("Wrong data was provided");
+        isChannelDataValid(channel, channelUpdateDto);
 
         channel.setUpdated(new Timestamp(System.currentTimeMillis()));
-
         channel.setName(channelUpdateDto.getName() != null ? channelUpdateDto.getName() : "");
         channel.setInfo(channelUpdateDto.getInfo() != null ? channelUpdateDto.getInfo() : "");
 
         channelRepository.save(channel);
+    }
+
+    private void isChannelDataValid(Channel channel, ChannelUpdateDto channelUpdateDto) throws ValidationException {
+        if (channelUpdateDto.getName() == null && channel.getInfo() == null)
+            throw new ValidationException("Wrong data was provided");
     }
 
     @Override
