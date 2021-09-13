@@ -1,7 +1,7 @@
 package com.therearenotasksforus.videohostingapi.bucket;
 
 public enum BucketName {
-    PROFILE_IMAGE("therearenotasksforus-assets");
+    PROFILE_IMAGE("video-hosting-api-bucket");
 
     private final String bucketName;
 

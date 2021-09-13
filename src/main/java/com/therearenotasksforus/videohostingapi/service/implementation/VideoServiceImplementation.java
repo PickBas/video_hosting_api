@@ -61,7 +61,7 @@ public class VideoServiceImplementation implements VideoService {
             throw new IllegalStateException("Failure: the API does not support this file format!");
         }
 
-        String basicUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/";
+        String basicUrl = "https://video-hosting-api-bucket.s3.eu-central-1.amazonaws.com/";
 
         Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Type", file.getContentType());
