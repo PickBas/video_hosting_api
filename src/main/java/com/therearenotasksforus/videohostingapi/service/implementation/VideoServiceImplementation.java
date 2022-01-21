@@ -60,12 +60,17 @@ public class VideoServiceImplementation implements VideoService {
                             "video/avi", "video/mpeg").contains(file.getContentType())) {
             throw new IllegalStateException("Failure: the API does not support this file format!");
         }
-        String basicUrl = "https://video-hosting-api-bucket.s3.eu-central-1.amazonaws.com/";
+        String basicUrl =
+                "https://"
+                + BucketName.BUCKET.getBucketName()
+                + ".s3."
+                + BucketName.BUCKET.getBucketRegion()
+                + ".amazonaws.com/";
         Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Type", file.getContentType());
         metadata.put("content-length", String.valueOf(file.getSize()));
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename()).replaceAll(" ", "_");
-        String path = String.format("%s/%s", BucketName.PROFILE_IMAGE.getBucketName(), channel.getId());
+        String path = String.format("%s/%s", BucketName.BUCKET.getBucketName(), channel.getId());
         String filename = String.format("%s-%s", UUID.randomUUID(), originalFileName);
         try {
             fileStore.save(path, filename, Optional.of(metadata), file.getInputStream());
