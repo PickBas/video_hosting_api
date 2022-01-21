@@ -21,18 +21,14 @@ public class TestMethods {
         return objectMapper.writeValueAsString(obj);
     }
 
-    public static Map<String, Object> mapFromJson(MvcResult mvcResult)
-            throws IOException {
-
+    public static Map<String, Object> mapFromJson(MvcResult mvcResult) throws IOException {
         return new ObjectMapper().readValue(
                 mvcResult.getResponse().getContentAsString(),
                 HashMap.class
         );
     }
 
-    public static ArrayList<Map<String, Object>> mapFromJsonList(MvcResult mvcResult)
-            throws IOException {
-
+    public static ArrayList<Map<String, Object>> mapFromJsonList(MvcResult mvcResult) throws IOException {
         return new ObjectMapper().readValue(
                 mvcResult.getResponse().getContentAsString(),
                 ArrayList.class
@@ -41,14 +37,11 @@ public class TestMethods {
 
     public static void register(MockMvc mvc) throws Exception {
         String uri = "/api/auth/register";
-
         Map<String, String> requestBodyRegister = new HashMap<>();
         requestBodyRegister.put("email", "firsttestuser@firsttestuser.com");
         requestBodyRegister.put("username", "firsttestuser");
         requestBodyRegister.put("password", "Asdf123!");
-
         String jsonBodyRegister = mapToJson(requestBodyRegister);
-
         mvc.perform(MockMvcRequestBuilders.post(uri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonBodyRegister)).andReturn();
@@ -56,14 +49,11 @@ public class TestMethods {
 
     public static int registerWithEmailAndUsername(MockMvc mvc, String email, String username) throws Exception {
         String uri = "/api/auth/register";
-
         Map<String, String> requestBodyRegister = new HashMap<>();
         requestBodyRegister.put("email", email);
         requestBodyRegister.put("username", username);
         requestBodyRegister.put("password", "Asdf123!");
-
         String jsonBodyRegister = mapToJson(requestBodyRegister);
-
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonBodyRegister)).andReturn();
@@ -72,13 +62,10 @@ public class TestMethods {
 
     public static MvcResult login(MockMvc mvc) throws Exception {
         String uri = "/api/auth/login";
-
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", "firsttestuser");
         requestBody.put("password", "Asdf123!");
-
         String jsonBody = mapToJson(requestBody);
-
         return mvc.perform(MockMvcRequestBuilders.post(uri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonBody)).andReturn();
@@ -86,13 +73,10 @@ public class TestMethods {
 
     public static MvcResult loginWithUsername(MockMvc mvc, String username) throws Exception {
         String uri = "/api/auth/login";
-
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", username);
         requestBody.put("password", "Asdf123!");
-
         String jsonBody = mapToJson(requestBody);
-
         return mvc.perform(MockMvcRequestBuilders.post(uri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonBody)).andReturn();
@@ -100,11 +84,9 @@ public class TestMethods {
 
     public static MvcResult createChannel(MockMvc mvc, String token) throws Exception {
         String uri = "/api/channel/create";
-
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("name", "TestChannel");
         requestBody.put("info", "TestChannel information");
-
         String requestBodyJson = mapToJson(requestBody);
         return postRequest(mvc, uri, token, requestBodyJson);
     }
@@ -122,7 +104,6 @@ public class TestMethods {
     public static HttpHeaders getHttpHeaders (String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", token);
-
         return headers;
     }
 
@@ -148,7 +129,6 @@ public class TestMethods {
                 "test.mp4",
                 "video/mp4",
                 "test video".getBytes());
-
         return mvc.perform(MockMvcRequestBuilders
                 .multipart(uri)
                 .file(video)
