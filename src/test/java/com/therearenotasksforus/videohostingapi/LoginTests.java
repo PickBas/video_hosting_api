@@ -1,5 +1,6 @@
 package com.therearenotasksforus.videohostingapi;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = VideoHostingApiApplication.class,
@@ -40,42 +38,31 @@ class LoginTests {
     @Test
     public void loginPostRequestTest() throws Exception {
         TestMethods.register(mvc);
-
         String uri = "/api/auth/login";
-
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", "firsttestuser");
         requestBody.put("password", "Asdf123!");
-
         String jsonBody = TestMethods.mapToJson(requestBody);
-
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonBody)).andReturn();
-
         Map<String, Object> responseBody = TestMethods.mapFromJson(mvcResult);
-
         int status = mvcResult.getResponse().getStatus();
-
-        assertEquals(200, status);
-        assertNotEquals(null, responseBody.get("token"));
+        Assertions.assertEquals(200, status);
+        Assertions.assertNotEquals(null, responseBody.get("token"));
     }
 
     @Test
     public void loginPostRequestBadCredentialsTest() throws Exception {
         String uri = "/api/auth/login";
-
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", "BadCredentials");
         requestBody.put("password", "BadCredentials");
-
         String jsonBody = TestMethods.mapToJson(requestBody);
-
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jsonBody)).andReturn();
-
         int status = mvcResult.getResponse().getStatus();
-        assertEquals(400, status);
+        Assertions.assertEquals(400, status);
     }
 }
