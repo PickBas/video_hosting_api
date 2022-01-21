@@ -1,5 +1,6 @@
 package com.therearenotasksforus.videohostingapi;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = VideoHostingApiApplication.class,
@@ -41,85 +39,66 @@ class RegistrationTests {
 	public void registerGetRequest() throws Exception {
 		String uri = "/api/auth/register";
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)).andReturn();
-
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(405, status);
+		Assertions.assertEquals(405, status);
 	}
 
 	@Test
 	public void registerPostRequest() throws Exception {
 		String uri = "/api/auth/register";
-
 		Map<String, String> requestBody = new HashMap<>();
 		requestBody.put("email", "test1@test.test");
 		requestBody.put("username", "test1");
 		requestBody.put("password", "Asdf123!");
-
 		String jsonBody = TestMethods.mapToJson(requestBody);
-
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.content(jsonBody)).andReturn();
-
 		int status = mvcResult.getResponse().getStatus();
-
 		Map<String, Object> responseBody = TestMethods.mapFromJson(mvcResult);
-
-		assertEquals(201, status);
-		assertNotEquals(null, responseBody.get("username"));
-		assertNotEquals(null, responseBody.get("email"));
+		Assertions.assertEquals(201, status);
+		Assertions.assertNotEquals(null, responseBody.get("username"));
+		Assertions.assertNotEquals(null, responseBody.get("email"));
 	}
 
 	@Test
 	public void registerWithWeakPassword() throws Exception {
 		String uri = "/api/auth/register";
-
 		Map<String, String> requestBody = new HashMap<>();
 		requestBody.put("email", "test2@test.test");
 		requestBody.put("username", "test2");
 		requestBody.put("password", "asd");
-
 		String jsonBody = TestMethods.mapToJson(requestBody);
-
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.content(jsonBody)).andReturn();
-
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(400, status);
+		Assertions.assertEquals(400, status);
 	}
 
 	@Test
 	public void registerWithUsedEmailAndUsername() throws Exception {
 		String uri = "/api/auth/register";
-
 		Map<String, String> requestBody = new HashMap<>();
 		requestBody.put("email", "test2@test.test");
 		requestBody.put("username", "test2");
 		requestBody.put("password", "Asdf123!");
-
 		String jsonBody = TestMethods.mapToJson(requestBody);
-
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.content(jsonBody)).andReturn();
-
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(201, status);
-
+		Assertions.assertEquals(201, status);
 		requestBody = new HashMap<>();
 		requestBody.put("email", "test2@test.test");
 		requestBody.put("username", "test2");
 		requestBody.put("password", "Asdf123!");
-
 		jsonBody = TestMethods.mapToJson(requestBody);
-
 		mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.content(jsonBody)).andReturn();
-
 		status = mvcResult.getResponse().getStatus();
-		assertEquals(400, status);
+		Assertions.assertEquals(400, status);
 
 	}
 }
