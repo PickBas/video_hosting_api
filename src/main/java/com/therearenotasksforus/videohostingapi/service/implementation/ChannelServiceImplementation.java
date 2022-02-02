@@ -54,18 +54,15 @@ public class ChannelServiceImplementation implements ChannelService {
         channel.setOwner(channelOwner);
         channel.setCreated(new Timestamp(System.currentTimeMillis()));
         channel.setUpdated(new Timestamp(System.currentTimeMillis()));
-
         return channelRepository.save(channel);
     }
 
     @Override
     public void update(Channel channel, ChannelUpdateDto channelUpdateDto) throws ValidationException {
         isChannelDataValid(channel, channelUpdateDto);
-
         channel.setUpdated(new Timestamp(System.currentTimeMillis()));
         channel.setName(channelUpdateDto.getName() != null ? channelUpdateDto.getName() : "");
         channel.setInfo(channelUpdateDto.getInfo() != null ? channelUpdateDto.getInfo() : "");
-
         channelRepository.save(channel);
     }
 
@@ -84,14 +81,11 @@ public class ChannelServiceImplementation implements ChannelService {
         if (isProfileOwner(profile, channel)) {
             throw new IllegalStateException("The user is the owner of the channel!");
         }
-
         if (channel.getSubscribers().contains(profile)) {
             throw new IllegalStateException("The user has already subscribed to the channel!");
         }
-
         profile.addSubscription(channel);
         profileRepository.save(profile);
-
         channel.addSubscriber(profile);
         channelRepository.save(channel);
 
@@ -102,10 +96,8 @@ public class ChannelServiceImplementation implements ChannelService {
         if (!channel.getSubscribers().contains(profile)) {
             throw new Exception("the user did not subscribe to the channel");
         }
-
         profile.removeSubscription(channel);
         profileRepository.save(profile);
-
         channel.removeSubscriber(profile);
         channelRepository.save(channel);
 
@@ -116,7 +108,6 @@ public class ChannelServiceImplementation implements ChannelService {
         isEmptyFile(file);
         isImage(file);
         Map<String, String> uploadPathData = getUploadPathData(channel, file);
-
         try {
             fileStore.save(uploadPathData.get("path"),
                     uploadPathData.get("filename"),
@@ -134,10 +125,8 @@ public class ChannelServiceImplementation implements ChannelService {
 
     private Map<String, String> getMetadata(MultipartFile file) {
         Map<String, String> metadata = new HashMap<>();
-
         metadata.put("Content-Type", file.getContentType());
         metadata.put("content-length", String.valueOf(file.getSize()));
-
         return metadata;
     }
 
@@ -158,16 +147,19 @@ public class ChannelServiceImplementation implements ChannelService {
 
     private Map<String, String> getUploadPathData(Channel channel, MultipartFile file) {
         Map<String, String> uploadPathData = new HashMap<>();
-
-        uploadPathData.put("basicUrl",
-                "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/");
+        String basicUrl =
+                "https://"
+                + BucketName.BUCKET.getBucketName()
+                + ".s3."
+                + BucketName.BUCKET.getBucketRegion()
+                + ".amazonaws.com/";
+        uploadPathData.put("basicUrl", basicUrl);
         uploadPathData.put("originalFileName",
                 Objects.requireNonNull(file.getOriginalFilename()).replaceAll(" ", "_"));
         uploadPathData.put("path",
                 String.format("%s/%s", BucketName.BUCKET.getBucketName(), channel.getId()));
         uploadPathData.put("filename",
                 String.format("%s-%s", UUID.randomUUID(), uploadPathData.get("originalFileName")));
-
         return uploadPathData;
     }
 
@@ -179,9 +171,7 @@ public class ChannelServiceImplementation implements ChannelService {
     @Override
     public List<Channel> getAllOwnedChannels(Profile profile) {
         List<Channel> channels = channelRepository.findAll();
-
         List<Channel> ownedChannels = new ArrayList<>();
-
         for (Channel channel : channels) {
             if (channel.getOwner().equals(profile)) {
                 ownedChannels.add(channel);
@@ -197,7 +187,6 @@ public class ChannelServiceImplementation implements ChannelService {
                 channel.getId());
         String[] pathArr = channel.getAvatarUrl().split("/");
         String filename = pathArr[pathArr.length - 1];
-
         return fileStore.download(path, filename);
     }
 
@@ -207,12 +196,10 @@ public class ChannelServiceImplementation implements ChannelService {
             videoService.delete(video.getId());
         channel.setSubscribers(new ArrayList<>());
         channelRepository.save(channel);
-
         List<Channel> ownedChannels = channel.getOwner().getOwnedChannels();
         ownedChannels.remove(channel);
         channel.getOwner().setOwnedChannels(ownedChannels);
         profileRepository.save(channel.getOwner());
-
         channelRepository.deleteById(channel.getId());
     }
 

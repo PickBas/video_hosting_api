@@ -51,15 +51,12 @@ public class AuthenticationController {
                     new UsernamePasswordAuthenticationToken(username, requestDto.getPassword());
             authenticationManager.authenticate(usernamePasswordAuthenticationToken);
             User user = userService.findByUsername(username);
-
             if (user == null) {
                 Map<String, String> response = new HashMap<>();
                 response.put("Error", "User was not found");
                 return ResponseEntity.badRequest().body(response);
             }
-
             String token = jwtTokenProvider.createToken(username, user.getRoles());
-
             Map<String, String> response = new HashMap<>();
             response.put("username", username);
             response.put("token", token);
@@ -75,47 +72,36 @@ public class AuthenticationController {
     public void passwordValidation(String password) throws Exception {
         if (password.length() < 8)
             throw new Exception("the password must contain at least 8 characters!");
-
         boolean hasSpecialCharacter = false;
         boolean hasLowerCase = false;
         boolean hasUpperCase = false;
         boolean hasDigits = false;
-
         for (int i = 0; i < password.length(); ++i) {
             if (Character.isDigit(password.charAt(i))) {
                 hasDigits = true;
             }
-
             if (!Character.isLetter(password.charAt(i)) && !Character.isDigit(password.charAt(i))) {
                 hasSpecialCharacter = true;
             }
-
             if (Character.isLowerCase(password.charAt(i))) {
                 hasLowerCase = true;
             }
-
             if (Character.isUpperCase(password.charAt(i))) {
                 hasUpperCase = true;
             }
-
             if (hasDigits && hasLowerCase && hasSpecialCharacter && hasUpperCase) {
                 return;
             }
-
         }
-
         throw new Exception("the password must contain lowercase letters, special characters and digits!");
-
     }
 
     public void emailValidation(String email) throws Exception {
         Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
         Matcher matcher = emailPattern.matcher(email);
-
         if (matcher.find()) {
             return;
         }
-
         throw new Exception("invalid email!");
     }
 
@@ -130,15 +116,12 @@ public class AuthenticationController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body(entry("Error", e.getMessage()));
         }
-
         try {
             User userToRegister = new User();
             userToRegister.setUsername(requestDto.getUsername());
             userToRegister.setEmail(requestDto.getEmail());
             userToRegister.setPassword(requestDto.getPassword());
-
             userService.register(userToRegister);
-
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(UserDto.fromUser(userService.findById(userToRegister.getId())));
         } catch (IllegalStateException e) {
@@ -152,12 +135,10 @@ public class AuthenticationController {
     @PostMapping("password/update")
     public ResponseEntity<?> updatePassword(Principal principal, @RequestBody Map<String, String> passwordUpdateInfo) {
         User currentUser = userService.findByUsername(principal.getName());
-
         if (StringUtils.isNullOrEmpty(passwordUpdateInfo.get("old_password"))
                 || (StringUtils.isNullOrEmpty(passwordUpdateInfo.get("updated_password")))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
         try {
             passwordValidation(passwordUpdateInfo.get("updated_password"));
         } catch (Exception e) {
@@ -165,15 +146,12 @@ public class AuthenticationController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body(entry("Error", e.getMessage()));
         }
-
         if (!new BCryptPasswordEncoder().matches(passwordUpdateInfo.get("old_password"),
                 currentUser.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(entry("Error",
                     "Invalid old password!"));
         }
-
         userService.updatePassword(currentUser, passwordUpdateInfo.get("updated_password"));
-
         return ResponseEntity.status(HttpStatus.OK).body(currentUser);
     }
 
