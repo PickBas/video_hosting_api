@@ -31,12 +31,10 @@ public class UserController {
     public List<UserDto> getAllUsers() {
         List<User> users = userService.getAll();
         List<UserDto> result = new ArrayList<>();
-
         for (User user : users) {
             UserDto userDtoToAdd = UserDto.fromUser(user);
             result.add(userDtoToAdd);
         }
-
         return result;
     }
 
@@ -55,7 +53,6 @@ public class UserController {
     @CrossOrigin
     public ResponseEntity<UserDto> getUserById(@PathVariable(name = "id") Long id) {
         User user = userService.findById(id);
-
         return user == null ?
                 ResponseEntity.status(HttpStatus.NOT_FOUND).body(null) :
                 ResponseEntity.ok(UserDto.fromUser(user));
@@ -66,20 +63,17 @@ public class UserController {
     public ResponseEntity<?> updateUser(Principal principal, @RequestBody UpdateUserDto requestDto) {
         User userToUpdate;
         Map<String, String> response = new HashMap<>();
-
         try {
              userToUpdate = userService.findByUsername(principal.getName());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-
         try {
             userService.updateNames(userToUpdate, requestDto);
         } catch (ValidationException e) {
             response.put("Error", "Invalid data was provided!");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-
         return ResponseEntity.ok(UserDto.fromUser(userService.findById(userToUpdate.getId())));
     }
 

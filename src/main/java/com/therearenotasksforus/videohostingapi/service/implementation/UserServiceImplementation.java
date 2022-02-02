@@ -23,7 +23,6 @@ public class UserServiceImplementation implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ProfileRepository profileRepository;
-
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
@@ -39,34 +38,26 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public void register(User user) {
-
         this.checkIfUserExists(user);
-
         Role roleUser = roleRepository.findByName("ROLE_USER");
         List<Role> userRoles = new ArrayList<>();
-
         userRoles.add(roleUser);
         user.setRoles(userRoles);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreated(new Timestamp(System.currentTimeMillis()));
         user.setUpdated(new Timestamp(System.currentTimeMillis()));
-
         Profile profile = new Profile();
-
         profile.setId(user.getId());
         profile.setCustomUrl(user.getUsername());
         profile.setUser(user);
         profileRepository.save(profile);
-
         user.setProfile(profile);
-
         userRepository.save(user);
     }
 
     @Override
     public void checkIfUserExists(User user) {
         List<User> users = this.getAll();
-
         for (User iterUser : users) {
             if (user.getEmail().equals(iterUser.getEmail()) ||
                     user.getUsername().equals(iterUser.getUsername())) {
@@ -86,12 +77,9 @@ public class UserServiceImplementation implements UserService {
         if (updateUserDto.getFirstName() == null && updateUserDto.getLastName() == null) {
             throw new ValidationException("Failure: wrong data was provided");
         }
-
         user.setFirstName(updateUserDto.getFirstName() != null ? updateUserDto.getFirstName() : "");
         user.setLastName(updateUserDto.getLastName() != null ? updateUserDto.getLastName() : "");
-
         user.setUpdated(new Timestamp(System.currentTimeMillis()));
-
         userRepository.save(user);
     }
 
