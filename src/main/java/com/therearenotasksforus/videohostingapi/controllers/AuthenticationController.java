@@ -70,23 +70,24 @@ public class AuthenticationController {
     }
 
     public void passwordValidation(String password) throws Exception {
-        if (password.length() < 8)
+        if (password.length() < 8) {
             throw new Exception("the password must contain at least 8 characters!");
+        }
         boolean hasSpecialCharacter = false;
         boolean hasLowerCase = false;
         boolean hasUpperCase = false;
         boolean hasDigits = false;
-        for (int i = 0; i < password.length(); ++i) {
-            if (Character.isDigit(password.charAt(i))) {
+        for (char ch : password.toCharArray()) {
+            if (Character.isDigit(ch)) {
                 hasDigits = true;
             }
-            if (!Character.isLetter(password.charAt(i)) && !Character.isDigit(password.charAt(i))) {
+            if (!Character.isLetter(ch) && !Character.isDigit(ch)) {
                 hasSpecialCharacter = true;
             }
-            if (Character.isLowerCase(password.charAt(i))) {
+            if (Character.isLowerCase(ch)) {
                 hasLowerCase = true;
             }
-            if (Character.isUpperCase(password.charAt(i))) {
+            if (Character.isUpperCase(ch)) {
                 hasUpperCase = true;
             }
             if (hasDigits && hasLowerCase && hasSpecialCharacter && hasUpperCase) {
