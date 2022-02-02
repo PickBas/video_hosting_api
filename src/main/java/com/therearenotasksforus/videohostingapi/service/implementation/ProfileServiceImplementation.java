@@ -95,7 +95,7 @@ public class ProfileServiceImplementation implements ProfileService {
 
         String basicUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/";
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename()).replaceAll(" ", "_");
-        String path = String.format("%s/%s", BucketName.PROFILE_IMAGE.getBucketName(), profile.getId());
+        String path = String.format("%s/%s", BucketName.BUCKET.getBucketName(), profile.getId());
         String filename = String.format("%s-%s", UUID.randomUUID(), originalFileName);
 
         try {
@@ -132,7 +132,7 @@ public class ProfileServiceImplementation implements ProfileService {
     @Override
     public byte[] downloadUserProfileImage(Profile profile) {
         String path = String.format("%s/%s",
-                BucketName.PROFILE_IMAGE.getBucketName(),
+                BucketName.BUCKET.getBucketName(),
                 profile.getId());
         String[] pathArr = profile.getAvatarUrl().split("/");
         String filename = pathArr[pathArr.length - 1];

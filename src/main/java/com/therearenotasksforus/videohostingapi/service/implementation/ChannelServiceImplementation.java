@@ -164,7 +164,7 @@ public class ChannelServiceImplementation implements ChannelService {
         uploadPathData.put("originalFileName",
                 Objects.requireNonNull(file.getOriginalFilename()).replaceAll(" ", "_"));
         uploadPathData.put("path",
-                String.format("%s/%s", BucketName.PROFILE_IMAGE.getBucketName(), channel.getId()));
+                String.format("%s/%s", BucketName.BUCKET.getBucketName(), channel.getId()));
         uploadPathData.put("filename",
                 String.format("%s-%s", UUID.randomUUID(), uploadPathData.get("originalFileName")));
 
@@ -193,7 +193,7 @@ public class ChannelServiceImplementation implements ChannelService {
     @Override
     public byte[] downloadChannelImage(Channel channel) {
         String path = String.format("%s/%s",
-                BucketName.PROFILE_IMAGE.getBucketName(),
+                BucketName.BUCKET.getBucketName(),
                 channel.getId());
         String[] pathArr = channel.getAvatarUrl().split("/");
         String filename = pathArr[pathArr.length - 1];
