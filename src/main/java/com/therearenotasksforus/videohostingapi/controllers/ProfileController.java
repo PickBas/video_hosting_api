@@ -37,11 +37,9 @@ public class ProfileController {
     public List<ProfileDto> getAllProfiles() {
         List<Profile> profiles = profileService.getAll();
         List<ProfileDto> result = new ArrayList<>();
-
         for (Profile profile : profiles) {
             result.add(ProfileDto.fromProfile(profile));
         }
-
         return result;
     }
 
@@ -61,11 +59,9 @@ public class ProfileController {
     @CrossOrigin
     public ResponseEntity<ProfileDto> getProfileById(@PathVariable(name = "id") Long id) {
         Profile profile = profileService.findById(id);
-
         if (profile == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-
         return ResponseEntity.ok().body(ProfileDto.fromProfile(profileService.findById(id)));
     }
 
@@ -77,14 +73,12 @@ public class ProfileController {
     ) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Map<String, String> response = new HashMap<>();
-
         try {
             profileService.update(currentProfile, requestDto);
         } catch (ValidationException e) {
             response.put("Error", "Wrong data was provided!");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-
         response.put("Success", "profile " + currentProfile.getUser().getUsername() + " was updated!");
         return ResponseEntity.ok(ProfileDto.fromProfile(profileService.findById(currentProfile.getId())));
     }
@@ -98,7 +92,6 @@ public class ProfileController {
     public ResponseEntity<?> uploadProfileAvatar(Principal principal, @RequestParam("file") MultipartFile file) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         profileService.uploadProfileAvatar(currentProfile, file);
-
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

@@ -62,7 +62,6 @@ public class ProfileServiceImplementation implements ProfileService {
     @Override
     public void update(Profile profile, ProfileUpdateDto profileUpdateDto) throws ValidationException {
         this.checkIfCustomUrlProvided(profileUpdateDto);
-
         String aboutProfileInfo = profileUpdateDto.getAboutProfileInfo() != null ?
                 profileUpdateDto.getAboutProfileInfo() : "";
         char gender = profile.getGender() == 'M' || profile.getGender() == 'F' ?
@@ -71,13 +70,11 @@ public class ProfileServiceImplementation implements ProfileService {
                 profileUpdateDto.getCountry() : "";
         String customUrl = profileUpdateDto.getCustomUrl();
         boolean isPrivateSublist = profileUpdateDto.getPrivateSublist();
-
         profile.setAboutProfileInfo(aboutProfileInfo);
         profile.setGender(gender);
         profile.setCountry(country);
         profile.setCustomUrl(customUrl);
         profile.setPrivateSublist(isPrivateSublist);
-
         profileRepository.save(profile);
 
     }
@@ -92,12 +89,15 @@ public class ProfileServiceImplementation implements ProfileService {
     public void uploadProfileAvatar(Profile profile, MultipartFile file) {
         isEmptyFile(file);
         isImage(file);
-
-        String basicUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/";
+        String basicUrl =
+                "https://"
+                + BucketName.BUCKET.getBucketName()
+                + ".s3."
+                + BucketName.BUCKET.getBucketRegion()
+                + ".amazonaws.com/";
         String originalFileName = Objects.requireNonNull(file.getOriginalFilename()).replaceAll(" ", "_");
         String path = String.format("%s/%s", BucketName.BUCKET.getBucketName(), profile.getId());
         String filename = String.format("%s-%s", UUID.randomUUID(), originalFileName);
-
         try {
             fileStore.save(path, filename, Optional.of(getMetadata(file)), file.getInputStream());
             profile.setAvatarUrl(basicUrl + profile.getId() + "/" + filename);
@@ -136,7 +136,6 @@ public class ProfileServiceImplementation implements ProfileService {
                 profile.getId());
         String[] pathArr = profile.getAvatarUrl().split("/");
         String filename = pathArr[pathArr.length - 1];
-
         return fileStore.download(path, filename);
     }
 
