@@ -1,5 +1,6 @@
 package com.therearenotasksforus.videohostingapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -61,19 +62,40 @@ class RegistrationTests {
 		Assertions.assertNotEquals(null, responseBody.get("email"));
 	}
 
+	public int getStatusWithWeakPassword(Map<String, String> requestBody, String password) throws Exception {
+		String uri = "/api/auth/register";
+		requestBody.put("password", password);
+		String jsonBody = TestMethods.mapToJson(requestBody);
+		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
+				.post(uri)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(jsonBody)).andReturn();
+		return mvcResult.getResponse().getStatus();
+	}
+
 	@Test
 	public void registerWithWeakPassword() throws Exception {
 		String uri = "/api/auth/register";
 		Map<String, String> requestBody = new HashMap<>();
 		requestBody.put("email", "test2@test.test");
 		requestBody.put("username", "test2");
-		requestBody.put("password", "asd");
+		requestBody.put("password", "123");
 		String jsonBody = TestMethods.mapToJson(requestBody);
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.content(jsonBody)).andReturn();
-		int status = mvcResult.getResponse().getStatus();
-		Assertions.assertEquals(400, status);
+		int statusWithThreeNums = mvcResult.getResponse().getStatus();
+		Assertions.assertEquals(400, statusWithThreeNums);
+		int statusWithEightNums = getStatusWithWeakPassword(requestBody, "12345678");
+		Assertions.assertEquals(400, statusWithEightNums);
+		int statusWithEightLetters = getStatusWithWeakPassword(requestBody, "asdfghjk");
+		Assertions.assertEquals(400, statusWithEightLetters);
+		int statusWithoutSpecialCharsAndUppercase = getStatusWithWeakPassword(requestBody, "asdf1234");
+		Assertions.assertEquals(400, statusWithoutSpecialCharsAndUppercase);
+		int statusWithoutSpecialChars = getStatusWithWeakPassword(requestBody, "Asdf1234");
+		Assertions.assertEquals(400, statusWithoutSpecialChars);
+		int statusShortPasswordCorrectPattern = getStatusWithWeakPassword(requestBody, "Asd123!");
+		Assertions.assertEquals(400, statusShortPasswordCorrectPattern);
 	}
 
 	@Test

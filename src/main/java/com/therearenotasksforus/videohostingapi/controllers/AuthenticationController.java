@@ -60,7 +60,6 @@ public class AuthenticationController {
             Map<String, String> response = new HashMap<>();
             response.put("username", username);
             response.put("token", token);
-
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, String> response = new HashMap<>();
@@ -70,35 +69,20 @@ public class AuthenticationController {
     }
 
     public void passwordValidation(String password) throws Exception {
-        if (password.length() < 8) {
-            throw new Exception("the password must contain at least 8 characters!");
-        }
-        boolean hasSpecialCharacter = false;
-        boolean hasLowerCase = false;
-        boolean hasUpperCase = false;
-        boolean hasDigits = false;
-        for (char ch : password.toCharArray()) {
-            if (Character.isDigit(ch)) {
-                hasDigits = true;
-            }
-            if (!Character.isLetter(ch) && !Character.isDigit(ch)) {
-                hasSpecialCharacter = true;
-            }
-            if (Character.isLowerCase(ch)) {
-                hasLowerCase = true;
-            }
-            if (Character.isUpperCase(ch)) {
-                hasUpperCase = true;
-            }
-            if (hasDigits && hasLowerCase && hasSpecialCharacter && hasUpperCase) {
-                return;
-            }
+        Pattern passwordPattern = Pattern.compile(
+                "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$",
+                Pattern.CASE_INSENSITIVE);
+        Matcher matcher = passwordPattern.matcher(password);
+        if (matcher.find()) {
+            return;
         }
         throw new Exception("the password must contain lowercase letters, special characters and digits!");
     }
 
     public void emailValidation(String email) throws Exception {
-        Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        Pattern emailPattern = Pattern.compile(
+                "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
+                Pattern.CASE_INSENSITIVE);
         Matcher matcher = emailPattern.matcher(email);
         if (matcher.find()) {
             return;
