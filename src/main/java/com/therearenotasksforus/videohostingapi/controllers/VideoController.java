@@ -31,7 +31,10 @@ public class VideoController {
     private final UserService userService;
 
     @Autowired
-    public VideoController(VideoService videoService, ChannelService channelService, ProfileService profileService, UserService userService) {
+    public VideoController(VideoService videoService,
+                           ChannelService channelService,
+                           ProfileService profileService,
+                           UserService userService) {
         this.videoService = videoService;
         this.channelService = channelService;
         this.profileService = profileService;
@@ -84,7 +87,9 @@ public class VideoController {
 
     @PostMapping("/api/video/{id}/comment")
     @CrossOrigin
-    public ResponseEntity<VideoDto> comment(Principal principal, @PathVariable(name = "id") Long id, @RequestBody CommentDto requestDto) {
+    public ResponseEntity<VideoDto> comment(Principal principal,
+                                            @PathVariable(name = "id") Long id,
+                                            @RequestBody CommentDto requestDto) {
         Video currentVideo = videoService.findById(id);
         if (currentVideo == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

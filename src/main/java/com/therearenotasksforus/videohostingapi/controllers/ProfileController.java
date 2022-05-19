@@ -89,7 +89,8 @@ public class ProfileController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @CrossOrigin
-    public ResponseEntity<?> uploadProfileAvatar(Principal principal, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadProfileAvatar(Principal principal,
+                                                 @RequestParam("file") MultipartFile file) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         profileService.uploadProfileAvatar(currentProfile, file);
         return new ResponseEntity<>(HttpStatus.CREATED);

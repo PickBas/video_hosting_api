@@ -29,7 +29,9 @@ public class ChannelController {
     private final UserService userService;
 
     @Autowired
-    public ChannelController(ChannelService channelService, ProfileService profileService, UserService userService) {
+    public ChannelController(ChannelService channelService,
+                             ProfileService profileService,
+                             UserService userService) {
         this.channelService = channelService;
         this.profileService = profileService;
         this.userService = userService;

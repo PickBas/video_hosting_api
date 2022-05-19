@@ -118,7 +118,8 @@ public class AuthenticationController {
 
     @CrossOrigin
     @PostMapping("password/update")
-    public ResponseEntity<?> updatePassword(Principal principal, @RequestBody Map<String, String> passwordUpdateInfo) {
+    public ResponseEntity<?> updatePassword(Principal principal,
+                                            @RequestBody Map<String, String> passwordUpdateInfo) {
         User currentUser = userService.findByUsername(principal.getName());
         if (StringUtils.isNullOrEmpty(passwordUpdateInfo.get("old_password"))
                 || (StringUtils.isNullOrEmpty(passwordUpdateInfo.get("updated_password")))) {
