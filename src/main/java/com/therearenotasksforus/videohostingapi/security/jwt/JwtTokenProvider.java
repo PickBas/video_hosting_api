@@ -40,8 +40,7 @@ public class JwtTokenProvider {
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        return bCryptPasswordEncoder;
+        return new BCryptPasswordEncoder();
     }
 
     @PostConstruct
@@ -94,11 +93,9 @@ public class JwtTokenProvider {
 
     private List<String> getRoleNames(List<Role> userRoles) {
         List<String> result = new ArrayList<>();
-
         userRoles.forEach(role -> {
             result.add(role.getName());
         });
-
         return result;
     }
 }
