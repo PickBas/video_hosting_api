@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-    
     services:
       mysql:
         image: mysql:8
@@ -17,6 +16,7 @@ jobs:
           MYSQL_PASSWORD: 1234
           MYSQL_ROOT_PASSWORD: toor
           MYSQL_DATABASE: video_hosting_db
+          SPRING_PROFILES_ACTIVE: docker
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
