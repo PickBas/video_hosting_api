@@ -1,4 +1,4 @@
-package com.therearenotasksforus.videohostingapi.service.implementation;
+package com.therearenotasksforus.videohostingapi.service.impl;
 
 import com.therearenotasksforus.videohostingapi.bucket.BucketName;
 import com.therearenotasksforus.videohostingapi.filestore.FileStore;
@@ -24,7 +24,7 @@ import java.sql.Timestamp;
 import java.util.*;
 
 @Service
-public class VideoServiceImplementation implements VideoService {
+public class VideoServiceImpl implements VideoService {
 
     private final VideoRepository videoRepository;
     private final LikeRepository likeRepository;
@@ -35,13 +35,13 @@ public class VideoServiceImplementation implements VideoService {
     private final FileStore fileStore;
 
     @Autowired
-    public VideoServiceImplementation(VideoRepository videoRepository,
-                                      LikeRepository likeRepository,
-                                      DislikeRepository dislikeRepository,
-                                      CommentRepository commentRepository,
-                                      ProfileRepository profileRepository,
-                                      ChannelRepository channelRepository,
-                                      FileStore fileStore) {
+    public VideoServiceImpl(VideoRepository videoRepository,
+                            LikeRepository likeRepository,
+                            DislikeRepository dislikeRepository,
+                            CommentRepository commentRepository,
+                            ProfileRepository profileRepository,
+                            ChannelRepository channelRepository,
+                            FileStore fileStore) {
         this.videoRepository = videoRepository;
         this.likeRepository = likeRepository;
         this.dislikeRepository = dislikeRepository;

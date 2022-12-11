@@ -1,4 +1,4 @@
-package com.therearenotasksforus.videohostingapi.service.implementation;
+package com.therearenotasksforus.videohostingapi.service.impl;
 
 import com.therearenotasksforus.videohostingapi.bucket.BucketName;
 import com.therearenotasksforus.videohostingapi.dto.profile.ProfileUpdateDto;
@@ -20,14 +20,14 @@ import java.util.*;
 import static org.apache.http.entity.ContentType.*;
 
 @Service
-public class ProfileServiceImplementation implements ProfileService {
+public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
     private final FileStore fileStore;
 
     @Autowired
-    public ProfileServiceImplementation(ProfileRepository profileRepository,
-                                        FileStore fileStore) {
+    public ProfileServiceImpl(ProfileRepository profileRepository,
+                              FileStore fileStore) {
         this.profileRepository = profileRepository;
         this.fileStore = fileStore;
     }

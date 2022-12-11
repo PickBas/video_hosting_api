@@ -1,4 +1,4 @@
-package com.therearenotasksforus.videohostingapi.service.implementation;
+package com.therearenotasksforus.videohostingapi.service.impl;
 
 import com.therearenotasksforus.videohostingapi.bucket.BucketName;
 import com.therearenotasksforus.videohostingapi.dto.channel.ChannelCreateDto;
@@ -23,7 +23,7 @@ import java.util.*;
 import static org.apache.http.entity.ContentType.*;
 
 @Service
-public class ChannelServiceImplementation implements ChannelService {
+public class ChannelServiceImpl implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final ProfileRepository profileRepository;
@@ -31,10 +31,10 @@ public class ChannelServiceImplementation implements ChannelService {
     private final FileStore fileStore;
 
     @Autowired
-    public ChannelServiceImplementation(ChannelRepository channelRepository,
-                                        ProfileRepository profileRepository,
-                                        VideoService videoService,
-                                        FileStore fileStore) {
+    public ChannelServiceImpl(ChannelRepository channelRepository,
+                              ProfileRepository profileRepository,
+                              VideoService videoService,
+                              FileStore fileStore) {
         this.channelRepository = channelRepository;
         this.profileRepository = profileRepository;
         this.videoService = videoService;

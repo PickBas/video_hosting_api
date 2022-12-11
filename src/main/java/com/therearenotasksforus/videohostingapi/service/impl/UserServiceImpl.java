@@ -1,4 +1,4 @@
-package com.therearenotasksforus.videohostingapi.service.implementation;
+package com.therearenotasksforus.videohostingapi.service.impl;
 
 import com.therearenotasksforus.videohostingapi.dto.user.UpdateUserDto;
 import com.therearenotasksforus.videohostingapi.models.Profile;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class UserServiceImplementation implements UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -26,10 +26,10 @@ public class UserServiceImplementation implements UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImplementation(UserRepository userRepository,
-                                     RoleRepository repository,
-                                     ProfileRepository profileRepository,
-                                     BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository,
+                           RoleRepository repository,
+                           ProfileRepository profileRepository,
+                           BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = repository;
         this.profileRepository = profileRepository;
