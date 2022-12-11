@@ -1,6 +1,7 @@
 package com.therearenotasksforus.videohostingapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.therearenotasksforus.videohostingapi.bucket.BucketName;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -36,8 +37,14 @@ public class Channel extends BaseEntity {
         name = "";
         info = "";
         videos = new ArrayList<>();
-        avatarUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/default/profileavatars/0.jpg";
+        avatarUrl = "https://"
+                + BucketName.BUCKET.getBucketName()
+                + ".s3."
+                + BucketName.BUCKET.getBucketRegion()
+                + ".amazonaws.com/default/unknown_profile.jpg";
     }
+
+    // s3://video-hosting-api-bucket/default/unknown_profile.jpg
 
     public Profile getOwner() {
         return owner;

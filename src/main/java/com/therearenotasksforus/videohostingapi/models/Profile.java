@@ -1,6 +1,7 @@
 package com.therearenotasksforus.videohostingapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.therearenotasksforus.videohostingapi.bucket.BucketName;
 import com.therearenotasksforus.videohostingapi.models.marks.Comment;
 import com.therearenotasksforus.videohostingapi.models.marks.Like;
 
@@ -58,7 +59,11 @@ public class Profile  extends BaseEntity {
         ownedChannels = new ArrayList<>();
         subscriptions = new ArrayList<>();
         likes = new ArrayList<>();
-        avatarUrl = "https://therearenotasksforus-assets.s3.eu-north-1.amazonaws.com/default/profileavatars/0.jpg";
+        avatarUrl = "https://"
+                + BucketName.BUCKET.getBucketName()
+                + ".s3."
+                + BucketName.BUCKET.getBucketRegion()
+                + ".amazonaws.com/default/unknown_profile.jpg";
     }
 
     public String getAboutProfileInfo() {

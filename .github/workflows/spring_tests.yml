@@ -2,9 +2,9 @@ name: Spring Tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, refactor/master ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, refactor/master ]
 
 jobs:
   build:
@@ -25,13 +25,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up JDK 16
+    - name: Set up JDK 17
       uses: actions/setup-java@v1
       with:
-        java-version: 16
+        java-version: 17
     - name: Test Spring
       run: ./mvnw test
       env:
-        MYSQL_URL: mysql://localhost:3306/video_hosting_db
+        SPRING_PROFILES_ACTIVE: docker
         AMAZON_ACCESS_KEY: ${{ secrets.AMAZON_ACCESS_KEY }}
         AMAZON_SECRET_KEY: ${{ secrets.AMAZON_SECRET_KEY }}
