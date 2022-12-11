@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.ValidationException;
+import javax.validation.ValidationException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;

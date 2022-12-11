@@ -6,7 +6,6 @@ import com.therearenotasksforus.videohostingapi.dto.user.UserRegistrationDto;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.security.jwt.JwtTokenProvider;
 import com.therearenotasksforus.videohostingapi.service.UserService;
-import org.h2.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -121,8 +120,9 @@ public class AuthenticationController {
     public ResponseEntity<?> updatePassword(Principal principal,
                                             @RequestBody Map<String, String> passwordUpdateInfo) {
         User currentUser = userService.findByUsername(principal.getName());
-        if (StringUtils.isNullOrEmpty(passwordUpdateInfo.get("old_password"))
-                || (StringUtils.isNullOrEmpty(passwordUpdateInfo.get("updated_password")))) {
+        String oldPassword = passwordUpdateInfo.get("old_password");
+        String updatedPassword = passwordUpdateInfo.get("updated_password");
+        if (oldPassword == null || oldPassword.isEmpty() || updatedPassword == null || updatedPassword.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         try {
