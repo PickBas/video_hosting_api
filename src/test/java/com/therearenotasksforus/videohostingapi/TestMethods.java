@@ -92,12 +92,12 @@ public class TestMethods {
     }
 
     public static String getToken(MockMvc mvc) throws Exception {
-        return "TOKEN_" + mapFromJson(login(mvc)).get("token").toString();
+        return "Bearer " + mapFromJson(login(mvc)).get("access_token").toString();
     }
 
     public static String getTokenWithUsername(MockMvc mvc, String username) throws Exception {
-        return "TOKEN_" + mapFromJson(loginWithUsername(mvc, username))
-                .get("token")
+        return "Bearer " + mapFromJson(loginWithUsername(mvc, username))
+                .get("access_token")
                 .toString();
     }
 

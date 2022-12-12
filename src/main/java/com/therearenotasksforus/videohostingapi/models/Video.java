@@ -5,7 +5,7 @@ import com.therearenotasksforus.videohostingapi.models.marks.Comment;
 import com.therearenotasksforus.videohostingapi.models.marks.Dislike;
 import com.therearenotasksforus.videohostingapi.models.marks.Like;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

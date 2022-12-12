@@ -1,4 +1,4 @@
-package com.therearenotasksforus.videohostingapi.service.implementation;
+package com.therearenotasksforus.videohostingapi.service.impl;
 
 import com.therearenotasksforus.videohostingapi.dto.user.UpdateUserDto;
 import com.therearenotasksforus.videohostingapi.models.Profile;
@@ -9,27 +9,27 @@ import com.therearenotasksforus.videohostingapi.repositories.RoleRepository;
 import com.therearenotasksforus.videohostingapi.repositories.UserRepository;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.ValidationException;
+import jakarta.validation.ValidationException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class UserServiceImplementation implements UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ProfileRepository profileRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImplementation(UserRepository userRepository,
-                                     RoleRepository repository,
-                                     ProfileRepository profileRepository,
-                                     BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository,
+                           RoleRepository repository,
+                           ProfileRepository profileRepository,
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = repository;
         this.profileRepository = profileRepository;
