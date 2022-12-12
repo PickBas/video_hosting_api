@@ -6,7 +6,7 @@ import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import java.util.List;
 
 public interface ChannelService {

@@ -4,13 +4,14 @@ import com.therearenotasksforus.videohostingapi.dto.auth.AuthenticationRequestDt
 import com.therearenotasksforus.videohostingapi.dto.user.UserDto;
 import com.therearenotasksforus.videohostingapi.dto.user.UserRegistrationDto;
 import com.therearenotasksforus.videohostingapi.models.User;
-import com.therearenotasksforus.videohostingapi.security.jwt.JwtTokenProvider;
+import com.therearenotasksforus.videohostingapi.security.JwtTokenService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,17 +28,15 @@ import static java.util.Map.entry;
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
-
-    private final JwtTokenProvider jwtTokenProvider;
-
+    private final JwtTokenService jwtTokenService;
     private final UserService userService;
 
     @Autowired
     public AuthenticationController(AuthenticationManager authenticationManager,
-                                    JwtTokenProvider jwtTokenProvider,
+                                    JwtTokenService jwtTokenService,
                                     UserService userService) {
         this.authenticationManager = authenticationManager;
-        this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtTokenService = jwtTokenService;
         this.userService = userService;
     }
 
@@ -48,17 +47,17 @@ public class AuthenticationController {
             String username = requestDto.getUsername();
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                     new UsernamePasswordAuthenticationToken(username, requestDto.getPassword());
-            authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+            Authentication auth = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
             User user = userService.findByUsername(username);
             if (user == null) {
                 Map<String, String> response = new HashMap<>();
                 response.put("Error", "User was not found");
                 return ResponseEntity.badRequest().body(response);
             }
-            String token = jwtTokenProvider.createToken(username, user.getRoles());
+            Map<String, String> tokens = jwtTokenService.generateTokens(auth);
             Map<String, String> response = new HashMap<>();
             response.put("username", username);
-            response.put("token", token);
+            response.put("token", tokens.get("access_token"));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, String> response = new HashMap<>();
