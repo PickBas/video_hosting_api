@@ -48,12 +48,6 @@ public class AuthenticationController {
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                     new UsernamePasswordAuthenticationToken(username, requestDto.getPassword());
             Authentication auth = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-            User user = userService.findByUsername(username);
-            if (user == null) {
-                Map<String, String> response = new HashMap<>();
-                response.put("Error", "User was not found");
-                return ResponseEntity.badRequest().body(response);
-            }
             Map<String, String> tokens = jwtTokenService.generateTokens(auth);
             Map<String, String> response = new HashMap<>();
             response.put("username", username);

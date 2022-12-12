@@ -1,7 +1,7 @@
 package com.therearenotasksforus.videohostingapi.security;
 
 import com.therearenotasksforus.videohostingapi.models.User;
-import com.therearenotasksforus.videohostingapi.service.UserService;
+import com.therearenotasksforus.videohostingapi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,16 +15,16 @@ import java.util.Collection;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserService userService;
+    private final UserRepository repo;
 
     @Autowired
-    public CustomUserDetailsService(UserService userService) {
-        this.userService = userService;
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.repo = userRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.findByUsername(username);
+        User user = repo.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException(String.format("Could not find user with username: %s", username));
         }
