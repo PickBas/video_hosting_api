@@ -1,14 +1,10 @@
 package com.therearenotasksforus.videohostingapi.controllers;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.therearenotasksforus.videohostingapi.dto.auth.AuthenticationRequestDto;
 import com.therearenotasksforus.videohostingapi.dto.user.UserDto;
 import com.therearenotasksforus.videohostingapi.dto.user.UserRegistrationDto;
-import com.therearenotasksforus.videohostingapi.models.Role;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.security.JwtTokenService;
 import com.therearenotasksforus.videohostingapi.security.util.JwtUtility;
@@ -29,7 +25,6 @@ import java.security.Principal;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static java.util.Map.entry;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
