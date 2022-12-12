@@ -11,7 +11,8 @@ import com.therearenotasksforus.videohostingapi.security.util.JwtUtility;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,34 +33,28 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping(value = "/api/auth/")
+@RequiredArgsConstructor @Slf4j
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
     private final UserService userService;
 
-    @Autowired
-    public AuthenticationController(AuthenticationManager authenticationManager,
-                                    JwtTokenService jwtTokenService,
-                                    UserService userService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenService = jwtTokenService;
-        this.userService = userService;
-    }
-
     @PostMapping("login")
     @CrossOrigin
     public ResponseEntity<Map<String, String>> login(@RequestBody AuthenticationRequestDto requestDto) {
+        String username = requestDto.getUsername();
         try {
-            String username = requestDto.getUsername();
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                     new UsernamePasswordAuthenticationToken(username, requestDto.getPassword());
             Authentication auth = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
             Map<String, String> tokens = jwtTokenService.generateTokens(auth);
+            log.info("User with username {} logged in. HttpStatus: {}", username, HttpStatus.OK);
             return ResponseEntity.ok(Map.of(
                     "access_token", tokens.get("access_token"),
                     "refresh_token", tokens.get("refresh_token")));
         } catch (Exception e) {
+            log.warn("User with username {} could not log in. HttpStatus: {}. Error: {}", username, 400, e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error_message", e.getMessage()));
         }
     }
@@ -72,7 +67,7 @@ public class AuthenticationController {
         if (matcher.find()) {
             return;
         }
-        throw new Exception("Password must contain lowercase letters, special characters and digits!");
+        throw new Exception("Password must contain lowercase letters, special characters and digits.");
     }
 
     public void emailValidation(String email) throws Exception {
@@ -83,7 +78,7 @@ public class AuthenticationController {
         if (matcher.find()) {
             return;
         }
-        throw new Exception("invalid email!");
+        throw new Exception("invalid email.");
     }
 
     @CrossOrigin
@@ -93,6 +88,7 @@ public class AuthenticationController {
             passwordValidation(requestDto.getPassword());
             emailValidation(requestDto.getEmail());
         } catch (Exception e) {
+            log.info(e.getMessage());
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(entry("error_message", e.getMessage()));
@@ -103,9 +99,13 @@ public class AuthenticationController {
             userToRegister.setEmail(requestDto.getEmail());
             userToRegister.setPassword(requestDto.getPassword());
             userService.register(userToRegister);
+            log.info("User with username {} registered. HttpStatus: {}",
+                    userToRegister.getUsername(), HttpStatus.CREATED);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(UserDto.fromUser(userService.findById(userToRegister.getId())));
         } catch (IllegalStateException e) {
+            log.warn("Could not register user with username {}. HttpStatus: {}. Error: {}",
+                    requestDto.getUsername(), HttpStatus.BAD_REQUEST, e.getMessage());
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(entry("error_message", e.getMessage()));
@@ -120,22 +120,29 @@ public class AuthenticationController {
         String oldPassword = passwordUpdateInfo.get("old_password");
         String updatedPassword = passwordUpdateInfo.get("updated_password");
         if (oldPassword == null || oldPassword.isEmpty() || updatedPassword == null || updatedPassword.isEmpty()) {
+            log.warn("Provided passwords by user {} are not valid. HttpStatus: {}",
+                    currentUser.getUsername(), HttpStatus.BAD_REQUEST);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         try {
             passwordValidation(passwordUpdateInfo.get("updated_password"));
         } catch (Exception e) {
+            log.warn("Provided updated password by user {} are not valid. HttpStatus: {}. Error: {}",
+                    currentUser.getUsername(), HttpStatus.BAD_REQUEST, e.getMessage());
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(entry("error_message", e.getMessage()));
         }
-        if (!new BCryptPasswordEncoder().matches(passwordUpdateInfo.get("old_password"),
-                currentUser.getPassword())) {
+        if (!new BCryptPasswordEncoder()
+                .matches(passwordUpdateInfo.get("old_password"), currentUser.getPassword())) {
+            log.warn("User {} Entered incorrect old password. HttpStatus: {}",
+                    currentUser.getUsername(), HttpStatus.BAD_REQUEST);
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(entry("error_message","Invalid old password."));
         }
         userService.updatePassword(currentUser, passwordUpdateInfo.get("updated_password"));
+        log.info("User {} updated password. HttpStatus: {}", currentUser.getUsername(), HttpStatus.OK);
         return ResponseEntity.status(HttpStatus.OK).body(currentUser);
     }
 
@@ -150,16 +157,22 @@ public class AuthenticationController {
                 User user = userService.findByUsername(username);
                 String accessToken = JwtUtility.issueAccessToken(user);
                 response.setContentType(APPLICATION_JSON_VALUE);
+                log.info("User {} refreshed token. HttpStatus: {}", user.getUsername(), HttpStatus.OK);
                 new ObjectMapper().writeValue(
                         response.getOutputStream(),
                         Map.of("access_token", accessToken, "refresh_token", refreshToken)
                 );
             } catch (Exception e) {
-                response.setStatus(403);
+                response.setStatus(HttpStatus.FORBIDDEN.value());
                 response.setContentType(APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), Map.of("error_message", e.getMessage()));
+                log.warn("Could not refresh access token. HttpStatus: {}. Error: {}",
+                        HttpStatus.FORBIDDEN, e.getMessage());
+                new ObjectMapper().writeValue(
+                        response.getOutputStream(), Map.of("error_message", e.getMessage())
+                );
             }
         } else {
+            log.warn("Invalid refresh token. HttpStatus: {}", HttpStatus.BAD_REQUEST);
             throw new IllegalArgumentException("Refresh token is invalid");
         }
     }
