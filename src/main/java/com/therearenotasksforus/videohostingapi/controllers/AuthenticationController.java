@@ -1,11 +1,19 @@
 package com.therearenotasksforus.videohostingapi.controllers;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.therearenotasksforus.videohostingapi.dto.auth.AuthenticationRequestDto;
 import com.therearenotasksforus.videohostingapi.dto.user.UserDto;
 import com.therearenotasksforus.videohostingapi.dto.user.UserRegistrationDto;
+import com.therearenotasksforus.videohostingapi.models.Role;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.security.JwtTokenService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +23,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.util.Map.entry;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping(value = "/api/auth/")
@@ -50,8 +61,8 @@ public class AuthenticationController {
             Authentication auth = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
             Map<String, String> tokens = jwtTokenService.generateTokens(auth);
             Map<String, String> response = new HashMap<>();
-            response.put("username", username);
-            response.put("token", tokens.get("access_token"));
+            response.put("access_token", tokens.get("access_token"));
+            response.put("refresh_token", tokens.get("refresh_token"));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, String> response = new HashMap<>();
@@ -132,6 +143,45 @@ public class AuthenticationController {
         }
         userService.updatePassword(currentUser, passwordUpdateInfo.get("updated_password"));
         return ResponseEntity.status(HttpStatus.OK).body(currentUser);
+    }
+
+    @GetMapping("token/refresh")
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String authHeader = request.getHeader(AUTHORIZATION);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            try {
+                String refreshToken = authHeader.substring("Bearer ".length());
+                Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+                JWTVerifier verifier = JWT.require(algorithm).build();
+                DecodedJWT decodedJWT = verifier.verify(refreshToken);
+                String username = decodedJWT.getSubject();
+                User user = userService.findByUsername(username);
+                String accessToken = JWT.create()
+                        .withSubject(user.getUsername())
+                        .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                        .withClaim("roles", user
+                                .getRoles()
+                                .stream()
+                                .map(Role::getName)
+                                .collect(Collectors.toList()))
+                        .withIssuer("video_hosting_api")
+                        .sign(algorithm);
+                Map<String, String> tokens = new HashMap<>();
+                tokens.put("access_token", accessToken);
+                tokens.put("refresh_token", refreshToken);
+                response.setContentType(APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+            } catch (Exception e) {
+                response.setHeader("error", e.getMessage());
+                response.setStatus(403);
+                Map<String, String> error = new HashMap<>();
+                error.put("error", e.getMessage());
+                response.setContentType(APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), error);
+            }
+        } else {
+            throw new IllegalArgumentException("Refresh token is invalid");
+        }
     }
 
 }

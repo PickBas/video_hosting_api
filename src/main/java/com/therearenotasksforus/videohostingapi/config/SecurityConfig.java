@@ -26,6 +26,7 @@ public class SecurityConfig {
     private static final String ADMIN_ENDPOINT = "/api/admin/**";
     private static final String LOGIN_ENDPOINT = "/api/auth/login";
     private static final String REGISTER_ENDPOINT = "/api/auth/register";
+    private static final String REFRESH_TOKEN_ENDPOINT = "/api/auth/token/refresh";
 
     @Autowired
     public SecurityConfig(UserDetailsService userDetailsService) {
@@ -48,7 +49,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(LOGIN_ENDPOINT, REGISTER_ENDPOINT).permitAll()
+                        .requestMatchers(LOGIN_ENDPOINT, REGISTER_ENDPOINT, REFRESH_TOKEN_ENDPOINT).permitAll()
                         .requestMatchers(ADMIN_ENDPOINT).hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .cors()
