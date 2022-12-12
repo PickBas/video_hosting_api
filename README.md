@@ -18,11 +18,6 @@ Open video_hosting_api folder in IDE (e.g. IntelliJ IDEA). Add environment varia
 
       AMAZON_ACCESS_KEY - access key for S3 storage;
       AMAZON_SECRET_KEY - secret key for S3 storage;
-      MYSQL_URL - URL for MYSQL database.
-      
-If you run containerized MySQL, URL should look like this:
-
-    mysql://localhost:3306/video_hosting_db
     
 Then run the API. If you did everything correctly, the API should be up and running on port 8080.
  
@@ -32,6 +27,7 @@ A token which you get after logging in has to be provided as a request header wi
     /api/auth/register - Registration. POST request. JSON Example: {"email": "example@example.com", "username": "example", "password": "TestPassword1!"}
     /api/auth/login - Authentication. POST request. JSON Example: {"username": "example", "password": "example"}
     /api/auth/password/update - Updating user password. POST request. Request must be authenticated. JSON Example: {"old_password": "TestOldPassword1!", "updated_password": "TestNewPassword1!"}
+    /api/auth/token/refresh - Refreshing access token  GET request with Bearer<space>refresh_token provided
 ### User
     /api/users - Getting all users. GET request.
     /api/user - Getting current user. GET request.
