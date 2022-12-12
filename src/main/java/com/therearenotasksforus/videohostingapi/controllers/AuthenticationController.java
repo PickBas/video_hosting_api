@@ -56,14 +56,11 @@ public class AuthenticationController {
                     new UsernamePasswordAuthenticationToken(username, requestDto.getPassword());
             Authentication auth = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
             Map<String, String> tokens = jwtTokenService.generateTokens(auth);
-            Map<String, String> response = new HashMap<>();
-            response.put("access_token", tokens.get("access_token"));
-            response.put("refresh_token", tokens.get("refresh_token"));
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(Map.of(
+                    "access_token", tokens.get("access_token"),
+                    "refresh_token", tokens.get("refresh_token")));
         } catch (Exception e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("Error", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.badRequest().body(Map.of("error_message", e.getMessage()));
         }
     }
 
@@ -75,7 +72,7 @@ public class AuthenticationController {
         if (matcher.find()) {
             return;
         }
-        throw new Exception("the password must contain lowercase letters, special characters and digits!");
+        throw new Exception("Password must contain lowercase letters, special characters and digits!");
     }
 
     public void emailValidation(String email) throws Exception {
@@ -98,7 +95,7 @@ public class AuthenticationController {
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(entry("Error", e.getMessage()));
+                    .body(entry("error_message", e.getMessage()));
         }
         try {
             User userToRegister = new User();
@@ -111,7 +108,7 @@ public class AuthenticationController {
         } catch (IllegalStateException e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(entry("Error", e.getMessage()));
+                    .body(entry("error_message", e.getMessage()));
         }
     }
 
@@ -130,12 +127,13 @@ public class AuthenticationController {
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(entry("Error", e.getMessage()));
+                    .body(entry("error_message", e.getMessage()));
         }
         if (!new BCryptPasswordEncoder().matches(passwordUpdateInfo.get("old_password"),
                 currentUser.getPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(entry("Error",
-                    "Invalid old password!"));
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(entry("error_message","Invalid old password."));
         }
         userService.updatePassword(currentUser, passwordUpdateInfo.get("updated_password"));
         return ResponseEntity.status(HttpStatus.OK).body(currentUser);
