@@ -1,10 +1,7 @@
 package com.therearenotasksforus.videohostingapi.models;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import jakarta.persistence.*;
+
 import java.util.List;
 
 @Entity

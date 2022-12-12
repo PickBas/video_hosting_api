@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.therearenotasksforus.videohostingapi.bucket.BucketName;
 import com.therearenotasksforus.videohostingapi.models.marks.Comment;
 import com.therearenotasksforus.videohostingapi.models.marks.Like;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -18,6 +18,8 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.therearenotasksforus.videohostingapi.TestMethods.getHttpHeaders;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = VideoHostingApiApplication.class,
         properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
@@ -49,7 +51,7 @@ class LoginTests {
         Map<String, Object> responseBody = TestMethods.mapFromJson(mvcResult);
         int status = mvcResult.getResponse().getStatus();
         Assertions.assertEquals(200, status);
-        Assertions.assertNotEquals(null, responseBody.get("token"));
+        Assertions.assertNotEquals(null, responseBody.get("access_token"));
     }
 
     @Test
@@ -64,5 +66,33 @@ class LoginTests {
                 .content(jsonBody)).andReturn();
         int status = mvcResult.getResponse().getStatus();
         Assertions.assertEquals(400, status);
+    }
+
+    @Test
+    public void refreshTokenTest() throws Exception {
+        TestMethods.register(mvc);
+        String uri = "/api/auth/token/refresh";
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", "firsttestuser");
+        requestBody.put("password", "Asdf123!");
+        String jsonBody = TestMethods.mapToJson(requestBody);
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
+                .post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(jsonBody)).andReturn();
+        Assertions.assertEquals(200, mvcResult.getResponse().getStatus());
+        Map<String, Object> responseBody = TestMethods.mapFromJson(mvcResult);
+        String accessToken = (String)responseBody.get("access_token");
+        String refreshToken = (String)responseBody.get("refresh_token");
+        Assertions.assertNotNull(accessToken);
+        Assertions.assertNotNull(refreshToken);
+        mvcResult = mvc.perform(MockMvcRequestBuilders
+                        .get("/api/auth/token/refresh").servletPath("/api/auth/token/refresh")
+                        .header("AUTHORIZATION", "Bearer " + refreshToken))
+                .andReturn();
+        Map<String, Object> response = TestMethods.mapFromJson(mvcResult);
+        Assertions.assertEquals(200, mvcResult.getResponse().getStatus());
+        Assertions.assertNotNull(response.get("access_token"));
+        Assertions.assertEquals(refreshToken, response.get("refresh_token"));
     }
 }

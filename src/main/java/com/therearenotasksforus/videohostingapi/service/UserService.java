@@ -4,7 +4,7 @@ import com.therearenotasksforus.videohostingapi.dto.user.UpdateUserDto;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
 
-import javax.xml.bind.ValidationException;
+import jakarta.validation.ValidationException;
 import java.util.List;
 
 public interface UserService {

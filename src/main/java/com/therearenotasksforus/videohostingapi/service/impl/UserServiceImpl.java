@@ -9,10 +9,10 @@ import com.therearenotasksforus.videohostingapi.repositories.RoleRepository;
 import com.therearenotasksforus.videohostingapi.repositories.UserRepository;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.ValidationException;
+import jakarta.validation.ValidationException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +23,13 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ProfileRepository profileRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository repository,
                            ProfileRepository profileRepository,
-                           BCryptPasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = repository;
         this.profileRepository = profileRepository;
