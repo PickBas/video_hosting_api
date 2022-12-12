@@ -1,10 +1,8 @@
 package com.therearenotasksforus.videohostingapi.security.filters;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.therearenotasksforus.videohostingapi.security.util.JwtUtility;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,22 +20,20 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
+    private static final List<String> ALLOWED_URLS
+            = List.of("/api/auth/login", "/api/auth/register", "/api/auth/token/refresh");
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        if (request.getServletPath().equals("/api/auth/login")
-                || request.getServletPath().equals("/api/auth/register")
-                || request.getServletPath().equals("/api/auth/token/refresh")) {
+        if (ALLOWED_URLS.contains(request.getServletPath())) {
             filterChain.doFilter(request, response);
         } else {
             String authHeader = request.getHeader(AUTHORIZATION);
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 try {
-                    String token = authHeader.substring("Bearer ".length());
-                    Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-                    JWTVerifier verifier = JWT.require(algorithm).build();
-                    DecodedJWT decodedJWT = verifier.verify(token);
+                    DecodedJWT decodedJWT = JwtUtility.getDecodedJwt(authHeader.substring("Bearer ".length()));
                     String username = decodedJWT.getSubject();
                     String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
                     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
@@ -47,12 +43,11 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     filterChain.doFilter(request, response);
                 } catch (Exception e) {
-                    response.setHeader("error", e.getMessage());
                     response.setStatus(403);
-                    Map<String, String> error = new HashMap<>();
-                    error.put("error", e.getMessage());
                     response.setContentType(APPLICATION_JSON_VALUE);
-                    new ObjectMapper().writeValue(response.getOutputStream(), error);
+                    new ObjectMapper().writeValue(
+                            response.getOutputStream(), Map.of("error_message", e.getMessage())
+                    );
                 }
             } else {
                 filterChain.doFilter(request, response);
