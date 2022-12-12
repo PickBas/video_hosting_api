@@ -5,15 +5,16 @@
 # Video Hosting Api
 API based on Java Spring framework
 
-## How to run the API
+## Running the API
 ### Docker
-Enter your S3 keys into docker-compose.yml file which is at root of the repository.
-Next, open your terminal, go to video_hosting_api folder. Then, run following command:
+* Enter your S3 keys into docker-compose.yml  
+* Open your terminal, go to video_hosting_api folder, run following command:
+
 
       docker-compose up --build -d
   
 If you did everything correctly, the API should be up and running on port 8080.
-### Localhost
+### Locally
 Open video_hosting_api folder in IDE (e.g. IntelliJ IDEA). Add environment variables:
 
       AMAZON_ACCESS_KEY - access key for S3 storage;
