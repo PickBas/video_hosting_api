@@ -4,27 +4,23 @@ import com.therearenotasksforus.videohostingapi.dto.user.UpdateUserDto;
 import com.therearenotasksforus.videohostingapi.dto.user.UserDto;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.ValidationException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.ValidationException;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor @Slf4j
 public class UserController {
 
     private final UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping("/api/users")
     @CrossOrigin
@@ -35,6 +31,7 @@ public class UserController {
             UserDto userDtoToAdd = UserDto.fromUser(user);
             result.add(userDtoToAdd);
         }
+        log.info("Loaded all users. HttpStatus: {}", HttpStatus.OK);
         return result;
     }
 
@@ -43,9 +40,10 @@ public class UserController {
     public ResponseEntity<UserDto> getCurrentUser(Principal principal) {
         try {
             UserDto userDto = UserDto.fromUser(userService.findByUsername(principal.getName()));
+            log.info("Loaded current user {}. HttpStatus: {}", principal.getName(), HttpStatus.OK);
             return ResponseEntity.ok(userDto);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -53,27 +51,30 @@ public class UserController {
     @CrossOrigin
     public ResponseEntity<UserDto> getUserById(@PathVariable(name = "id") Long id) {
         User user = userService.findById(id);
-        return user == null ?
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body(null) :
-                ResponseEntity.ok(UserDto.fromUser(user));
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        log.info("Loaded user {}. HttpStatus: {}", user.getUsername(), HttpStatus.OK);
+        return ResponseEntity.ok(UserDto.fromUser(user));
     }
 
     @PostMapping("/api/user/update")
     @CrossOrigin
     public ResponseEntity<?> updateUser(Principal principal, @RequestBody UpdateUserDto requestDto) {
         User userToUpdate;
-        Map<String, String> response = new HashMap<>();
         try {
              userToUpdate = userService.findByUsername(principal.getName());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         try {
             userService.updateNames(userToUpdate, requestDto);
         } catch (ValidationException e) {
-            response.put("Error", "Invalid data was provided!");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error_message", "Invalid data was provided!"));
         }
+        log.info("Updated user {}. HttpStatus: {}", principal.getName(), HttpStatus.OK);
         return ResponseEntity.ok(UserDto.fromUser(userService.findById(userToUpdate.getId())));
     }
 
