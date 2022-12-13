@@ -11,7 +11,8 @@ import com.therearenotasksforus.videohostingapi.service.ChannelService;
 import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
 import com.therearenotasksforus.videohostingapi.service.VideoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,26 +21,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor @Slf4j
 public class VideoController {
     private final VideoService videoService;
     private final ChannelService channelService;
     private final ProfileService profileService;
     private final UserService userService;
-
-    @Autowired
-    public VideoController(VideoService videoService,
-                           ChannelService channelService,
-                           ProfileService profileService,
-                           UserService userService) {
-        this.videoService = videoService;
-        this.channelService = channelService;
-        this.profileService = profileService;
-        this.userService = userService;
-    }
 
     @GetMapping("/api/videos")
     @CrossOrigin
@@ -49,6 +40,7 @@ public class VideoController {
         for (Video video : videos) {
             videoDtos.add(VideoDto.fromVideo(video));
         }
+        log.info("Loaded all videos. HttpStatus: {}", HttpStatus.OK);
         return videoDtos;
     }
 
@@ -56,9 +48,11 @@ public class VideoController {
     @CrossOrigin
     public ResponseEntity<VideoDto> getVideo(@PathVariable(name = "id") Long id) {
         Video video = videoService.findById(id);
-        return video == null ?
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body(null) :
-                ResponseEntity.ok(VideoDto.fromVideo(video));
+        if (video == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        log.info("Loaded video with id {}. HttpStatus: {}", id, HttpStatus.OK);
+        return ResponseEntity.ok(VideoDto.fromVideo(video));
     }
 
     @PostMapping("/api/video/{id}/like")
@@ -70,6 +64,8 @@ public class VideoController {
         }
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         videoService.setLike(currentProfile, currentVideo);
+        log.info("Set like on video with id {} by user {}. HttpStatus: {}",
+                id, currentProfile.getUser().getUsername(), HttpStatus.OK);
         return ResponseEntity.ok(VideoDto.fromVideo(videoService.findById(currentVideo.getId())));
     }
 
@@ -78,10 +74,12 @@ public class VideoController {
     public ResponseEntity<VideoDto> setDislike(Principal principal, @PathVariable(name = "id") Long id) {
         Video currentVideo = videoService.findById(id);
         if (currentVideo == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         videoService.setDislike(currentProfile, currentVideo);
+        log.info("Set dislike on video with id {} by user {}. HttpStatus: {}",
+                id, currentProfile.getUser().getUsername(), HttpStatus.OK);
         return ResponseEntity.ok(VideoDto.fromVideo(videoService.findById(currentVideo.getId())));
     }
 
@@ -96,6 +94,8 @@ public class VideoController {
         }
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         videoService.saveComment(currentProfile, currentVideo, requestDto.getCommentBody());
+        log.info("Commented video with id {} by user {}. HttpStatus: {}",
+                id, currentProfile.getUser().getUsername(), HttpStatus.OK);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(VideoDto.fromVideo(videoService.findById(id)));
@@ -116,7 +116,9 @@ public class VideoController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         videoService.deleteComments(currentVideo, commentId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        log.info("Comment with id {} was deleted from video with id {}. HttpStatus: {}",
+                commentId, videoId, HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/api/video/{id}/get/comments")
@@ -127,6 +129,7 @@ public class VideoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         List<Comment> comments = currentVideo.getComments();
+        log.info("Loaded comments of video with id {}. HttpStatus: {}", id, HttpStatus.OK);
         return ResponseEntity.ok(comments);
     }
 
@@ -141,6 +144,7 @@ public class VideoController {
         for (Video video : channel.getVideos()) {
             videoDtos.add(VideoDto.fromVideo(video));
         }
+        log.info("Loaded all videos of channel with id {}. HttpStatus: {}", id, HttpStatus.OK);
         return ResponseEntity.ok(videoDtos);
     }
 
@@ -155,6 +159,8 @@ public class VideoController {
         for (Video video : profile.getLikedVideos()) {
             dtos.add(VideoDto.fromVideo(video));
         }
+        log.info("Loaded all liked videos of user {}. HttpStatus: {}",
+                profile.getUser().getUsername(), HttpStatus.OK);
         return ResponseEntity.ok(dtos);
     }
 
@@ -171,17 +177,16 @@ public class VideoController {
         Channel currentChannel = channelService.findById(id);
         Long newVideoId;
         if (currentProfile != currentChannel.getOwner()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new HashMap<>() {{
-                put("Error", "This profile is not the channel owner!");
-            }});
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error_message", "This profile is not the channel owner!"));
         }
         try {
             newVideoId = videoService.uploadVideo(currentProfile, currentChannel, file);
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HashMap<>() {{
-                put("Error", e.getMessage());
-            }});
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error_message", e.getMessage()));
         }
+        log.info("Uploaded video on channel with id {}. HttpStatus: {}", id, HttpStatus.OK);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(VideoDto.fromVideo(videoService.findById(newVideoId)));
@@ -200,10 +205,9 @@ public class VideoController {
         try {
             videoService.updateName(currentProfile, currentVideo, requestDto.getName());
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new HashMap<>() {{
-                put("Error", e.getMessage());
-            }});
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error_message", e.getMessage()));
         }
+        log.info("Updated title of video with id {}. HttpStatus: {}", id, HttpStatus.OK);
         return ResponseEntity.ok(VideoDto.fromVideo(currentVideo));
     }
 
@@ -214,12 +218,13 @@ public class VideoController {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Video currentVideo = videoService.findById(id);
         if (currentVideo == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
         if (currentProfile != currentVideo.getChannel().getOwner()) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         videoService.delete(id);
+        log.info("Deleted video with id {}. HttpStatus: {}", id, HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

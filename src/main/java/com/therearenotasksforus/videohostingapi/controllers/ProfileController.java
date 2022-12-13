@@ -6,14 +6,15 @@ import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
 import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.ValidationException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.validation.ValidationException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,16 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor @Slf4j
 public class ProfileController {
+
     private final ProfileService profileService;
-
     private final UserService userService;
-
-    @Autowired
-    public ProfileController(ProfileService profileService, UserService userService) {
-        this.profileService = profileService;
-        this.userService = userService;
-    }
 
     @GetMapping("/api/profiles")
     @CrossOrigin
@@ -40,6 +36,7 @@ public class ProfileController {
         for (Profile profile : profiles) {
             result.add(ProfileDto.fromProfile(profile));
         }
+        log.info("Loaded all profiles. HttpStatus: {}", HttpStatus.OK);
         return result;
     }
 
@@ -49,6 +46,7 @@ public class ProfileController {
         try {
             User currentUser = userService.findByUsername(principal.getName());
             Profile currentProfile = currentUser.getProfile();
+            log.info("Loaded current profile of user {}. HttpStatus: {}", principal.getName(), HttpStatus.OK);
             return ResponseEntity.ok().body(ProfileDto.fromProfile(currentProfile));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -62,15 +60,14 @@ public class ProfileController {
         if (profile == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+        log.info("Loaded profile with id {}. HttpStatus: {}", id, HttpStatus.OK);
         return ResponseEntity.ok().body(ProfileDto.fromProfile(profileService.findById(id)));
     }
 
     @PostMapping("/api/profile/update")
     @CrossOrigin
-    public ResponseEntity<?> updateProfile(
-            Principal principal,
-            @RequestBody ProfileUpdateDto requestDto
-    ) {
+    public ResponseEntity<?> updateProfile(Principal principal,
+            @RequestBody ProfileUpdateDto requestDto) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Map<String, String> response = new HashMap<>();
         try {
@@ -80,6 +77,8 @@ public class ProfileController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         response.put("Success", "profile " + currentProfile.getUser().getUsername() + " was updated!");
+        log.info("Updated profile of user {}. HttpStatus: {}",
+                currentProfile.getUser().getUsername(), HttpStatus.OK);
         return ResponseEntity.ok(ProfileDto.fromProfile(profileService.findById(currentProfile.getId())));
     }
 
@@ -93,12 +92,15 @@ public class ProfileController {
                                                  @RequestParam("file") MultipartFile file) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         profileService.uploadProfileAvatar(currentProfile, file);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        log.info("Uploaded profile avatar. HttpStatus: {}", HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/api/profile/{id}/download/avatar")
     public byte[] downloadUserProfileImage(@PathVariable("id") Long id) {
-        return profileService.downloadUserProfileImage(profileService.findById(id));
+        byte[] image = profileService.downloadUserProfileImage(profileService.findById(id));
+        log.info("Downloaded profile avatar. HttpStatus: {}", HttpStatus.OK);
+        return image;
     }
 
 }

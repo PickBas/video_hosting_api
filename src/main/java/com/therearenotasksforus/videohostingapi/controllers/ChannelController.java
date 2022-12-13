@@ -8,7 +8,8 @@ import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.service.ChannelService;
 import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,19 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor @Slf4j
 public class ChannelController {
     private final ChannelService channelService;
     private final ProfileService profileService;
     private final UserService userService;
-
-    @Autowired
-    public ChannelController(ChannelService channelService,
-                             ProfileService profileService,
-                             UserService userService) {
-        this.channelService = channelService;
-        this.profileService = profileService;
-        this.userService = userService;
-    }
 
     @PostMapping("/api/channel/create")
     @CrossOrigin
@@ -48,6 +41,7 @@ public class ChannelController {
         }
         Channel channel = channelService.create(channelOwner, requestDto);
         profileService.addOwnedChannel(channelOwner, channel);
+        log.info("Channel with id {} is created. HttpStatus: {}", channel.getId(), HttpStatus.CREATED);
         return ResponseEntity.status(HttpStatus.CREATED).body(ChannelDto.fromChannel(channel));
     }
 
@@ -62,6 +56,7 @@ public class ChannelController {
         for (Channel channel : channels) {
             channelDtos.add(ChannelDto.fromChannel(channel));
         }
+        log.info("All channels loaded. HttpStatus: {}", HttpStatus.OK);
         return channelDtos;
     }
 
@@ -74,6 +69,7 @@ public class ChannelController {
         } catch (Exception e) {
             return null;
         }
+        log.info("Loaded channels of user {}. HttpStatus: {}", principal.getName(), HttpStatus.OK);
         return channelService.getAllOwnedChannels(channelsOwner);
     }
 
@@ -86,12 +82,15 @@ public class ChannelController {
             response.put("Error", "Cannot find the channel!");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
+        log.info("Loaded channel with id {}. HttpStatus: {}", id, HttpStatus.OK);
         return ResponseEntity.status(HttpStatus.OK).body(ChannelDto.fromChannel(channel));
     }
 
     @PostMapping("/api/channel/{id}/update")
     @CrossOrigin
-    public ResponseEntity<?> updateChannel(Principal principal, @PathVariable(name = "id") Long id, @RequestBody ChannelUpdateDto requestDto) {
+    public ResponseEntity<?> updateChannel(Principal principal,
+                                           @PathVariable(name = "id") Long id,
+                                           @RequestBody ChannelUpdateDto requestDto) {
         Profile ownerProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel channel = channelService.findById(id);
         Map<String, String> response = new HashMap<>();
@@ -109,12 +108,14 @@ public class ChannelController {
             response.put("Error", "Wrong data was provided!");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
+        log.info("Channel with id {} was updated. HttpStatus: {}", channel.getId(), HttpStatus.OK);
         return ResponseEntity.status(HttpStatus.OK).body(ChannelDto.fromChannel(channelService.findById(id)));
     }
 
     @PostMapping("/api/channel/{id}/subscribe")
     @CrossOrigin
-    public ResponseEntity<Map<String, String>> subscribeToChannel(Principal principal, @PathVariable(name = "id") Long id) {
+    public ResponseEntity<?> subscribeToChannel(Principal principal,
+                                                                  @PathVariable(name = "id") Long id) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel currentChannel = channelService.findById(id);
         Map<String, String> response = new HashMap<>();
@@ -124,12 +125,14 @@ public class ChannelController {
             response.put("Error", e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }
+        log.info("User {} subscribed to channel with id {}. HttpStatus: {}",
+                currentProfile.getUser().getUsername(), currentChannel.getId(), HttpStatus.OK);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @PostMapping("/api/channel/{id}/unsubscribe")
     @CrossOrigin
-    public ResponseEntity<Map<String, String>> unsubscribeFromChannel(Principal principal, @PathVariable(name = "id") Long id) {
+    public ResponseEntity<?> unsubscribeFromChannel(Principal principal, @PathVariable(name = "id") Long id) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel currentChannel = channelService.findById(id);
         Map<String, String> response = new HashMap<>();
@@ -141,7 +144,8 @@ public class ChannelController {
         }
         response.put("Success", "User " + currentProfile.getUser().getUsername() +
                 " unsubscribed from " + currentChannel.getName() + " channel!");
-
+        log.info("User {} unsubscribed from channel with id {}. HttpStatus: {}",
+                currentProfile.getUser().getUsername(), currentChannel.getId(), HttpStatus.OK);
         return ResponseEntity.ok().body(response);
     }
 
@@ -160,6 +164,7 @@ public class ChannelController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         channelService.delete(channel);
+        log.info("Channel with id {} was deleted. HttpStatus: {}", channel.getId(), HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -185,11 +190,13 @@ public class ChannelController {
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        log.info("Uploaded image of channel with id {}. HttpStatus: {}", currentChannel.getId(), HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/api/channel/{id}/download/avatar")
-    public byte[] downloadUserProfileImage(@PathVariable("id") Long id) {
+    public byte[] downloadChannelImage(@PathVariable("id") Long id) {
+        log.info("Downloaded image of channel with id {}. HttpStatus: {}", id, HttpStatus.OK);
         return channelService.downloadChannelImage(channelService.findById(id));
     }
 
