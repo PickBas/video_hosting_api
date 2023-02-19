@@ -16,12 +16,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequiredArgsConstructor @Slf4j
 public class UserController {
 
     private final UserService userService;
 
+    @ApiResponse(
+        responseCode = "200",
+        description = "Get all users",
+        content = @Content(mediaType = "application/json")
+    )
     @GetMapping("/api/users")
     @CrossOrigin
     public List<UserDto> getAllUsers() {
@@ -35,6 +44,12 @@ public class UserController {
         return result;
     }
 
+    @Operation(summary = "Retrieve current user")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Retrieved current user",
+        content = @Content(mediaType = "application/json")
+    )
     @GetMapping("/api/user")
     @CrossOrigin
     public ResponseEntity<UserDto> getCurrentUser(Principal principal) {
@@ -47,6 +62,11 @@ public class UserController {
         }
     }
 
+    @ApiResponse(
+        responseCode = "200",
+        description = "Retrieved user by id",
+        content = @Content(mediaType = "application/json")
+    )
     @GetMapping("/api/user/id/{id}")
     @CrossOrigin
     public ResponseEntity<UserDto> getUserById(@PathVariable(name = "id") Long id) {
@@ -58,6 +78,11 @@ public class UserController {
         return ResponseEntity.ok(UserDto.fromUser(user));
     }
 
+    @ApiResponse(
+        responseCode = "200",
+        description = "Updated user information",
+        content = @Content(mediaType = "application/json")
+    )
     @PostMapping("/api/user/update")
     @CrossOrigin
     public ResponseEntity<?> updateUser(Principal principal, @RequestBody UpdateUserDto requestDto) {
