@@ -22,8 +22,8 @@ jobs:
     name: Tests
     strategy:
       matrix:
-        os: ubuntu-latest
-        java: [ 11, 17 ]
+        os: [ubuntu-latest]
+        java: [ 17 ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
