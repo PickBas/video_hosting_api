@@ -3,6 +3,7 @@ package com.therearenotasksforus.videohostingapi.controllers;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.therearenotasksforus.videohostingapi.dto.auth.AuthenticationRequestDto;
+import com.therearenotasksforus.videohostingapi.dto.auth.UpdatePasswordDto;
 import com.therearenotasksforus.videohostingapi.dto.user.UserDto;
 import com.therearenotasksforus.videohostingapi.dto.user.UserRegistrationDto;
 import com.therearenotasksforus.videohostingapi.models.User;
@@ -31,6 +32,11 @@ import static java.util.Map.entry;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequestMapping(value = "/api/auth/")
 @RequiredArgsConstructor @Slf4j
@@ -40,6 +46,11 @@ public class AuthenticationController {
     private final JwtTokenService jwtTokenService;
     private final UserService userService;
 
+    @ApiResponse(
+        responseCode = "200",
+        description = "Logged in",
+        content = @Content(mediaType = "application/json")
+    )
     @PostMapping("login")
     @CrossOrigin
     public ResponseEntity<Map<String, String>> login(@RequestBody AuthenticationRequestDto requestDto) {
@@ -81,6 +92,11 @@ public class AuthenticationController {
         throw new Exception("invalid email.");
     }
 
+    @ApiResponse(
+        responseCode = "201",
+        description = "Registered",
+        content = @Content(mediaType = "application/json")
+    )
     @CrossOrigin
     @PostMapping("register")
     public ResponseEntity<?> register(@RequestBody UserRegistrationDto requestDto) {
@@ -112,20 +128,25 @@ public class AuthenticationController {
         }
     }
 
+    @ApiResponse(
+        responseCode = "200",
+        description = "Password updated",
+        content = @Content(mediaType = "application/json")
+    )
     @CrossOrigin
     @PostMapping("password/update")
     public ResponseEntity<?> updatePassword(Principal principal,
-                                            @RequestBody Map<String, String> passwordUpdateInfo) {
+                                            @RequestBody UpdatePasswordDto passwordUpdateInfo) {
         User currentUser = userService.findByUsername(principal.getName());
-        String oldPassword = passwordUpdateInfo.get("old_password");
-        String updatedPassword = passwordUpdateInfo.get("updated_password");
+        String oldPassword = passwordUpdateInfo.getOldPassword();
+        String updatedPassword = passwordUpdateInfo.getNewPassword();
         if (oldPassword == null || oldPassword.isEmpty() || updatedPassword == null || updatedPassword.isEmpty()) {
             log.warn("Provided passwords by user {} are not valid. HttpStatus: {}",
                     currentUser.getUsername(), HttpStatus.BAD_REQUEST);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         try {
-            passwordValidation(passwordUpdateInfo.get("updated_password"));
+            passwordValidation(passwordUpdateInfo.getNewPassword());
         } catch (Exception e) {
             log.warn("Provided updated password by user {} are not valid. HttpStatus: {}. Error: {}",
                     currentUser.getUsername(), HttpStatus.BAD_REQUEST, e.getMessage());
@@ -134,18 +155,23 @@ public class AuthenticationController {
                     .body(entry("error_message", e.getMessage()));
         }
         if (!new BCryptPasswordEncoder()
-                .matches(passwordUpdateInfo.get("old_password"), currentUser.getPassword())) {
+                .matches(passwordUpdateInfo.getOldPassword(), currentUser.getPassword())) {
             log.warn("User {} Entered incorrect old password. HttpStatus: {}",
                     currentUser.getUsername(), HttpStatus.BAD_REQUEST);
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(entry("error_message","Invalid old password."));
         }
-        userService.updatePassword(currentUser, passwordUpdateInfo.get("updated_password"));
+        userService.updatePassword(currentUser, passwordUpdateInfo.getNewPassword());
         log.info("User {} updated password. HttpStatus: {}", currentUser.getUsername(), HttpStatus.OK);
         return ResponseEntity.status(HttpStatus.OK).body(currentUser);
     }
 
+    @ApiResponse(
+        responseCode = "200",
+        description = "Tokens refreshed",
+        content = @Content(mediaType = "application/json")
+    )
     @GetMapping("token/refresh")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authHeader = request.getHeader(AUTHORIZATION);

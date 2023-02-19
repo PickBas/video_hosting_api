@@ -20,8 +20,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
-    private static final List<String> ALLOWED_URLS
-            = List.of("/api/auth/login", "/api/auth/register", "/api/auth/token/refresh");
+    private static final List<String> ALLOWED_URLS = List.of(
+        "/swagger-ui/**",
+        "/api/auth/login",
+        "/api/auth/register",
+        "/api/auth/token/refresh"
+    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

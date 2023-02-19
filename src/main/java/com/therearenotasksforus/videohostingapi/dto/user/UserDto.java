@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.models.User;
 
+import lombok.Setter;
+
+@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDto {
     private Long id;
@@ -35,30 +38,6 @@ public class UserDto {
         userDto.setProfile(user.getProfile());
 
         return userDto;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setProfile(Profile profile) {
-        this.profile = profile;
     }
 
     public Long getId() {
