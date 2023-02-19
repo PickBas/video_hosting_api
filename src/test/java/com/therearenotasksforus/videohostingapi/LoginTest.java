@@ -18,14 +18,12 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.therearenotasksforus.videohostingapi.TestMethods.getHttpHeaders;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = VideoHostingApiApplication.class,
         properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
 @WebAppConfiguration
 @AutoConfigureMockMvc
-class LoginTests {
+class LoginTest {
 
     @Autowired
     protected MockMvc mvc;

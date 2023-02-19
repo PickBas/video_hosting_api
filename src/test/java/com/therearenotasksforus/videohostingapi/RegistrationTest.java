@@ -1,6 +1,5 @@
 package com.therearenotasksforus.videohostingapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +23,7 @@ import java.util.Map;
 		properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
 @WebAppConfiguration
 @AutoConfigureMockMvc
-class RegistrationTests {
+class RegistrationTest {
 
 	@Autowired
 	protected MockMvc mvc;
