@@ -1,11 +1,14 @@
 package com.therearenotasksforus.videohostingapi.dto.user;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @AllArgsConstructor
-@Getter @Setter
+@NoArgsConstructor
+@Getter @Setter @Data
 public class UpdateUserDto {
     private String firstName;
     private String lastName;

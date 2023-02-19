@@ -26,6 +26,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @Deprecated
     @ApiResponse(
         responseCode = "200",
         description = "Get all users",
