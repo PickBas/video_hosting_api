@@ -1,8 +1,8 @@
-name: Spring Tests
+name: mvn
 
 on:
   push:
-    branches: [ master, feature/rename_test_classes ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
