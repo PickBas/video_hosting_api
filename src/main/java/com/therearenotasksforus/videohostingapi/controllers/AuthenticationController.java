@@ -46,8 +46,11 @@ public class AuthenticationController {
     private final JwtTokenService jwtTokenService;
     private final UserService userService;
 
-    @ApiResponse(responseCode = "200", description = "Logged in",
-        content = @Content(mediaType = "application/json"))
+    @ApiResponse(
+        responseCode = "200",
+        description = "Logged in",
+        content = @Content(mediaType = "application/json")
+    )
     @PostMapping("login")
     @CrossOrigin
     public ResponseEntity<Map<String, String>> login(@RequestBody AuthenticationRequestDto requestDto) {
@@ -89,8 +92,11 @@ public class AuthenticationController {
         throw new Exception("invalid email.");
     }
 
-    @ApiResponse(responseCode = "201", description = "Registered",
-        content = @Content(mediaType = "application/json"))
+    @ApiResponse(
+        responseCode = "201",
+        description = "Registered",
+        content = @Content(mediaType = "application/json")
+    )
     @CrossOrigin
     @PostMapping("register")
     public ResponseEntity<?> register(@RequestBody UserRegistrationDto requestDto) {
@@ -122,8 +128,11 @@ public class AuthenticationController {
         }
     }
 
-    @ApiResponse(responseCode = "200", description = "Password updated",
-        content = @Content(mediaType = "application/json"))
+    @ApiResponse(
+        responseCode = "200",
+        description = "Password updated",
+        content = @Content(mediaType = "application/json")
+    )
     @CrossOrigin
     @PostMapping("password/update")
     public ResponseEntity<?> updatePassword(Principal principal,
@@ -158,8 +167,11 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.OK).body(currentUser);
     }
 
-    @ApiResponse(responseCode = "200", description = "Tokens refreshed",
-        content = @Content(mediaType = "application/json"))
+    @ApiResponse(
+        responseCode = "200",
+        description = "Tokens refreshed",
+        content = @Content(mediaType = "application/json")
+    )
     @GetMapping("token/refresh")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authHeader = request.getHeader(AUTHORIZATION);
