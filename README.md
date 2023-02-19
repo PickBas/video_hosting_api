@@ -1,5 +1,4 @@
-![Build](https://github.com/PickBas/video_hosting_api/workflows/Build/badge.svg)
-![Spring Tests](https://github.com/PickBas/video_hosting_api/workflows/Spring%20Tests/badge.svg)
+[![mvn](https://github.com/PickBas/video_hosting_api/actions/workflows/mvn.yml/badge.svg)](https://github.com/PickBas/video_hosting_api/actions/workflows/mvn.yml)
 ![license](https://img.shields.io/badge/license-MIT-brightgreen)
 
 # Video Hosting Api
