@@ -23,6 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequiredArgsConstructor @Slf4j
 public class ChannelController {
@@ -30,6 +34,11 @@ public class ChannelController {
     private final ProfileService profileService;
     private final UserService userService;
 
+    @ApiResponse(
+        responseCode = "201",
+        description = "Channel created",
+        content = @Content(mediaType = "application/json")
+    )
     @PostMapping("/api/channel/create")
     @CrossOrigin
     public ResponseEntity<?> channelCreate(Principal principal, @RequestBody ChannelCreateDto requestDto) {
@@ -45,6 +54,12 @@ public class ChannelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ChannelDto.fromChannel(channel));
     }
 
+    @Operation(summary = "Get all channels")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Get list of all channels (DEPRECATED)",
+        content = @Content(mediaType = "application/json")
+    )
     @GetMapping("/api/channels")
     @CrossOrigin
     public List<ChannelDto> getAllChannels() {
@@ -60,6 +75,12 @@ public class ChannelController {
         return channelDtos;
     }
 
+    @Operation(summary = "Retrieve all owned channels")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Retrieved all channels owned by current user",
+        content = @Content(mediaType = "application/json")
+    )
     @GetMapping("/api/channels/owned")
     @CrossOrigin
     public List<Channel> getAllOwnedChannels(Principal principal) {
@@ -73,6 +94,12 @@ public class ChannelController {
         return channelService.getAllOwnedChannels(channelsOwner);
     }
 
+    @Operation(summary = "Retrieve channel by id")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Retrieved channel by id",
+        content = @Content(mediaType = "application/json")
+    )
     @GetMapping("/api/channel/{id}")
     @CrossOrigin
     public ResponseEntity<?> getChannelById(@PathVariable(name = "id") Long id) {
@@ -86,11 +113,19 @@ public class ChannelController {
         return ResponseEntity.status(HttpStatus.OK).body(ChannelDto.fromChannel(channel));
     }
 
+    @Operation(summary = "Update channel's information")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Updated channel information",
+        content = @Content(mediaType = "application/json")
+    )
     @PostMapping("/api/channel/{id}/update")
     @CrossOrigin
-    public ResponseEntity<?> updateChannel(Principal principal,
-                                           @PathVariable(name = "id") Long id,
-                                           @RequestBody ChannelUpdateDto requestDto) {
+    public ResponseEntity<?> updateChannel(
+        Principal principal,
+        @PathVariable(name = "id") Long id,
+        @RequestBody ChannelUpdateDto requestDto
+    ) {
         Profile ownerProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel channel = channelService.findById(id);
         Map<String, String> response = new HashMap<>();
@@ -112,10 +147,16 @@ public class ChannelController {
         return ResponseEntity.status(HttpStatus.OK).body(ChannelDto.fromChannel(channelService.findById(id)));
     }
 
+    @ApiResponse(
+        responseCode = "200",
+        description = "Subscribed current user to the channel"
+    )
     @PostMapping("/api/channel/{id}/subscribe")
     @CrossOrigin
-    public ResponseEntity<?> subscribeToChannel(Principal principal,
-                                                                  @PathVariable(name = "id") Long id) {
+    public ResponseEntity<?> subscribeToChannel(
+        Principal principal,
+        @PathVariable(name = "id") Long id
+    ) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel currentChannel = channelService.findById(id);
         Map<String, String> response = new HashMap<>();
@@ -127,32 +168,46 @@ public class ChannelController {
         }
         log.info("User {} subscribed to channel with id {}. HttpStatus: {}",
                 currentProfile.getUser().getUsername(), currentChannel.getId(), HttpStatus.OK);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @ApiResponse(
+        responseCode = "200",
+        description = "Unsubscribed current user from the channel"
+    )
     @PostMapping("/api/channel/{id}/unsubscribe")
     @CrossOrigin
-    public ResponseEntity<?> unsubscribeFromChannel(Principal principal, @PathVariable(name = "id") Long id) {
+    public ResponseEntity<?> unsubscribeFromChannel(
+        Principal principal, @PathVariable(name = "id") Long id
+    ) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel currentChannel = channelService.findById(id);
         Map<String, String> response = new HashMap<>();
         try {
             channelService.unsubscribeFromChannel(currentProfile, currentChannel);
         } catch (Exception e) {
-            response.put("Error", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
-        response.put("Success", "User " + currentProfile.getUser().getUsername() +
-                " unsubscribed from " + currentChannel.getName() + " channel!");
-        log.info("User {} unsubscribed from channel with id {}. HttpStatus: {}",
-                currentProfile.getUser().getUsername(), currentChannel.getId(), HttpStatus.OK);
-        return ResponseEntity.ok().body(response);
+        log.info(
+            "User {} unsubscribed from channel with id {}. HttpStatus: {}",
+            currentProfile.getUser().getUsername(),
+            currentChannel.getId(),
+            HttpStatus.OK
+        );
+        return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Delete channel by id")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Deleted channel by id"
+    )
     @DeleteMapping("/api/channel/{id}")
     @CrossOrigin
-    public ResponseEntity<?> deleteChannelById(Principal principal,
-                                               @PathVariable(name = "id") Long id) {
+    public ResponseEntity<?> deleteChannelById(
+        Principal principal,
+        @PathVariable(name = "id") Long id
+    ) {
         Channel channel = channelService.findById(id);
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         if (channel == null) {
@@ -165,18 +220,24 @@ public class ChannelController {
         }
         channelService.delete(channel);
         log.info("Channel with id {} was deleted. HttpStatus: {}", channel.getId(), HttpStatus.OK);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
+    @ApiResponse(
+        responseCode = "201",
+        description = "Updated channel's avatar"
+    )
     @PostMapping(
             path = "/api/channel/{id}/upload/avatar",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @CrossOrigin
-    public ResponseEntity<?> uploadChannelAvatar(Principal principal,
-                                                 @RequestParam("file") MultipartFile file,
-                                                 @PathVariable("id") Long id) {
+    public ResponseEntity<?> uploadChannelAvatar(
+        Principal principal,
+        @RequestParam("file") MultipartFile file,
+        @PathVariable("id") Long id
+    ) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Channel currentChannel = channelService.findById(id);
         if (currentChannel == null) {
@@ -194,6 +255,10 @@ public class ChannelController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @ApiResponse(
+        responseCode = "200",
+        description = "Downloaded channel's avatar"
+    )
     @GetMapping("/api/channel/{id}/download/avatar")
     public byte[] downloadChannelImage(@PathVariable("id") Long id) {
         log.info("Downloaded image of channel with id {}. HttpStatus: {}", id, HttpStatus.OK);
