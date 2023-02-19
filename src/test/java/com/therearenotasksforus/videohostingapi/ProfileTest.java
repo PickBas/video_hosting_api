@@ -26,7 +26,7 @@ import java.util.Map;
         properties = { "spring.jpa.hibernate.ddl-auto=create-drop" })
 @WebAppConfiguration
 @AutoConfigureMockMvc
-class ProfileTests {
+class ProfileTest {
 
     @Autowired
     public MockMvc mvc;
