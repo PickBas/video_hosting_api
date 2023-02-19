@@ -24,6 +24,8 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
 
     private static final String ADMIN_ENDPOINT = "/api/admin/**";
+    private static final String SWAGGER_ENDPOINT = "/swagger-ui/**";
+    private static final String API_DOCS_ENDPOINT = "/v3/api-docs/**";
     private static final String LOGIN_ENDPOINT = "/api/auth/login";
     private static final String REGISTER_ENDPOINT = "/api/auth/register";
     private static final String REFRESH_TOKEN_ENDPOINT = "/api/auth/token/refresh";
@@ -49,7 +51,13 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(LOGIN_ENDPOINT, REGISTER_ENDPOINT, REFRESH_TOKEN_ENDPOINT).permitAll()
+                        .requestMatchers(
+                            LOGIN_ENDPOINT,
+                            REGISTER_ENDPOINT,
+                            REFRESH_TOKEN_ENDPOINT,
+                            SWAGGER_ENDPOINT,
+                            API_DOCS_ENDPOINT
+                        ).permitAll()
                         .requestMatchers(ADMIN_ENDPOINT).hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .cors()
