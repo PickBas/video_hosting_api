@@ -24,6 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequiredArgsConstructor @Slf4j
 public class VideoController {
@@ -32,6 +36,7 @@ public class VideoController {
     private final ProfileService profileService;
     private final UserService userService;
 
+    @Deprecated
     @GetMapping("/api/videos")
     @CrossOrigin
     public List<VideoDto> getAllVideos() {
@@ -44,6 +49,11 @@ public class VideoController {
         return videoDtos;
     }
 
+    @ApiResponse(
+        responseCode = "200",
+        description = "Retrieved video by id",
+        content = @Content(mediaType = "application/json")
+    )
     @GetMapping("/api/video/{id}")
     @CrossOrigin
     public ResponseEntity<VideoDto> getVideo(@PathVariable(name = "id") Long id) {
@@ -55,57 +65,101 @@ public class VideoController {
         return ResponseEntity.ok(VideoDto.fromVideo(video));
     }
 
+    @Operation(summary = "Set like by current user")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Set like by current user",
+        content = @Content(mediaType = "application/json")
+    )
     @PostMapping("/api/video/{id}/like")
     @CrossOrigin
-    public ResponseEntity<VideoDto> setLike(Principal principal, @PathVariable(name = "id") Long id) {
+    public ResponseEntity<VideoDto> setLike(
+        Principal principal,
+        @PathVariable(name = "id") Long id
+    ) {
         Video currentVideo = videoService.findById(id);
         if (currentVideo == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         videoService.setLike(currentProfile, currentVideo);
-        log.info("Set like on video with id {} by user {}. HttpStatus: {}",
-                id, currentProfile.getUser().getUsername(), HttpStatus.OK);
+        log.info(
+            "Set like on video with id {} by user {}. HttpStatus: {}",
+            id,
+            currentProfile.getUser().getUsername(),
+            HttpStatus.OK
+        );
         return ResponseEntity.ok(VideoDto.fromVideo(videoService.findById(currentVideo.getId())));
     }
 
+    @Operation(summary = "Set dislike by current user")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Set dislike by current user",
+        content = @Content(mediaType = "application/json")
+    )
     @PostMapping("/api/video/{id}/dislike")
     @CrossOrigin
-    public ResponseEntity<VideoDto> setDislike(Principal principal, @PathVariable(name = "id") Long id) {
+    public ResponseEntity<VideoDto> setDislike(
+        Principal principal,
+        @PathVariable(name = "id") Long id
+    ) {
         Video currentVideo = videoService.findById(id);
         if (currentVideo == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         videoService.setDislike(currentProfile, currentVideo);
-        log.info("Set dislike on video with id {} by user {}. HttpStatus: {}",
-                id, currentProfile.getUser().getUsername(), HttpStatus.OK);
+        log.info(
+            "Set dislike on video with id {} by user {}. HttpStatus: {}",
+            id,
+            currentProfile.getUser().getUsername(),
+            HttpStatus.OK
+        );
         return ResponseEntity.ok(VideoDto.fromVideo(videoService.findById(currentVideo.getId())));
     }
 
+    @Operation(summary = "Add comment by current user")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Added comment by current user",
+        content = @Content(mediaType = "application/json")
+    )
     @PostMapping("/api/video/{id}/comment")
     @CrossOrigin
-    public ResponseEntity<VideoDto> comment(Principal principal,
-                                            @PathVariable(name = "id") Long id,
-                                            @RequestBody CommentDto requestDto) {
+    public ResponseEntity<VideoDto> comment(
+        Principal principal,
+        @PathVariable(name = "id") Long id,
+        @RequestBody CommentDto requestDto) {
         Video currentVideo = videoService.findById(id);
         if (currentVideo == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         videoService.saveComment(currentProfile, currentVideo, requestDto.getCommentBody());
-        log.info("Commented video with id {} by user {}. HttpStatus: {}",
-                id, currentProfile.getUser().getUsername(), HttpStatus.OK);
+        log.info(
+            "Commented video with id {} by user {}. HttpStatus: {}",
+            id,
+            currentProfile.getUser().getUsername(),
+            HttpStatus.OK
+        );
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(VideoDto.fromVideo(videoService.findById(id)));
     }
 
+    @Operation(summary = "Delete comment added by current user")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Deleted comment added by current user"
+    )
     @DeleteMapping("/api/video/{video_id}/comment/{comment_id}")
     @CrossOrigin
-    public ResponseEntity<?> deleteCommentById(Principal principal,
-                                                      @PathVariable(name = "video_id") Long videoId,
-                                                      @PathVariable(name = "comment_id") Long commentId) {
+    public ResponseEntity<?> deleteCommentById(
+        Principal principal,
+        @PathVariable(name = "video_id") Long videoId,
+        @PathVariable(name = "comment_id") Long commentId
+    ) {
         Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
         Video currentVideo = videoService.findById(videoId);
         Comment comment = videoService.findCommentById(commentId);
@@ -121,6 +175,7 @@ public class VideoController {
         return ResponseEntity.ok().build();
     }
 
+    @Deprecated
     @GetMapping("/api/video/{id}/get/comments")
     @CrossOrigin
     public ResponseEntity<List<Comment>> getComments(@PathVariable(name = "id") Long id) {
@@ -133,6 +188,7 @@ public class VideoController {
         return ResponseEntity.ok(comments);
     }
 
+    @Deprecated
     @GetMapping("/api/channel/{id}/videos")
     @CrossOrigin
     public ResponseEntity<List<VideoDto>> getAllChannelVideos(@PathVariable(name = "id") Long id) {
@@ -148,6 +204,7 @@ public class VideoController {
         return ResponseEntity.ok(videoDtos);
     }
 
+    @Deprecated
     @GetMapping("/api/profile/{id}/likedvideos")
     @CrossOrigin
     public ResponseEntity<List<VideoDto>> getAllLikedVideos(@PathVariable(name = "id") Long id) {
@@ -164,39 +221,18 @@ public class VideoController {
         return ResponseEntity.ok(dtos);
     }
 
-    @PostMapping(
-            path = "/api/channel/{id}/upload/video",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
+    @ApiResponse(
+        responseCode = "200",
+        description = "Updated video name",
+        content = @Content(mediaType = "application/json")
     )
-    @CrossOrigin
-    public ResponseEntity<?> uploadVideo(Principal principal,
-                                         @PathVariable(name = "id") Long id,
-                                         @RequestParam("file") MultipartFile file) {
-        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
-        Channel currentChannel = channelService.findById(id);
-        Long newVideoId;
-        if (currentProfile != currentChannel.getOwner()) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("error_message", "This profile is not the channel owner!"));
-        }
-        try {
-            newVideoId = videoService.uploadVideo(currentProfile, currentChannel, file);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error_message", e.getMessage()));
-        }
-        log.info("Uploaded video on channel with id {}. HttpStatus: {}", id, HttpStatus.OK);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(VideoDto.fromVideo(videoService.findById(newVideoId)));
-    }
-
     @PostMapping("/api/video/{id}/update/name")
     @CrossOrigin
-    public ResponseEntity<?> updateVideoName(Principal principal,
-                                             @PathVariable(name = "id") Long id,
-                                             @RequestBody NameUpdateDto requestDto) {
+    public ResponseEntity<?> updateVideoName(
+        Principal principal,
+        @PathVariable(name = "id") Long id,
+        @RequestBody NameUpdateDto requestDto
+    ) {
         Video currentVideo = videoService.findById(id);
         if (currentVideo == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -211,6 +247,11 @@ public class VideoController {
         return ResponseEntity.ok(VideoDto.fromVideo(currentVideo));
     }
 
+    @ApiResponse(
+        responseCode = "200",
+        description = "Deleted video by id",
+        content = @Content(mediaType = "application/json")
+    )
     @DeleteMapping("/api/video/{id}")
     @CrossOrigin
     public ResponseEntity<?> deleteVideo(Principal principal,

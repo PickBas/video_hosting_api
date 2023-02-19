@@ -3,11 +3,14 @@ package com.therearenotasksforus.videohostingapi.controllers;
 import com.therearenotasksforus.videohostingapi.dto.channel.ChannelCreateDto;
 import com.therearenotasksforus.videohostingapi.dto.channel.ChannelDto;
 import com.therearenotasksforus.videohostingapi.dto.channel.ChannelUpdateDto;
+import com.therearenotasksforus.videohostingapi.dto.video.VideoDto;
 import com.therearenotasksforus.videohostingapi.models.Channel;
 import com.therearenotasksforus.videohostingapi.models.Profile;
 import com.therearenotasksforus.videohostingapi.service.ChannelService;
 import com.therearenotasksforus.videohostingapi.service.ProfileService;
 import com.therearenotasksforus.videohostingapi.service.UserService;
+import com.therearenotasksforus.videohostingapi.service.VideoService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -33,6 +36,7 @@ public class ChannelController {
     private final ChannelService channelService;
     private final ProfileService profileService;
     private final UserService userService;
+    private final VideoService videoService;
 
     @ApiResponse(
         responseCode = "201",
@@ -263,6 +267,44 @@ public class ChannelController {
     public byte[] downloadChannelImage(@PathVariable("id") Long id) {
         log.info("Downloaded image of channel with id {}. HttpStatus: {}", id, HttpStatus.OK);
         return channelService.downloadChannelImage(channelService.findById(id));
+    }
+
+    @Operation(summary = "Upload video by current user")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Uploaded video by current user",
+        content = @Content(mediaType = "application/json")
+    )
+    @PostMapping(
+        path = "/api/channel/{id}/upload/video",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @CrossOrigin
+    public ResponseEntity<?> uploadVideo(
+        Principal principal,
+        @PathVariable(name = "id") Long id,
+        @RequestParam("file") MultipartFile file
+    ) {
+        Profile currentProfile = userService.findByUsername(principal.getName()).getProfile();
+        Channel currentChannel = channelService.findById(id);
+        Long newVideoId;
+        if (currentProfile != currentChannel.getOwner()) {
+            return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error_message", "This profile is not the channel owner!"));
+        }
+        try {
+            newVideoId = videoService.uploadVideo(currentProfile, currentChannel, file);
+        } catch (IllegalStateException e) {
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error_message", e.getMessage()));
+        }
+        log.info("Uploaded video on channel with id {}. HttpStatus: {}", id, HttpStatus.OK);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(VideoDto.fromVideo(videoService.findById(newVideoId)));
     }
 
 }
