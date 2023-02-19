@@ -1,13 +1,11 @@
 package com.therearenotasksforus.videohostingapi.dto.auth;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@AllArgsConstructor
+@Getter @Setter
 public class LogoutRequestDto {
     private String logout;
-
-    public String getLogout() {
-        return logout;
-    }
-
-    public void setLogout(String logout) {
-        this.logout = logout;
-    }
 }
