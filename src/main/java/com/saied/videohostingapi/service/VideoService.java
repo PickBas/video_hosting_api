@@ -17,10 +17,10 @@ public interface VideoService {
     Like findLikeById(Long id);
     Dislike findDislikeById(Long id);
     Comment findCommentById(Long id);
-    List<Video> getAll();
-    List<Like> getAllLikes(Video video);
-    List<Dislike> getAllDislikes(Video video);
-    List<Comment> getAllComments(Video video);
+    List<Video> getVideosPaginated(int pageNumber, int page);
+    List<Like> getLikesPaginated(Video video, int pageNumner, int page);
+    List<Dislike> getAllDislikes(Video video, int pageNumner, int page);
+    List<Comment> getAllComments(Video video, int pageNumner, int page);
     void setLike(Profile profile, Video video);
     void setDislike(Profile profile, Video video);
     void saveComment(Profile profile, Video video, String commentBody);

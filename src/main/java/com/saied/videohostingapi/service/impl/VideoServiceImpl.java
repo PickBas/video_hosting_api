@@ -35,13 +35,15 @@ public class VideoServiceImpl implements VideoService {
     private final FileStore fileStore;
 
     @Autowired
-    public VideoServiceImpl(VideoRepository videoRepository,
-                            LikeRepository likeRepository,
-                            DislikeRepository dislikeRepository,
-                            CommentRepository commentRepository,
-                            ProfileRepository profileRepository,
-                            ChannelRepository channelRepository,
-                            FileStore fileStore) {
+    public VideoServiceImpl(
+        VideoRepository videoRepository,
+        LikeRepository likeRepository,
+        DislikeRepository dislikeRepository,
+        CommentRepository commentRepository,
+        ProfileRepository profileRepository,
+        ChannelRepository channelRepository,
+        FileStore fileStore
+    ) {
         this.videoRepository = videoRepository;
         this.likeRepository = likeRepository;
         this.dislikeRepository = dislikeRepository;
@@ -119,42 +121,23 @@ public class VideoServiceImpl implements VideoService {
         return commentRepository.findById(id).orElse(null);
     }
 
-    @Override
-    public List<Video> getAll() {
-        return videoRepository.findAll();
-    }
-
-    @Override
-    public List<Like> getAllLikes(Video video) {
-        return video.getLikes();
-    }
-
-    @Override
-    public List<Dislike> getAllDislikes(Video video) {
-        return video.getDislikes();
-    }
-
-    @Override
-    public List<Comment> getAllComments(Video video) {
-        return video.getComments();
-    }
 
     public Like isLikeSet(Profile profile, Video video) {
         return video
-                .getLikes()
-                .stream()
-                .filter(o -> o.getOwner().equals(profile))
-                .findFirst()
-                .orElse(null);
+            .getLikes()
+            .stream()
+            .filter(o -> o.getOwner().equals(profile))
+            .findFirst()
+            .orElse(null);
     }
 
     public Dislike isDislikeSet(Profile profile, Video video) {
         return video
-                .getDislikes()
-                .stream()
-                .filter(o -> o.getOwner().equals(profile))
-                .findFirst()
-                .orElse(null);
+            .getDislikes()
+            .stream()
+            .filter(o -> o.getOwner().equals(profile))
+            .findFirst()
+            .orElse(null);
     }
 
     public void processLikes(Profile profile, Video video) {

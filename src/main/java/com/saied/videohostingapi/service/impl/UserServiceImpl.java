@@ -26,10 +26,12 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository,
-                           RoleRepository repository,
-                           ProfileRepository profileRepository,
-                           PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(
+        UserRepository userRepository,
+        RoleRepository repository,
+        ProfileRepository profileRepository,
+        PasswordEncoder passwordEncoder
+    ) {
         this.userRepository = userRepository;
         this.roleRepository = repository;
         this.profileRepository = profileRepository;
@@ -84,8 +86,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll() {
-        return userRepository.findAll();
+    public List<User> getUsersPaginated(int numberPerPage, int page) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override

@@ -31,10 +31,12 @@ public class ChannelServiceImpl implements ChannelService {
     private final FileStore fileStore;
 
     @Autowired
-    public ChannelServiceImpl(ChannelRepository channelRepository,
-                              ProfileRepository profileRepository,
-                              VideoService videoService,
-                              FileStore fileStore) {
+    public ChannelServiceImpl(
+        ChannelRepository channelRepository,
+        ProfileRepository profileRepository,
+        VideoService videoService,
+        FileStore fileStore
+    ) {
         this.channelRepository = channelRepository;
         this.profileRepository = profileRepository;
         this.videoService = videoService;
@@ -66,7 +68,10 @@ public class ChannelServiceImpl implements ChannelService {
         channelRepository.save(channel);
     }
 
-    private void isChannelDataValid(Channel channel, ChannelUpdateDto channelUpdateDto) throws ValidationException {
+    private void isChannelDataValid(
+        Channel channel,
+        ChannelUpdateDto channelUpdateDto
+    ) throws ValidationException {
         if (channelUpdateDto.getName() == null && channel.getInfo() == null)
             throw new ValidationException("Wrong data was provided");
     }
@@ -161,11 +166,6 @@ public class ChannelServiceImpl implements ChannelService {
         uploadPathData.put("filename",
                 String.format("%s-%s", UUID.randomUUID(), uploadPathData.get("originalFileName")));
         return uploadPathData;
-    }
-
-    @Override
-    public List<Channel> getAll() {
-        return channelRepository.findAll();
     }
 
     @Override

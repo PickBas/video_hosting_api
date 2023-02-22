@@ -12,7 +12,7 @@ public interface UserService {
     void checkIfUserExists(User user);
     void updatePassword(User user, String password);
     void updateNames(User user, UpdateUserDto updateUserDto) throws ValidationException;
-    List<User> getAll();
+    List<User> getUsersPaginated(int numberPerPage, int page);
     User findById(Long id);
     User findByProfile(Profile profile);
     User findByUsername(String username);

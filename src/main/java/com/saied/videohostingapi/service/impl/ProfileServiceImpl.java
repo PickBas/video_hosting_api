@@ -26,8 +26,10 @@ public class ProfileServiceImpl implements ProfileService {
     private final FileStore fileStore;
 
     @Autowired
-    public ProfileServiceImpl(ProfileRepository profileRepository,
-                              FileStore fileStore) {
+    public ProfileServiceImpl(
+        ProfileRepository profileRepository,
+        FileStore fileStore
+    ) {
         this.profileRepository = profileRepository;
         this.fileStore = fileStore;
     }
