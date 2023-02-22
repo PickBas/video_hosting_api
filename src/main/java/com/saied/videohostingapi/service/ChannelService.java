@@ -3,7 +3,6 @@ package com.saied.videohostingapi.service;
 import com.saied.videohostingapi.dto.channel.ChannelCreateDto;
 import com.saied.videohostingapi.dto.channel.ChannelUpdateDto;
 import com.saied.videohostingapi.models.Channel;
-import com.saied.videohostingapi.models.Profile;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.ValidationException;
