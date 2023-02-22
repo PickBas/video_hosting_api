@@ -1,112 +1,178 @@
 package com.saied.videohostingapi.service.impl;
 
 import com.saied.videohostingapi.dto.user.UpdateUserDto;
-import com.saied.videohostingapi.models.Profile;
+import com.saied.videohostingapi.dto.user.UserRegistrationDto;
+import com.saied.videohostingapi.exceptions.user.AppUserNotFoundException;
+import com.saied.videohostingapi.exceptions.user.AppUserAlreadyExistsException;
 import com.saied.videohostingapi.models.Role;
 import com.saied.videohostingapi.models.User;
-import com.saied.videohostingapi.repositories.ProfileRepository;
 import com.saied.videohostingapi.repositories.RoleRepository;
 import com.saied.videohostingapi.repositories.UserRepository;
+import com.saied.videohostingapi.service.ProfileService;
 import com.saied.videohostingapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.validation.ValidationException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final ProfileRepository profileRepository;
+    private final ProfileService profileService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(
         UserRepository userRepository,
         RoleRepository repository,
-        ProfileRepository profileRepository,
+        ProfileService profileService,
         PasswordEncoder passwordEncoder
     ) {
         this.userRepository = userRepository;
         this.roleRepository = repository;
-        this.profileRepository = profileRepository;
+        this.profileService = profileService;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public void register(User user) {
-        this.checkIfUserExists(user);
-        Role roleUser = roleRepository.findByName("ROLE_USER");
+    @Transactional(readOnly = true)
+    public User findByUsername(String username) throws AppUserNotFoundException {
+        return userRepository
+            .findByUsername(username)
+            .orElseThrow(
+                () -> {
+                    log.warn("User does not exist with username: {}", username);
+                    return new AppUserNotFoundException(
+                        String.format("Could not find user with username: %s", username)
+                    );
+                }
+            );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User findById(Long id) throws AppUserNotFoundException {
+        return userRepository
+            .findById(id)
+            .orElseThrow(
+                () -> {
+                    log.warn("User does not exist with id: {}", id);
+                    return new AppUserNotFoundException(
+                        String.format("Could not find user with id: %s", id)
+                    );
+                }
+            );
+    }
+
+    @Override
+    public User findByProfile(Long profileId) throws AppUserNotFoundException {
+        return userRepository
+            .findByProfile(profileService.findById(profileId))
+            .orElseThrow(
+                () -> {
+                    log.warn("User does not exist with profile_id: {}", profileId);
+                    return new AppUserNotFoundException(
+                        String.format("Could not find user with profile_id: %s", profileId)
+                    );
+                }
+            );
+    }
+
+    @Override
+    @Transactional(rollbackFor = AppUserAlreadyExistsException.class)
+    public void register(UserRegistrationDto userRegDto) throws AppUserAlreadyExistsException {
+        if (this.checkIfUserExistsByUsername(userRegDto.getUsername())) {
+            log.warn("User already exists with username: {}", userRegDto.getUsername());
+            throw new AppUserAlreadyExistsException(
+                String.format(
+                    "User already exists with username: %s", userRegDto.getUsername()
+                )
+            );
+        }
         List<Role> userRoles = new ArrayList<>();
+        Role roleUser = roleRepository.findByName("ROLE_USER");
         userRoles.add(roleUser);
-        user.setRoles(userRoles);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setCreated(new Timestamp(System.currentTimeMillis()));
-        user.setUpdated(new Timestamp(System.currentTimeMillis()));
-        Profile profile = new Profile();
-        profile.setId(user.getId());
-        profile.setCustomUrl(user.getUsername());
-        profile.setUser(user);
-        profileRepository.save(profile);
-        user.setProfile(profile);
-        userRepository.save(user);
+        User.builder()
+            .username(userRegDto.getUsername())
+            .email(userRegDto.getEmail())
+            .password(passwordEncoder.encode(userRegDto.getPassword()))
+            .roles(userRoles)
+            .build();
+        log.info(
+            "User was created with username: {}; email: {};",
+            userRegDto.getUsername(),
+            userRegDto.getEmail()
+        );
     }
 
     @Override
-    public void checkIfUserExists(User user) {
-        List<User> users = this.getAll();
-        for (User iterUser : users) {
-            if (user.getEmail().equals(iterUser.getEmail()) ||
-                    user.getUsername().equals(iterUser.getUsername())) {
-                throw new IllegalStateException("User with such name or email already exists");
-            }
+    @Transactional(
+        rollbackFor = {AppUserNotFoundException.class, ProfileNotFoundException.class}
+    )
+    public void setProfile(
+        Long userId,
+        Long profileId
+    ) throws ProfileNotFoundException, AppUserNotFoundException {
+        User user = this.findById(userId);
+        user.setProfile(profileService.findById(profileId));
+        log.info("Profile was set with id: {}; for user with id: {}", profileId, userId);
+    }
+
+    @Override
+    public boolean checkIfUserExistsByUsername(String username) {
+        try {
+            this.findByUsername(username);
+        } catch (AppUserNotFoundException e) {
+            return false;
         }
+        return true;
     }
 
     @Override
-    public void updatePassword(User user, String password) {
+    @Transactional
+    public void updatePassword(Long userId, String password) throws AppUserNotFoundException {
+        User user = this.findById(userId);
         user.setPassword(passwordEncoder.encode(password));
-        userRepository.save(user);
+        log.info("Password was updated for user with id: {}", userId);
     }
 
     @Override
-    public void updateNames(User user, UpdateUserDto updateUserDto) throws ValidationException {
-        if (updateUserDto.getFirstName() == null && updateUserDto.getLastName() == null) {
-            throw new ValidationException("Failure: wrong data was provided");
+    @Transactional(rollbackFor = AppUserNotFoundException.class)
+    public void updateNames(
+        Long userId,
+        UpdateUserDto updateUserDto
+    ) throws AppUserNotFoundException {
+        User user = this.findById(userId);
+        String updatedFirstName = updateUserDto.getFirstName();
+        String updatedLastName = updateUserDto.getLastName();
+        if (updatedFirstName != null && updatedFirstName.length() > 0) {
+            user.setFirstName(updateUserDto.getFirstName());
         }
-        user.setFirstName(updateUserDto.getFirstName() != null ? updateUserDto.getFirstName() : "");
-        user.setLastName(updateUserDto.getLastName() != null ? updateUserDto.getLastName() : "");
-        user.setUpdated(new Timestamp(System.currentTimeMillis()));
-        userRepository.save(user);
+        if (updatedLastName != null && updatedLastName.length() > 0) {
+            user.setLastName(updatedLastName);
+        }
+        log.info("Updated names for user with id: {}", userId);
     }
 
     @Override
-    public List<User> getUsersPaginated(int numberPerPage, int page) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
-    @Override
-    public User findById(Long id) {
-        return userRepository.findById(id).orElse(null);
-    }
-
-    @Override
-    public User findByProfile(Profile profile) {
-        return userRepository.findByProfile(profile);
+    public Page<User> getUsersPaginated(int offset, int pageSize) {
+        return userRepository.findAll(PageRequest.of(offset, pageSize));
     }
 
     @Override
     public void delete(Long id) {
         userRepository.deleteById(id);
+        log.info("Deleted user with id: {}", id);
+
     }
 }
