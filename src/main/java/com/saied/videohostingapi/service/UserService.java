@@ -23,7 +23,7 @@ public interface UserService {
     /**
      * Updating user's password
      * @param userId User id
-     * @param password New passowrd
+     * @param password New password
      */
     void updatePassword(Long userId, String password);
 
