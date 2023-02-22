@@ -20,53 +20,53 @@ public interface ChannelService {
 
     /**
      * Creating channel from dto
-     * @param channelOwner Profile entity - channel owner
+     * @param channelOwnerId Profile id - channel owner
      * @param requestDto New channel data
      * @return Channel entity
      */
-    Channel create(Profile channelOwner, ChannelCreateDto requestDto);
+    Channel create(Long channelOwnerId, ChannelCreateDto requestDto);
 
     /**
      * Updating channel's data
-     * @param channel Channel entity
+     * @param channelId Channel id
      * @param channelUpdateDto New channel data
      * @throws ValidationException If provided data is incorrect
      */
     void update(
-        Channel channel,
+        Long channelId,
         ChannelUpdateDto channelUpdateDto
     ) throws ValidationException;
 
     /**
      * Checking if provided user is the owner of the channel
-     * @param profile Profile entity
-     * @param channel Channel entity
+     * @param profileId Profile id
+     * @param channelId Channel id
      * @return true if user is owner, false otherwise
      */
-    boolean isProfileOwner(Profile profile, Channel channel);
+    boolean isProfileOwner(Long profileId, Long channelId);
 
     /**
      * Subscribing provided user to provided channel
-     * @param profile Profile entity
-     * @param channel Channel entity
+     * @param profileId Profile id
+     * @param channelId Channel id
      * @throws Exception If user is already subscribed to the channel
      */
-    void subscribeToChannel(Profile profile, Channel channel) throws Exception;
+    void subscribeToChannel(Long profileId, Long channelId) throws Exception;
 
     /**
      * Subscribing provided user to provided channel
-     * @param profile Profile entity
-     * @param channel Channel entity
+     * @param profileId Profile id
+     * @param channelId Channel id
      * @throws Exception If user is not subscribed to the channel
      */
-    void unsubscribeFromChannel(Profile profile, Channel channel) throws Exception;
+    void unsubscribeFromChannel(Long profileId, Long channelId) throws Exception;
 
     /**
      * Uploading avatar on provided channel
-     * @param channel Channel entity
+     * @param channelId Channel id
      * @param file Avatar
      */
-    void uploadChannelAvatar(Channel channel, MultipartFile file);
+    void uploadChannelAvatar(Channel channelId, MultipartFile file);
 
     /**
      * Listing all channels with pagination
@@ -77,22 +77,22 @@ public interface ChannelService {
 
     /**
      * Listing all channels owned by provided user with pagination
-     * @param profile Profile entity
+     * @param profileId Profile entity
      * @param page Number of the page
      * @return List of Channel entities
      */
-    List<Channel> getOwnedChannelsPaginated(Profile profile, int page);
+    List<Channel> getOwnedChannelsPaginated(Long profileId, int page);
 
     /**
      * Deleting channel
-     * @param channel Channel entity
+     * @param channelId Channel id
      */
-    void delete(Channel channel);
+    void delete(Long channelId);
 
     /**
      * Downloading channel's avatar
-     * @param channel Channel Entity
+     * @param channelId Channel Entity
      * @return Avatar in array of bytes
      */
-    byte[] downloadChannelImage(Channel channel);
+    byte[] downloadChannelImage(Long channelId);
 }
