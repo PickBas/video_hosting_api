@@ -1,4 +1,4 @@
-package com.saied.videohostingapi.models.marks;
+package com.saied.videohostingapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.saied.videohostingapi.models.Profile;

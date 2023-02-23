@@ -1,12 +1,12 @@
-package com.saied.videohostingapi.exceptions.profile;
+package com.saied.videohostingapi.exceptions.channel;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
-public class ProfileNotFoundException extends Exception {
+public class ChannelNotFoundException extends Exception {
 
-    public ProfileNotFoundException(String err) {
+    public ChannelNotFoundException (String err) {
         super(err);
     }
 }

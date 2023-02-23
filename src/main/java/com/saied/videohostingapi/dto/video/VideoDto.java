@@ -2,7 +2,7 @@ package com.saied.videohostingapi.dto.video;
 
 import com.saied.videohostingapi.models.Channel;
 import com.saied.videohostingapi.models.Video;
-import com.saied.videohostingapi.models.marks.Comment;
+import com.saied.videohostingapi.models.Comment;
 import com.saied.videohostingapi.models.marks.Dislike;
 import com.saied.videohostingapi.models.marks.Like;
 

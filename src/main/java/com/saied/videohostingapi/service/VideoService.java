@@ -1,7 +1,7 @@
 package com.saied.videohostingapi.service;
 
 import com.saied.videohostingapi.models.Video;
-import com.saied.videohostingapi.models.marks.Comment;
+import com.saied.videohostingapi.models.Comment;
 import com.saied.videohostingapi.models.marks.Dislike;
 import com.saied.videohostingapi.models.marks.Like;
 import org.springframework.web.multipart.MultipartFile;

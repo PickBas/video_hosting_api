@@ -2,6 +2,10 @@ package com.saied.videohostingapi.service;
 
 import com.saied.videohostingapi.dto.profile.ProfileDto;
 import com.saied.videohostingapi.dto.profile.ProfileUpdateDto;
+import com.saied.videohostingapi.exceptions.channel.ChannelNotFoundException;
+import com.saied.videohostingapi.exceptions.img.ImageFileIsEmptyException;
+import com.saied.videohostingapi.exceptions.img.InvalidImageFormatException;
+import com.saied.videohostingapi.exceptions.img.InvalidProvidedImageException;
 import com.saied.videohostingapi.exceptions.profile.ProfileNotFoundException;
 import com.saied.videohostingapi.exceptions.user.AppUserNotFoundException;
 import com.saied.videohostingapi.models.Profile;
@@ -30,7 +34,7 @@ public interface ProfileService {
      * @param profileId Profile id
      * @param channelId Channel id
      */
-    void addOwnedChannel(Long profileId, Long channelId) throws ProfileNotFoundException;
+    void addOwnedChannel(Long profileId, Long channelId) throws ProfileNotFoundException, ChannelNotFoundException;
 
     /**
      * Creating profile for a user
@@ -52,7 +56,8 @@ public interface ProfileService {
      * @param profileId Profile id
      * @param file Avatar
      */
-    void uploadProfileAvatar(Long profileId, MultipartFile file) throws ProfileNotFoundException;
+    void uploadProfileAvatar(Long profileId, MultipartFile file)
+        throws ProfileNotFoundException, ImageFileIsEmptyException, InvalidImageFormatException, InvalidProvidedImageException;
 
     /**
      * Downloading profile's avatar

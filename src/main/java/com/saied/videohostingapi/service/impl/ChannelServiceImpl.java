@@ -3,154 +3,276 @@ package com.saied.videohostingapi.service.impl;
 import com.saied.videohostingapi.bucket.BucketName;
 import com.saied.videohostingapi.dto.channel.ChannelCreateDto;
 import com.saied.videohostingapi.dto.channel.ChannelUpdateDto;
+import com.saied.videohostingapi.exceptions.channel.ChannelNotFoundException;
+import com.saied.videohostingapi.exceptions.channel.UserIsAlreadySubscribedException;
+import com.saied.videohostingapi.exceptions.channel.UserIsNotChannelOwnerException;
+import com.saied.videohostingapi.exceptions.channel.UserWasNotSubscribedException;
+import com.saied.videohostingapi.exceptions.img.InvalidProvidedImageException;
+import com.saied.videohostingapi.exceptions.profile.ProfileNotFoundException;
 import com.saied.videohostingapi.filestore.FileStore;
 import com.saied.videohostingapi.models.Channel;
 import com.saied.videohostingapi.models.Profile;
-import com.saied.videohostingapi.models.Video;
 import com.saied.videohostingapi.repositories.ChannelRepository;
-import com.saied.videohostingapi.repositories.ProfileRepository;
 import com.saied.videohostingapi.service.ChannelService;
+import com.saied.videohostingapi.service.ImgValidatorService;
+import com.saied.videohostingapi.service.ProfileService;
 import com.saied.videohostingapi.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.ValidationException;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Objects;
+import java.util.UUID;
 
-import static org.apache.http.entity.ContentType.*;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class ChannelServiceImpl implements ChannelService {
 
     private final ChannelRepository channelRepository;
-    private final ProfileRepository profileRepository;
+    private final ProfileService profileService;
     private final VideoService videoService;
+    private final ImgValidatorService imgValidatorService;
     private final FileStore fileStore;
 
     @Autowired
     public ChannelServiceImpl(
         ChannelRepository channelRepository,
-        ProfileRepository profileRepository,
+        ProfileService profileService,
         VideoService videoService,
+        ImgValidatorService imgValidatorService,
         FileStore fileStore
     ) {
         this.channelRepository = channelRepository;
-        this.profileRepository = profileRepository;
+        this.profileService = profileService;
         this.videoService = videoService;
+        this.imgValidatorService = imgValidatorService;
         this.fileStore = fileStore;
     }
 
     @Override
-    public Channel findById(Long id) {
-        return channelRepository.findById(id).orElse(null);
+    @Transactional(readOnly = true, rollbackFor = ChannelNotFoundException.class)
+    public Channel findById(Long id) throws ChannelNotFoundException {
+        return channelRepository
+            .findById(id)
+            .orElseThrow(
+                () -> {
+                    log.warn("Channel with id: {}; does not exist", id);
+                    return new ChannelNotFoundException(
+                        String.format("Could not find channel with id: %s", id)
+                    );
+                }
+            );
     }
 
     @Override
-    public Channel create(Profile channelOwner, ChannelCreateDto requestDto) {
-        Channel channel = new Channel();
-        channel.setName(requestDto.getName());
-        channel.setInfo(requestDto.getInfo());
-        channel.setOwner(channelOwner);
-        channel.setCreated(new Timestamp(System.currentTimeMillis()));
-        channel.setUpdated(new Timestamp(System.currentTimeMillis()));
-        return channelRepository.save(channel);
+    @Transactional(rollbackFor = ProfileNotFoundException.class)
+    public Channel create(
+        Long channelOwnerId,
+        ChannelCreateDto requestDto
+    ) throws ProfileNotFoundException {
+        Profile channelOwner = this.profileService.findById(channelOwnerId);
+        return Channel.builder()
+            .name(requestDto.getName())
+            .info(requestDto.getInfo())
+            .owner(channelOwner)
+            .build();
     }
 
     @Override
-    public void update(Channel channel, ChannelUpdateDto channelUpdateDto) throws ValidationException {
-        isChannelDataValid(channel, channelUpdateDto);
-        channel.setUpdated(new Timestamp(System.currentTimeMillis()));
-        channel.setName(channelUpdateDto.getName() != null ? channelUpdateDto.getName() : "");
-        channel.setInfo(channelUpdateDto.getInfo() != null ? channelUpdateDto.getInfo() : "");
-        channelRepository.save(channel);
-    }
-
-    private void isChannelDataValid(
-        Channel channel,
+    @Transactional(
+        rollbackFor = {
+            ValidationException.class,
+            ChannelNotFoundException.class,
+            UserIsNotChannelOwnerException.class
+        }
+    )
+    public void update(
+        Long profileId,
+        Long channelId,
         ChannelUpdateDto channelUpdateDto
-    ) throws ValidationException {
-        if (channelUpdateDto.getName() == null && channel.getInfo() == null)
-            throw new ValidationException("Wrong data was provided");
-    }
-
-    @Override
-    public boolean isProfileOwner(Profile profile, Channel channel) {
-        return profile == channel.getOwner();
-    }
-
-    @Override
-    public void subscribeToChannel(Profile profile, Channel channel) throws IllegalStateException {
-        if (isProfileOwner(profile, channel)) {
-            throw new IllegalStateException("The user is the owner of the channel!");
+    ) throws ValidationException, ChannelNotFoundException, UserIsNotChannelOwnerException {
+        Channel channel = this.findById(channelId);
+        this.isProfileOwner(profileId, channel);
+        this.isChannelDataValid(channelUpdateDto);
+        if (channelUpdateDto.getName() != null) {
+            channel.setName(channelUpdateDto.getName());
         }
-        if (channel.getSubscribers().contains(profile)) {
-            throw new IllegalStateException("The user has already subscribed to the channel!");
+        if (channelUpdateDto.getInfo() != null) {
+            channel.setInfo(channelUpdateDto.getInfo());
         }
-        profile.addSubscription(channel);
-        profileRepository.save(profile);
-        channel.addSubscriber(profile);
-        channelRepository.save(channel);
-
     }
 
     @Override
-    public void unsubscribeFromChannel(Profile profile, Channel channel) throws Exception {
-        if (!channel.getSubscribers().contains(profile)) {
-            throw new Exception("the user did not subscribe to the channel");
+    @Transactional(readOnly = true)
+    public void isProfileOwner(Long profileId, Channel channel)
+        throws UserIsNotChannelOwnerException {
+        if (!channel.getOwner().getId().equals(profileId)) {
+            throw new UserIsNotChannelOwnerException(
+                String.format(
+                    "Profile with id: %s; is not owner of channel with id: %s. Action unauthorized",
+                    profileId,
+                    channel.getId()
+                )
+            );
         }
-        profile.removeSubscription(channel);
-        profileRepository.save(profile);
-        channel.removeSubscriber(profile);
-        channelRepository.save(channel);
-
     }
 
     @Override
-    public void uploadChannelAvatar(Channel channel, MultipartFile file) {
-        isEmptyFile(file);
-        isImage(file);
-        Map<String, String> uploadPathData = getUploadPathData(channel, file);
+    @Transactional(
+        rollbackFor = {
+            ProfileNotFoundException.class,
+            ChannelNotFoundException.class,
+            UserIsAlreadySubscribedException.class
+        }
+    )
+    public void subscribeToChannel(
+        Long profileId,
+        Long channelId
+    ) throws
+        ProfileNotFoundException,
+        ChannelNotFoundException,
+        UserIsAlreadySubscribedException {
+        Profile profile = this.profileService.findById(profileId);
+        Channel channel = this.findById(channelId);
+        profile.addSub(channel);
+    }
+
+    @Override
+    @Transactional(
+        rollbackFor = {
+            ProfileNotFoundException.class,
+            ChannelNotFoundException.class,
+            UserWasNotSubscribedException.class
+        }
+    )
+    public void unsubscribeFromChannel(
+        Long profileId,
+        Long channelId
+    ) throws
+        ProfileNotFoundException,
+        ChannelNotFoundException,
+        UserWasNotSubscribedException {
+        Profile profile = this.profileService.findById(profileId);
+        Channel channel = this.findById(channelId);
+        profile.removeSub(channel);
+    }
+
+    @Override
+    @Transactional(rollbackFor = {
+        InvalidProvidedImageException.class,
+        ChannelNotFoundException.class,
+        UserIsNotChannelOwnerException.class,
+    })
+    public void uploadChannelAvatar(
+        Long profileId,
+        Long channelId,
+        MultipartFile file
+    ) throws InvalidProvidedImageException, ChannelNotFoundException, UserIsNotChannelOwnerException {
+        this.imgValidatorService.isValidImage(file);
+        Channel channel = this.findById(channelId);
+        this.isProfileOwner(profileId, channel);
+        Map<String, String> uploadPathData = getUploadPathData(channelId, file);
         try {
-            fileStore.save(uploadPathData.get("path"),
-                    uploadPathData.get("filename"),
-                    Optional.of(getMetadata(file)),
-                    file.getInputStream());
-            channel.setAvatarUrl(uploadPathData.get("basicUrl") +
-                    channel.getId() +
-                    "/" +
-                    uploadPathData.get("filename"));
-            channelRepository.save(channel);
+            fileStore.save(
+                uploadPathData.get("path"),
+                uploadPathData.get("filename"),
+                Optional.of(getMetadata(file)),
+                file.getInputStream()
+            );
+            channel.setAvatarUrl(
+                uploadPathData.get("basicUrl") +
+                channel.getId() +
+                "/" +
+                uploadPathData.get("filename")
+            );
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Channel> getChannelsPaginated(int offset, int pageSize) {
+        return this.channelRepository.findAll(PageRequest.of(offset, pageSize));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Channel> getOwnedChannelsPaginated(
+        Long profileId,
+        int offset,
+        int pageSize
+    ) {
+        return this.channelRepository.findAllByOwnerId(profileId, PageRequest.of(offset, pageSize))
+    }
+
+    @Override
+    @Transactional(rollbackFor = {
+            ChannelNotFoundException.class,
+            UserIsNotChannelOwnerException.class,
+        }
+    )
+    public void delete(
+        Long profileId,
+        Long channelId
+    ) throws ChannelNotFoundException, UserIsNotChannelOwnerException {
+        Channel channel = this.findById(channelId);
+        this.isProfileOwner(profileId, channel);
+        this.channelRepository.delete(channel);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] downloadChannelImage(Long channelId) throws ChannelNotFoundException {
+        Channel channel = this.findById(channelId);
+        String path = String.format("%s/%s",
+            BucketName.BUCKET.getBucketName(),
+            channelId);
+        String[] pathArr = channel.getAvatarUrl().split("/");
+        String filename = pathArr[pathArr.length - 1];
+        return fileStore.download(path, filename);
+    }
+
+    /**
+     * Checking if provided data is valid for updating channel's info
+     * @param channelUpdateDto Requested data to update
+     * @throws ValidationException if data is invalid
+     */
+    private void isChannelDataValid(ChannelUpdateDto channelUpdateDto) throws ValidationException {
+        if (channelUpdateDto.getName() == null && channelUpdateDto.getInfo() == null) {
+            throw new ValidationException("Provided channelUpdateDto is invalid");
+        }
+    }
+
+    /**
+     * Getting metadata of an avatar
+     * @param file MultipartFile
+     * @return  HashMap with `Content-Type` and `Content-Length` keys
+     */
     private Map<String, String> getMetadata(MultipartFile file) {
         Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Type", file.getContentType());
-        metadata.put("content-length", String.valueOf(file.getSize()));
+        metadata.put("Content-Length", String.valueOf(file.getSize()));
         return metadata;
     }
 
-    private void isImage(MultipartFile file) {
-        if (!Arrays.asList(
-                IMAGE_JPEG.getMimeType(),
-                IMAGE_PNG.getMimeType(),
-                IMAGE_GIF.getMimeType()).contains(file.getContentType())) {
-            throw new IllegalStateException("Failure: file must be an image [" + file.getContentType() + "]");
-        }
-    }
-
-    private void isEmptyFile(MultipartFile file) {
-        if (file.isEmpty()) {
-            throw new IllegalStateException("Failure: cannot upload empty file [ " + file.getSize() + "]");
-        }
-    }
-
-    private Map<String, String> getUploadPathData(Channel channel, MultipartFile file) {
+    /**
+     * Gitting upload path for image
+     * @param channelId Channel id
+     * @param file MultipartFile
+     * @return HashMap with `basicUrl`, `originalFileName`. `path` and `filename` keys
+     */
+    private Map<String, String> getUploadPathData(Long channelId, MultipartFile file) {
         Map<String, String> uploadPathData = new HashMap<>();
         String basicUrl =
                 "https://"
@@ -159,48 +281,21 @@ public class ChannelServiceImpl implements ChannelService {
                 + BucketName.BUCKET.getBucketRegion()
                 + ".amazonaws.com/";
         uploadPathData.put("basicUrl", basicUrl);
-        uploadPathData.put("originalFileName",
-                Objects.requireNonNull(file.getOriginalFilename()).replaceAll(" ", "_"));
-        uploadPathData.put("path",
-                String.format("%s/%s", BucketName.BUCKET.getBucketName(), channel.getId()));
-        uploadPathData.put("filename",
-                String.format("%s-%s", UUID.randomUUID(), uploadPathData.get("originalFileName")));
+        uploadPathData.put(
+            "originalFileName",
+            Objects
+                .requireNonNull(file.getOriginalFilename())
+                .replaceAll(" ", "_")
+        );
+        uploadPathData.put(
+            "path",
+            String.format("%s/%s", BucketName.BUCKET.getBucketName(), channelId)
+        );
+        uploadPathData.put(
+            "filename",
+            String.format("%s-%s", UUID.randomUUID(), uploadPathData.get("originalFileName"))
+        );
         return uploadPathData;
-    }
-
-    @Override
-    public List<Channel> getAllOwnedChannels(Profile profile) {
-        List<Channel> channels = channelRepository.findAll();
-        List<Channel> ownedChannels = new ArrayList<>();
-        for (Channel channel : channels) {
-            if (channel.getOwner().equals(profile)) {
-                ownedChannels.add(channel);
-            }
-        }
-        return ownedChannels;
-    }
-
-    @Override
-    public byte[] downloadChannelImage(Channel channel) {
-        String path = String.format("%s/%s",
-                BucketName.BUCKET.getBucketName(),
-                channel.getId());
-        String[] pathArr = channel.getAvatarUrl().split("/");
-        String filename = pathArr[pathArr.length - 1];
-        return fileStore.download(path, filename);
-    }
-
-    @Override
-    public void delete(Channel channel) {
-        for (Video video : channel.getVideos())
-            videoService.delete(video.getId());
-        channel.setSubscribers(new ArrayList<>());
-        channelRepository.save(channel);
-        List<Channel> ownedChannels = channel.getOwner().getOwnedChannels();
-        ownedChannels.remove(channel);
-        channel.getOwner().setOwnedChannels(ownedChannels);
-        profileRepository.save(channel.getOwner());
-        channelRepository.deleteById(channel.getId());
     }
 
 }

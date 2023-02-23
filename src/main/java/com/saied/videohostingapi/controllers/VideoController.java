@@ -6,7 +6,7 @@ import com.saied.videohostingapi.dto.video.VideoDto;
 import com.saied.videohostingapi.models.Channel;
 import com.saied.videohostingapi.models.Profile;
 import com.saied.videohostingapi.models.Video;
-import com.saied.videohostingapi.models.marks.Comment;
+import com.saied.videohostingapi.models.Comment;
 import com.saied.videohostingapi.service.ChannelService;
 import com.saied.videohostingapi.service.ProfileService;
 import com.saied.videohostingapi.service.UserService;

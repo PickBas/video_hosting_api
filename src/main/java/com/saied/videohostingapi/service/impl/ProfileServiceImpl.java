@@ -3,6 +3,10 @@ package com.saied.videohostingapi.service.impl;
 import com.saied.videohostingapi.bucket.BucketName;
 import com.saied.videohostingapi.dto.profile.ProfileDto;
 import com.saied.videohostingapi.dto.profile.ProfileUpdateDto;
+import com.saied.videohostingapi.exceptions.channel.ChannelNotFoundException;
+import com.saied.videohostingapi.exceptions.img.ImageFileIsEmptyException;
+import com.saied.videohostingapi.exceptions.img.InvalidImageFormatException;
+import com.saied.videohostingapi.exceptions.img.InvalidProvidedImageException;
 import com.saied.videohostingapi.exceptions.profile.ProfileNotFoundException;
 import com.saied.videohostingapi.exceptions.user.AppUserNotFoundException;
 import com.saied.videohostingapi.filestore.FileStore;
@@ -10,6 +14,7 @@ import com.saied.videohostingapi.models.Channel;
 import com.saied.videohostingapi.models.Profile;
 import com.saied.videohostingapi.repositories.ProfileRepository;
 import com.saied.videohostingapi.service.ChannelService;
+import com.saied.videohostingapi.service.ImgValidatorService;
 import com.saied.videohostingapi.service.ProfileService;
 import com.saied.videohostingapi.service.UserService;
 
@@ -19,9 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.ValidationException;
-import static org.apache.http.entity.ContentType.IMAGE_GIF;
-import static org.apache.http.entity.ContentType.IMAGE_JPEG;
-import static org.apache.http.entity.ContentType.IMAGE_PNG;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -29,7 +31,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Arrays;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,6 +41,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final ProfileRepository profileRepository;
     private final UserService userService;
     private final ChannelService channelService;
+    private final ImgValidatorService imgValidatorService;
     private final FileStore fileStore;
 
     @Autowired
@@ -47,11 +49,13 @@ public class ProfileServiceImpl implements ProfileService {
         ProfileRepository profileRepository,
         UserService userService,
         ChannelService channelService,
+        ImgValidatorService imgValidatorService,
         FileStore fileStore
     ) {
         this.profileRepository = profileRepository;
         this.userService = userService;
         this.channelService = channelService;
+        this.imgValidatorService = imgValidatorService;
         this.fileStore = fileStore;
     }
 
@@ -136,18 +140,17 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    @Transactional(rollbackFor = ProfileNotFoundException.class)
+    @Transactional(rollbackFor = {
+            ProfileNotFoundException.class,
+            InvalidProvidedImageException.class
+        }
+    )
     public void uploadProfileAvatar(
         Long profileId,
         MultipartFile file
-    ) throws ProfileNotFoundException {
+    ) throws ProfileNotFoundException, InvalidProvidedImageException {
         Profile profile = this.findById(profileId);
-        try {
-            this.isEmptyFile(file);
-            this.isImage(file);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+        this.imgValidatorService.isValidImage(file);
         String basicUrl = "https://"
                 + BucketName.BUCKET.getBucketName()
                 + ".s3."
@@ -165,32 +168,6 @@ public class ProfileServiceImpl implements ProfileService {
             profile.setAvatarUrl(basicUrl + profileId + "/" + filename);
         } catch (IOException e) {
             throw new IllegalStateException(e);
-        }
-    }
-
-    /**
-     * Checking if file is image
-     * @param file File
-     */
-    private void isImage(MultipartFile file) throws Exception {
-        if (
-            !Arrays.asList(
-                IMAGE_JPEG.getMimeType(),
-                IMAGE_PNG.getMimeType(),
-                IMAGE_GIF.getMimeType()
-            ).contains(file.getContentType())
-        ) {
-            throw new Exception("Failure: file must be an image [" + file.getContentType() + "]");
-        }
-    }
-
-    /**
-     * Checking if file is empty
-     * @param file File
-     */
-    private void isEmptyFile(MultipartFile file) throws Exception {
-        if (file.isEmpty()) {
-            throw new Exception("Failure: cannot upload empty file [ " + file.getSize() + "]");
         }
     }
 
