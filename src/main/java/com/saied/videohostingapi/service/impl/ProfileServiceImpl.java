@@ -104,7 +104,12 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    @Transactional(rollbackFor = {ProfileNotFoundException.class, ChannelNotFoundException.class})
+    @Transactional(
+        rollbackFor = {
+            ProfileNotFoundException.class,
+            ChannelNotFoundException.class
+        }
+    )
     public void addOwnedChannel(
         Long profileId,
         Long channelId
@@ -115,7 +120,9 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    @Transactional(rollbackFor = {ProfileNotFoundException.class, ValidationException.class})
+    @Transactional(
+        rollbackFor = {ProfileNotFoundException.class, ValidationException.class}
+    )
     public void update(
         Long profileId,
         ProfileUpdateDto profileUpdateDto
@@ -201,13 +208,17 @@ public class ProfileServiceImpl implements ProfileService {
         return fileStore.download(path, filename);
     }
 
+    /**
+     * Getting file's metadata
+     * @param file MultipartFile
+     * @return HashMap with Content-Type and Content-Length keys
+     */
     private Map<String, String> getMetadata(MultipartFile file) {
         Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Type", file.getContentType());
         metadata.put("Content-Length", String.valueOf(file.getSize()));
         return metadata;
     }
-
 
     @Override
     public void delete(Long id) {
