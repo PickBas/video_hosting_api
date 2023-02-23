@@ -45,16 +45,8 @@ public class Profile {
     private Long id;
     @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL)
     private User user;
-    @Column(name = "about_profile_info")
-    private String aboutProfileInfo;
-    @Column(name = "gender")
-    private Character gender;
     @Column(name = "country")
     private String country;
-    @Column(name = "custom_url")
-    private String customUrl;
-    @Column(name = "private_sublist")
-    private boolean privateSublist;
     @Column(name = "avatar_url")
     private String avatarUrl;
     @CreatedDate
@@ -76,4 +68,8 @@ public class Profile {
     @OneToMany(cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Channel> subscriptions;
+
+    public void addOwnedChannel(Channel channel) {
+        this.ownedChannels.add(channel);
+    }
 }

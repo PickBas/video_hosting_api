@@ -2,6 +2,7 @@ package com.saied.videohostingapi.service;
 
 import com.saied.videohostingapi.dto.user.UpdateUserDto;
 import com.saied.videohostingapi.dto.user.UserRegistrationDto;
+import com.saied.videohostingapi.exceptions.profile.ProfileNotFoundException;
 import com.saied.videohostingapi.exceptions.user.AppUserNotFoundException;
 import com.saied.videohostingapi.exceptions.user.AppUserAlreadyExistsException;
 import com.saied.videohostingapi.models.User;
@@ -67,7 +68,7 @@ public interface UserService {
      * @param profileId ProfileId
      * @return User entity
      */
-    User findByProfile(Long profileId) throws AppUserNotFoundException;
+    User findByProfile(Long profileId) throws AppUserNotFoundException, ProfileNotFoundException;
 
     /**
      * Finding user by username

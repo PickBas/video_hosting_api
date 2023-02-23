@@ -2,6 +2,7 @@ package com.saied.videohostingapi.service.impl;
 
 import com.saied.videohostingapi.dto.user.UpdateUserDto;
 import com.saied.videohostingapi.dto.user.UserRegistrationDto;
+import com.saied.videohostingapi.exceptions.profile.ProfileNotFoundException;
 import com.saied.videohostingapi.exceptions.user.AppUserNotFoundException;
 import com.saied.videohostingapi.exceptions.user.AppUserAlreadyExistsException;
 import com.saied.videohostingapi.models.Role;
@@ -47,7 +48,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public User findByUsername(String username) throws AppUserNotFoundException {
-        return userRepository
+        return this.userRepository
             .findByUsername(username)
             .orElseThrow(
                 () -> {
@@ -62,7 +63,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public User findById(Long id) throws AppUserNotFoundException {
-        return userRepository
+        return this.userRepository
             .findById(id)
             .orElseThrow(
                 () -> {
@@ -75,9 +76,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByProfile(Long profileId) throws AppUserNotFoundException {
-        return userRepository
-            .findByProfile(profileService.findById(profileId))
+    public User findByProfile(Long profileId) throws AppUserNotFoundException, ProfileNotFoundException {
+        return this.userRepository
+            .findByProfile(this.profileService.findById(profileId))
             .orElseThrow(
                 () -> {
                     log.warn("User does not exist with profile_id: {}", profileId);
@@ -100,12 +101,12 @@ public class UserServiceImpl implements UserService {
             );
         }
         List<Role> userRoles = new ArrayList<>();
-        Role roleUser = roleRepository.findByName("ROLE_USER");
+        Role roleUser = this.roleRepository.findByName("ROLE_USER");
         userRoles.add(roleUser);
         User.builder()
             .username(userRegDto.getUsername())
             .email(userRegDto.getEmail())
-            .password(passwordEncoder.encode(userRegDto.getPassword()))
+            .password(this.passwordEncoder.encode(userRegDto.getPassword()))
             .roles(userRoles)
             .build();
         log.info(
@@ -124,7 +125,7 @@ public class UserServiceImpl implements UserService {
         Long profileId
     ) throws ProfileNotFoundException, AppUserNotFoundException {
         User user = this.findById(userId);
-        user.setProfile(profileService.findById(profileId));
+        user.setProfile(this.profileService.findById(profileId));
         log.info("Profile was set with id: {}; for user with id: {}", profileId, userId);
     }
 
@@ -142,7 +143,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updatePassword(Long userId, String password) throws AppUserNotFoundException {
         User user = this.findById(userId);
-        user.setPassword(passwordEncoder.encode(password));
+        user.setPassword(this.passwordEncoder.encode(password));
         log.info("Password was updated for user with id: {}", userId);
     }
 
@@ -166,12 +167,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<User> getUsersPaginated(int offset, int pageSize) {
-        return userRepository.findAll(PageRequest.of(offset, pageSize));
+        return this.userRepository.findAll(PageRequest.of(offset, pageSize));
     }
 
     @Override
     public void delete(Long id) {
-        userRepository.deleteById(id);
+        this.userRepository.deleteById(id);
         log.info("Deleted user with id: {}", id);
 
     }
